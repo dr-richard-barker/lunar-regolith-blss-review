@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this work or interactive models, please cite it as below."
+title: "From Dust to Bio-Infrastructure: A Mechanistic Review of Sintered Regolith Ceramics for Lunar Biogenerative Life Support Systems"
+abstract: "A comprehensive mechanistic review and systems engineering evaluation of sintered regolith ceramics as bio-infrastructure for lunar biogenerative life support systems."
+type: article
+authors:
+  - family-names: "Author"
+    given-names: "Lead"
+    affiliation: "Advanced Life Support and Space Bio-Engineering Group"
+keywords:
+  - "lunar regolith"
+  - "biogenerative life support systems"
+  - "ISRU"
+  - "sintered ceramics"
+  - "microgravity fluid dynamics"
+  - "equivalent system mass"
+license: "CC-BY-4.0"
+repository-code: "https://github.com/organization/lunar-regolith-blss-review"
+url: "https://organization.github.io/lunar-regolith-blss-review"
+date-released: 2026-09-06

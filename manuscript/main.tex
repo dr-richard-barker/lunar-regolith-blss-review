@@ -1,0 +1,102 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Typography & Encodings ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\setstretch{1.15}
+
+% --- Layout & Margins ---
+\usepackage[margin=1in]{geometry}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+
+% --- Mathematics & Science ---
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{chemformula}
+\usepackage{siunitx}
+
+% --- Graphics & Tables ---
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup{font=small,labelfont=bf,labelsep=period}
+
+% --- Citations & References ---
+% Nature style citations (superscript without brackets in text)
+\usepackage[super,sort&compress]{natbib}
+\setcitestyle{super,comma}
+
+% --- Hyperlinks & Colors ---
+\usepackage{xcolor}
+\definecolor{natureblue}{RGB}{0,70,140}
+\usepackage[
+    colorlinks=true,
+    linkcolor=natureblue,
+    citecolor=natureblue,
+    urlcolor=natureblue,
+    breaklinks=true
+]{hyperref}
+
+% --- Section Formatting (Nature Portfolio style) ---
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\small\bfseries}{\thesubsubsection}{0.5em}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{npj Microgravity Review (In Preparation)}}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\begin{document}
+
+% --- Front Matter ---
+\title{\textbf{\Large From Dust to Bio-Infrastructure: A Mechanistic Review of Sintered Regolith Ceramics for Lunar Biogenerative Life Support Systems}}
+
+\author{
+    \textbf{First Author}$^{1,*}$, \textbf{Second Author}$^{1,2}$, \textbf{Collaborator Three}$^{3}$, and \textbf{Lead Author}$^{1,4,\dagger}$
+}
+
+\date{
+    \small
+    $^{1}$Advanced Life Support and Space Bio-Engineering Group, Planetary Exploration Directorate\\
+    $^{2}$Department of Materials Science and Engineering, Institute of Technology\\
+    $^{3}$Division of Plant Biology and Microgravity Omics, Aerospace Biological Sciences\\
+    $^{4}$In-Situ Resource Utilization and Planetary Infrastructures Center\\[1ex]
+    $^{*}$Equal contribution; $^{\dagger}$Corresponding author: \texttt{author@organization.edu}\\[2ex]
+    \today
+}
+
+\maketitle
+
+% --- Abstract & Keywords ---
+\input{sections/00_abstract.tex}
+
+\vspace{1em}
+\hrule
+\vspace{1.5em}
+
+% --- Main Body Sections ---
+\input{sections/01_introduction.tex}
+\input{sections/02_toxicology_and_passivation.tex}
+\input{sections/03_materials_and_manufacturing.tex}
+\input{sections/04_multiphase_fluid_dynamics.tex}
+\input{sections/05_systems_engineering_esm.tex}
+\input{sections/06_closed_loop_ecosystems.tex}
+\input{sections/07_roadmap_and_trl.tex}
+\input{sections/08_conclusion.tex}
+\input{sections/09_declarations.tex}
+
+% --- References ---
+\newpage
+\bibliographystyle{naturemag}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,24 @@
+{
+  "title": "From Dust to Bio-Infrastructure: A Mechanistic Review of Sintered Regolith Ceramics for Lunar Biogenerative Life Support Systems",
+  "description": "Complete research compendium including LaTeX manuscript, verified 59-reference bibliography, publication figures, interactive simulation tools, and NASA BVAD Equivalent System Mass analysis models.",
+  "creators": [
+    {
+      "name": "Lunar BLSS Research Collaboration",
+      "affiliation": "Planetary Exploration Directorate"
+    }
+  ],
+  "access_right": "open",
+  "license": "CC-BY-4.0",
+  "keywords": [
+    "Lunar Regolith",
+    "Biogenerative Life Support Systems",
+    "ISRU",
+    "Porous Ceramics",
+    "Microwave Sintering",
+    "Microgravity Hydrodynamics",
+    "Equivalent System Mass",
+    "npj Microgravity"
+  ],
+  "upload_type": "publication",
+  "publication_type": "article"
+}
