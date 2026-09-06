@@ -1,0 +1,80 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usepackage{amsmath}
+\usepackage{pgfgantt}
+\usepackage{xcolor}
+
+\definecolor{coseblue}{RGB}{59,110,165}
+\definecolor{coseteal}{RGB}{63,182,168}
+\definecolor{cosedark}{RGB}{47,89,133}
+\definecolor{coseamber}{RGB}{217,119,6}
+\definecolor{cosered}{RGB}{225,29,72}
+\definecolor{cosegreen}{RGB}{22,163,74}
+
+\begin{document}
+\sffamily
+\begin{ganttchart}[
+    canvas/.append style={fill=white, draw=black!20, line width=.75pt},
+    hgrid style/.style={draw=black!10, line width=.5pt},
+    vgrid={*5{draw=black!8, line width=.4pt}, *1{draw=black!25, line width=.75pt}},
+    title/.style={draw=none, fill=coseblue},
+    title label font=\bfseries\color{white}\small,
+    title height=0.6,
+    title top shift=0.05,
+    include title in canvas=false,
+    bar/.append style={fill=coseblue!75, draw=coseblue, rounded corners=2pt, line width=.5pt},
+    bar height=0.55,
+    bar label font=\footnotesize\color{black!80},
+    group/.append style={fill=cosedark, draw=cosedark},
+    group label font=\bfseries\small\color{cosedark},
+    group height=0.25,
+    milestone/.append style={fill=coseamber, draw=coseamber!80!black, rounded corners=1pt},
+    milestone height=0.4,
+    milestone label font=\bfseries\footnotesize\color{coseamber!80!black},
+    link/.style={->, thick, coseblue},
+    x unit=0.55cm,
+    y unit chart=0.68cm,
+    time slot format=simple
+]{1}{24}
+    \gantttitle{Closed-Loop Multitrophic Operational Sequencing: 120-Day Staggered Substrate Schedule}{24} \\
+    \gantttitle{Month 1 (Days 1--30)}{6}
+    \gantttitle{Month 2 (Days 31--60)}{6}
+    \gantttitle{Month 3 (Days 61--90)}{6}
+    \gantttitle{Month 4 (Days 91--120)}{6} \\
+    \gantttitlelist{5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120}{1} \\
+
+    % Track 1
+    \ganttgroup{Primary Crop Canopy (Dwarf Wheat Chamber Batch 1)}{1}{14} \\
+    \ganttbar[bar/.append style={fill=cosegreen!70, draw=cosegreen}]{Capillary imbibition \& seed germination (Days 1--7)}{1}{2} \\
+    \ganttbar[bar/.append style={fill=cosegreen!70, draw=cosegreen}]{Vegetative canopy development \& leaf expansion (Days 8--35)}{2}{7} \\
+    \ganttbar[bar/.append style={fill=cosegreen!70, draw=cosegreen}]{Anthesis, grain fill \& transpiration recovery (Days 36--70)}{8}{14} \\
+    \ganttmilestone{Wheat Harvest \& Residue Partition (Day 70)}{14} \\
+
+    % Track 2
+    \ganttgroup{Sintered Ceramic Substrate Regeneration (Module A)}{14}{17} \\
+    \ganttbar[bar/.append style={fill=coseblue!70, draw=coseblue}]{Root severance, water purge \& inspection (Day 71)}{14}{15} \\
+    \ganttbar[bar/.append style={fill=cosered!75, draw=cosered}]{$500^\circ$C pyrolytic bake-out \& ECLSS gas loop recovery (Day 72)}{15}{15} \\
+    \ganttbar[bar/.append style={fill=coseteal!70, draw=coseteal}]{Mineral ash flush \& liquid fertilizer re-wetting (Days 73--75)}{15}{16} \\
+    \ganttmilestone{Substrate Sterile \& Ready for Replanting (Day 75)}{16} \\
+    \ganttbar[bar/.append style={fill=cosegreen!70, draw=cosegreen}]{Wheat Batch 2 seeding \& capillary re-start (Days 76--82)}{16}{17} \\
+
+    % Track 3
+    \ganttgroup{Staggered Continuous Crop Canopy (Salad Greens)}{2}{21} \\
+    \ganttbar[bar/.append style={fill=cosegreen!55, draw=cosegreen}]{Greens Batch 2A (Nursery to harvest, Days 10--38)}{2}{8} \\
+    \ganttbar[bar/.append style={fill=cosegreen!55, draw=cosegreen}]{Greens Batch 2B (Nursery to harvest, Days 40--68)}{8}{14} \\
+    \ganttbar[bar/.append style={fill=cosegreen!55, draw=cosegreen}]{Greens Batch 2C (Nursery to harvest, Days 70--98)}{14}{20} \\
+
+    % Track 4
+    \ganttgroup{Saprotrophic Mycoponics (Inedible Straw Bioconversion)}{14}{20} \\
+    \ganttbar[bar/.append style={fill=coseamber!65, draw=coseamber}]{Wheat straw shredding \& steam pasteurization (Days 71--73)}{14}{15} \\
+    \ganttbar[bar/.append style={fill=coseamber!65, draw=coseamber}]{Pleurotus ostreatus mycelial inoculation (Days 74--76)}{15}{16} \\
+    \ganttbar[bar/.append style={fill=coseamber!65, draw=coseamber}]{Hyphal colonization of porous ceramic matrix (Days 77--90)}{16}{18} \\
+    \ganttbar[bar/.append style={fill=coseamber!85, draw=coseamber!90!black}]{Fruiting flush induction \& mushroom harvest (Days 91--98)}{19}{20} \\
+
+    % Track 5
+    \ganttgroup{Microbial Bioweathering Loop (Decoupled External Reactor)}{3}{9} \\
+    \ganttbar[bar/.append style={fill=cosedark!70, draw=cosedark}]{Raw regolith dust loading into isolated vessel (Days 15--17)}{3}{4} \\
+    \ganttbar[bar/.append style={fill=cosedark!70, draw=cosedark}]{Acidolysis bioleaching with S. desiccabilis (Days 18--32)}{4}{7} \\
+    \ganttbar[bar/.append style={fill=cosedark!70, draw=cosedark}]{Ultrafiltration \& heavy metal exclusion (Days 33--35)}{7}{8} \\
+    \ganttmilestone{Purified K/Mg/P Nutrient Injection into Loop (Day 36)}{8}
+\end{ganttchart}
+\end{document}

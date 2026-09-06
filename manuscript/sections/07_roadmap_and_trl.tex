@@ -1,7 +1,14 @@
 \section{Strategic Outlook and Technology Development Roadmap}
 \label{sec:roadmap}
 
-Transitioning sintered regolith bio-infrastructure from terrestrial laboratory validation to operational lunar deployment requires a structured Technology Readiness Level (TRL) maturation strategy\cite{ming1989lunar,fateri2019solar,santomartino2024ecomine}. Current research resides predominantly at TRL 2 to 3, characterized by benchtop sintering of lunar regolith simulants and biological assays on returned Apollo samples\cite{paul2022plants,fateri2019solar}. Maturing these technologies into flight-ready systems requires a three-phase development roadmap aligned with international Artemis and lunar exploration campaigns (Figure~\ref{fig:trl_roadmap} and Table~\ref{tab:trl_roadmap}):
+Transitioning sintered regolith bio-infrastructure from terrestrial laboratory validation to operational lunar deployment requires a structured Technology Readiness Level (TRL) maturation strategy\cite{ming1989lunar,fateri2019solar,santomartino2024ecomine}. Current research resides predominantly at TRL 2 to 3, characterized by benchtop sintering of lunar regolith simulants and biological assays on returned Apollo samples\cite{paul2022plants,fateri2019solar}. Maturing these technologies into flight-ready systems requires a synchronized, multi-track development roadmap aligned with international Artemis and lunar exploration campaigns (Figures~\ref{fig:trl_roadmap}--\ref{fig:trl_gantt} and Table~\ref{tab:trl_roadmap}):
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/fig7_trl_gantt.png}
+    \caption{\textbf{Strategic technology maturation and multi-track development Gantt schedule (2024--2035).} Concurrent maturation trajectories across Track A (Sintering Physics \& ISRU Hardware), Track B (Fluid Dynamics \& Substrate Architecture), Track C (Agronomy \& Multitrophic Loops), and Track D (Bioweathering \& Substrate Lifecycle). Critical path milestones include the CLPS lunar surface sintering experiment (late 2027), ISS $1/6\,g$ fluidics and aeration qualification (mid 2028), and full-scale habitat ECLSS loop integration ($>$2031).}
+    \label{fig:trl_gantt}
+\end{figure}
 
 \subsection{Phase 1: Laboratory Formulations and Simulant Validation (2024--2026, \texorpdfstring{TRL 1 $\to$ 3}{TRL 1-3})}
 The foundational phase centers on materials characterization and multiphysics process modeling using high-fidelity lunar highland and mare simulants\cite{paul2022plants,chen2024measurement}. Key engineering milestones include mapping complex permittivity and dielectric loss tangents across microwave frequencies ($400\,\mathrm{MHz}\text{--}20\,\mathrm{GHz}$)\cite{chen2024measurement}, optimizing volumetric electromagnetic coupling\cite{lim2019numerical}, and establishing precise cooling curves ($<15^\circ\mathrm{C/min}$) to eliminate thermal-stress-induced microcracking\cite{xi2026multiphysics}. In parallel, multi-generational botanical and fungal assays must verify that sintered porous substrates fully eliminate the transcriptomic stress, ROS bursts, and telomeric DNA lesions observed in raw regolith\cite{paul2022plants,ming1989lunar,barbero2024telomere}.
@@ -11,6 +18,15 @@ The demonstration phase advances autonomous hardware to relevant spaceflight env
 
 \subsection{Phase 3: Operational Habitat Integration and Autonomous Production (\texorpdfstring{$>$2031}{>2031}, \texorpdfstring{TRL 7 $\to$ 9}{TRL 7-9})}
 The operational phase achieves full integration within a permanent lunar surface base\cite{ming1989lunar,metzger2023cost,anderson2021lunar}. Automated ISRU manufacturing systems will excavate and classify raw regolith, sinter modular hydroponic troughs, and install them into habitat life-support racks\cite{ming1989lunar,fateri2019solar,metzger2023cost}. The agricultural architecture will connect photoautotrophic crop canopies, saprotrophic mushroom cultivation, and external microbial bioweathering reactors into an interconnected closed loop\cite{ming1989lunar,liu2020bioregenerative,cockell2018biorock}. Incorporating automated $500^\circ\mathrm{C}$ pyrolytic bake-out cycles will enable infinite substrate re-use and $>98.5\%$ water recovery, providing a durable foundation for long-duration human life support on the lunar surface\cite{ming1989lunar,anderson2021lunar,barta1994thermal}.
+
+\subsection{Concurrent Multi-Track Maturation and Critical Path Dependencies}
+As mapped in the strategic Gantt schedule (Figure~\ref{fig:trl_gantt}), advancing lunar bio-infrastructure requires de-risking four concurrent technical tracks rather than pursuing sequential milestones:
+\begin{itemize}
+    \item \textbf{Track A (Sintering Physics \& ISRU):} Precursor materials characterization and multiphysics simulations directly inform the flight payload design scheduled for CLPS surface validation by late 2027 (TRL 5). Surface qualification under hard vacuum ($10^{-10}\,\mathrm{Torr}$) provides the empirical thermal constants necessary to scale the autonomous pilot plant to operational status (TRL 7--9) by 2031.
+    \item \textbf{Track B (Multiphase Fluid Dynamics):} Pore throat optimization ($30\text{--}60\,\mu\mathrm{m}$) conducted in terrestrial benchtop tests serves as the direct prerequisite for ISS variable-gravity centrifuge flight experiments (2026--2028), ensuring that zero-hypoxia root aeration is validated before modular hydroponic racks are integrated into habitat structures.
+    \item \textbf{Track C (Crop Canopy \& Multitrophic Loops):} Early botanical transcriptomic assays (TRL 1--3) transition into co-cultivation testbeds linking crops and saprotrophic fungi, establishing the baseline yield models required for habitat life-support sizing.
+    \item \textbf{Track D (Bioweathering \& Substrate Lifecycle):} Terrestrial microbial leaching kinetics transition into microgravity bioreactor demonstrations (building on the ESA BioRock legacy), ensuring continuous in-situ fertilizer replenishment is fully decoupled from the active plant root zone before full-scale base commissioning.
+\end{itemize}
 
 \begin{figure}[t!]
     \centering

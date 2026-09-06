@@ -1,0 +1,75 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usepackage{amsmath}
+\usepackage{pgfgantt}
+\usepackage{xcolor}
+
+\definecolor{coseblue}{RGB}{59,110,165}
+\definecolor{coseteal}{RGB}{63,182,168}
+\definecolor{cosedark}{RGB}{47,89,133}
+\definecolor{coseamber}{RGB}{217,119,6}
+\definecolor{coselight}{RGB}{224,242,254}
+\definecolor{cosegray}{RGB}{100,116,139}
+
+\begin{document}
+\sffamily
+\begin{ganttchart}[
+    canvas/.append style={fill=white, draw=black!20, line width=.75pt},
+    hgrid style/.style={draw=black!10, line width=.5pt},
+    vgrid={*5{draw=black!8, line width=.4pt}, *1{draw=black!25, line width=.75pt}},
+    title/.style={draw=none, fill=coseblue},
+    title label font=\bfseries\color{white}\small,
+    title height=0.6,
+    title top shift=0.05,
+    include title in canvas=false,
+    bar/.append style={fill=coseblue!75, draw=coseblue, rounded corners=2pt, line width=.5pt},
+    bar height=0.55,
+    bar label font=\footnotesize\color{black!80},
+    group/.append style={fill=cosedark, draw=cosedark},
+    group label font=\bfseries\small\color{cosedark},
+    group height=0.25,
+    milestone/.append style={fill=coseamber, draw=coseamber!80!black, rounded corners=1pt},
+    milestone height=0.4,
+    milestone label font=\bfseries\footnotesize\color{coseamber!80!black},
+    link/.style={->, thick, coseblue},
+    x unit=0.65cm,
+    y unit chart=0.68cm,
+    time slot format=simple
+]{1}{24}
+    \gantttitle{Strategic Technology Readiness (TRL 1--9) Maturation Horizon (2024--2035)}{24} \\
+    \gantttitle{Phase 1: Lab Formulations (TRL 1-3)}{6}
+    \gantttitle{Phase 2: Subscale Flight Testing (TRL 4-6)}{10}
+    \gantttitle{Phase 3: Operational Outpost (TRL 7-9)}{8} \\
+    \gantttitlelist{2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035}{2} \\
+
+    % Track A
+    \ganttgroup{Track A: Sintering Physics \& ISRU Hardware}{1}{23} \\
+    \ganttbar[bar/.append style={fill=coseteal!70, draw=coseteal}]{Dielectric permittivity mapping (400 MHz--20 GHz)}{1}{4} \\
+    \ganttbar[bar/.append style={fill=coseteal!70, draw=coseteal}]{Multiphysics microwave \& cooling models ($<15^\circ$C/min)}{2}{6} \\
+    \ganttbar[bar/.append style={fill=coseblue!80, draw=coseblue}]{CLPS flight demo sintering payload qualification}{5}{8} \\
+    \ganttmilestone{CLPS Lunar Sintering Experiment (TRL 5)}{8} \\
+    \ganttbar[bar/.append style={fill=coseblue!80, draw=coseblue}]{Autonomous vacuum sintering pilot plant test}{9}{14} \\
+    \ganttbar[bar/.append style={fill=cosedark!85, draw=cosedark}]{Full-scale ISRU ceramic habitat plant ops (TRL 7--9)}{15}{23} \\
+
+    % Track B
+    \ganttgroup{Track B: Fluid Dynamics \& Substrate Architecture}{1}{22} \\
+    \ganttbar[bar/.append style={fill=coseteal!70, draw=coseteal}]{Pore throat hydraulic envelope optimization ($30\text{--}60\,\mu$m)}{1}{3} \\
+    \ganttbar[bar/.append style={fill=coseteal!70, draw=coseteal}]{Terrestrial multi-cycle hydroponic benchtop validation}{2}{5} \\
+    \ganttbar[bar/.append style={fill=coseblue!80, draw=coseblue}]{ISS / Parabolic 1/6-g capillary aeration flight test}{6}{10} \\
+    \ganttmilestone{Flight Fluidics \& Aeration Qualified (TRL 6)}{10} \\
+    \ganttbar[bar/.append style={fill=cosedark!85, draw=cosedark}]{Modular ceramic hydroponic flight rack integration}{11}{17} \\
+
+    % Track C
+    \ganttgroup{Track C: Agronomy \& Multitrophic Loops}{1}{23} \\
+    \ganttbar[bar/.append style={fill=coseteal!70, draw=coseteal}]{Apollo sample \& simulant ROS / telomere assays}{1}{4} \\
+    \ganttbar[bar/.append style={fill=coseteal!70, draw=coseteal}]{Pleurotus mycoponics \& enzyme stability assays}{3}{6} \\
+    \ganttbar[bar/.append style={fill=coseblue!80, draw=coseblue}]{Closed crop-mycelium co-cultivation testbed}{6}{10} \\
+    \ganttbar[bar/.append style={fill=cosedark!85, draw=cosedark}]{Automated lunar greenhouse canopy deployment}{15}{22} \\
+
+    % Track D
+    \ganttgroup{Track D: Bioweathering \& Thermal Substrate Lifecycle}{1}{22} \\
+    \ganttbar[bar/.append style={fill=coseteal!70, draw=coseteal}]{Microbial bioleaching kinetics on basalt/simulant}{1}{4} \\
+    \ganttbar[bar/.append style={fill=coseblue!80, draw=coseblue}]{BioRock-successor fractional-g bioreactor flight}{5}{9} \\
+    \ganttbar[bar/.append style={fill=coseblue!80, draw=coseblue}]{Automated 500$^\circ$C pyrolytic bakeout qualification}{7}{12} \\
+    \ganttmilestone{Decoupled Bioweathering Loop Online (TRL 7)}{16}
+\end{ganttchart}
+\end{document}
