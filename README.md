@@ -2,8 +2,8 @@
 
 [![License: CC BY 4.0](https://img.shields.io/badge/Manuscript-CC--BY--4.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Build Manuscript](https://github.com/organization/lunar-regolith-blss-review/actions/workflows/build-manuscript.yml/badge.svg)](https://github.com/organization/lunar-regolith-blss-review/actions)
-[![GitHub Pages](https://img.shields.io/badge/Interactive%20Explorer-Live%20Demo-sky.svg)](https://organization.github.io/lunar-regolith-blss-review)
+[![Build Manuscript](https://github.com/dr-richard-barker/lunar-regolith-blss-review/actions/workflows/build-manuscript.yml/badge.svg)](https://github.com/dr-richard-barker/lunar-regolith-blss-review/actions)
+[![GitHub Pages](https://img.shields.io/badge/Interactive%20Explorer-Live%20Demo-sky.svg)](https://dr-richard-barker.github.io/lunar-regolith-blss-review)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.placeholder-orange.svg)](https://doi.org/10.5281/zenodo.placeholder)
 [![Style](https://img.shields.io/badge/Format-npj%20Microgravity-red.svg)](https://www.nature.com/npjmgrav/)
 
@@ -18,7 +18,7 @@ An open, collaborative, and FAIR (Findable, Accessible, Interoperable, Reusable)
 
 Explore the companion interactive tool with real-time parametric trade studies, fluid hydrodynamics simulations, and mission lifecycle economics:
 
-👉 **[Launch Interactive Explorer](https://organization.github.io/lunar-regolith-blss-review)**  
+👉 **[Launch Interactive Explorer](https://dr-richard-barker.github.io/lunar-regolith-blss-review)**  
 📄 **[Download Compiled Manuscript (PDF)](manuscript.pdf)**
 
 ### Key Interactive Features:
@@ -169,7 +169,7 @@ If you use this manuscript, repository, or interactive explorer in your research
   journal   = {npj Microgravity (In Preparation)},
   year      = {2026},
   doi       = {10.5281/zenodo.placeholder},
-  url       = {https://organization.github.io/lunar-regolith-blss-review}
+  url       = {https://dr-richard-barker.github.io/lunar-regolith-blss-review}
 }
 ```
 
