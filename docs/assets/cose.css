@@ -1,0 +1,200 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CoSE (Centre of Space Evolution) Brand Theme Design System
+   Adapted for Lunar Regolith BLSS Review — npj Microgravity Manuscript Draft
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* CoSE Primary Brand Palette */
+  --cose-blue:          #3B6EA5;
+  --cose-blue-light:    #5a8bc0;
+  --cose-blue-dark:     #2f5985;
+  --cose-teal:          #3FB6A8;
+  --cose-teal-light:    #54c9ba;
+  --cose-teal-dark:     #2b8c80;
+
+  /* CoSE Accent Hexagons */
+  --cose-yellow:        #f5c542;
+  --cose-green:         #4caf50;
+  --cose-red:           #e57373;
+  --cose-orange:        #ff9800;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Lora', 'Georgia', serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+
+  /* Layout */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+/* Light Mode (Default) */
+:root, [data-theme="light"] {
+  --bg-app:         #f8fafc;
+  --bg-surface:     #ffffff;
+  --bg-elevated:    #f1f5f9;
+  --bg-card:        #ffffff;
+  --bg-header:      rgba(255, 255, 255, 0.92);
+  --border-subtle:  rgba(0, 0, 0, 0.08);
+  --border-default: #e2e8f0;
+  --border-active:  var(--cose-blue);
+
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-muted:     #64748b;
+  --text-accent:    var(--cose-blue);
+
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md:      0 4px 14px rgba(0,0,0,0.08);
+  --shadow-lg:      0 10px 30px rgba(0,0,0,0.12);
+
+  --badge-bg:       #e0f2fe;
+  --badge-text:     #0369a1;
+}
+
+/* Dark Mode */
+[data-theme="dark"], .dark {
+  --bg-app:         #0b0f19;
+  --bg-surface:     #111827;
+  --bg-elevated:    #1f2937;
+  --bg-card:        #151e2e;
+  --bg-header:      rgba(17, 24, 39, 0.92);
+  --border-subtle:  rgba(255, 255, 255, 0.08);
+  --border-default: #1e293b;
+  --border-active:  var(--cose-teal);
+
+  --text-primary:   #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+  --text-accent:    var(--cose-blue-light);
+
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:      0 4px 14px rgba(0,0,0,0.5);
+  --shadow-lg:      0 10px 30px rgba(0,0,0,0.6);
+
+  --badge-bg:       #082f49;
+  --badge-text:     #38bdf8;
+}
+
+/* CoSE Header Brand Bar */
+.cose-top-bar {
+  background: linear-gradient(90deg, #3B6EA5 0%, #2f5985 50%, #3FB6A8 100%);
+  height: 4px;
+  width: 100%;
+}
+
+/* Academic Text Body */
+.manuscript-body {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  color: var(--text-primary);
+}
+
+.manuscript-body h2 {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-subtle);
+  padding-bottom: 0.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.manuscript-body h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.manuscript-body p {
+  margin-bottom: 1.25rem;
+  text-align: justify;
+}
+
+/* Formula Callouts */
+.equation-box {
+  background: var(--bg-elevated);
+  border-left: 4px solid var(--cose-blue);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  font-family: var(--font-sans);
+  overflow-x: auto;
+}
+
+/* Custom Table Styles */
+.cose-table-wrapper {
+  overflow-x: auto;
+  margin: 2rem 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.cose-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.cose-table th {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-weight: 700;
+  text-align: left;
+  padding: 0.875rem 1rem;
+  border-bottom: 2px solid var(--border-default);
+}
+
+.cose-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.cose-table tr:hover td {
+  background: var(--bg-elevated);
+}
+
+/* Figure Container */
+.manuscript-figure {
+  margin: 2.5rem 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.manuscript-figure:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.manuscript-figure img {
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+  background: #ffffff;
+}
+
+.manuscript-caption {
+  margin-top: 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.manuscript-caption strong {
+  color: var(--text-primary);
+}

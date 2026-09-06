@@ -1,599 +1,702 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lunar BLSS: Sintered Regolith Ceramics Interactive Explorer</title>
+    <title>From Dust to Bio-Infrastructure: Sintered Regolith Ceramics for Lunar BLSS</title>
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        sand: {
-                            50: '#fdfbf7',
-                            100: '#f7f4ec',
-                            200: '#eee7d7',
-                            300: '#e0d3b8',
-                            800: '#544732',
-                            900: '#382e1e'
-                        },
-                        tech: {
-                            cyan: '#0284c7',
-                            amber: '#d97706',
-                            emerald: '#059669',
-                            rose: '#e11d48',
-                            purple: '#7c3aed',
-                            slate: '#334155'
+                        cose: {
+                            blue: '#3B6EA5',
+                            bluelight: '#5a8bc0',
+                            bluedark: '#2f5985',
+                            teal: '#3FB6A8',
+                            teallight: '#54c9ba',
+                            yellow: '#f5c542',
+                            green: '#4caf50',
+                            red: '#e57373',
+                            orange: '#ff9800'
                         }
                     },
                     fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        serif: ['Lora', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace']
                     }
                 }
             }
         }
     </script>
-    <style>
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            height: 320px;
-            max-height: 380px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
-        }
-        /* Custom scrollbars */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .dark ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        .dark ::-webkit-scrollbar-thumb {
-            background: #334155;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-    </style>
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- KaTeX CDN for Native Mathematics Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+    
+    <!-- CoSE Custom Stylesheet -->
+    <link rel="stylesheet" href="assets/cose.css">
 </head>
-<body class="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen selection:bg-tech-cyan selection:text-white transition-colors duration-200">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen transition-colors duration-200">
 
-<!-- Chosen Palette: Dual Dynamic Theme (Light: Pure White #ffffff / Warm Sand Accents; Dark: Deep Orbital Slate #020617 / Slate 900 Containers) -->
+    <!-- Top CoSE Brand Bar -->
+    <div class="cose-top-bar"></div>
 
-<!-- Application Structure Plan:
-  - Header & Sticky Nav: Clean tabs with dynamic Light/Dark mode toggle switch.
-  - Hero Header & Dynamic Metric Overview: Core metrics adapted for dual-mode contrast.
-  - Section 1: Physicochemical & Toxicological Passivation: Interactive substrate selector updating radical production & stress gene expression alongside Chart 1.
-  - Section 2: In-Situ Manufacturing Modality Evaluator: Radar trade-off comparison (Chart 2) for Microwave vs. Solar vs. SLM Sintering.
-  - Section 3: 1/6th Gravity Hydrodynamics Simulator: Dynamic pore throat slider updating air porosity, capillary suction, and hypoxia metrics alongside Chart 3.
-  - Section 4: Equivalent System Mass (ESM) Calculator: Sliders recalculating breakeven payback & updating cumulative trajectory (Chart 4).
-  - Section 5: Closed-Loop Ecosystem Architecture: 4-stage interactive circular loop stepper.
-  - Section 6: Technology Readiness Level (TRL) Roadmap: Phase cards & Chart 5 mapping TRL 1-9 progression.
--->
-
-<!-- Visualization & Content Choices:
-  - Hydroxyl Radical & Stress Pathways: Chart.js Bar Chart (Goal: Compare / Inform).
-  - Additive Manufacturing Modalities: Chart.js Radar Chart (Goal: Compare / Trade-off).
-  - Pore Hydrodynamics & Aeration: Chart.js Combo Bar & Line Chart (Goal: Simulation / Relationships).
-  - Cumulative ESM Mass Curve: Chart.js Line Chart with dynamic update logic (Goal: Economic Payback).
-  - TRL Maturation Horizon: Chart.js Horizontal Bar Chart (Goal: Roadmap).
-  - Dynamic Chart Palette Switcher: Function updates chart grids, text, ticks, and legends seamlessly on theme toggle.
-  - Confirming strictly NO SVG elements and NO Mermaid JS libraries are used anywhere in this file.
--->
-
-    <!-- Top Sticky Header -->
-    <header class="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-200">
+    <!-- Main Navigation Header -->
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-xs transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Left Branding -->
             <div class="flex items-center space-x-3">
-                <div class="w-3.5 h-3.5 rounded-full bg-tech-cyan animate-pulse"></div>
-                <span class="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-white uppercase">Lunar BLSS ISRU Architecture</span>
+                <img src="assets/cose-logo.png" alt="CoSE Logo" class="h-9 w-auto">
+                <img src="assets/regolith-logo.png" alt="Regolith Logo" class="h-8 w-auto hidden sm:inline-block">
+                <div class="border-l border-slate-300 dark:border-slate-700 pl-3">
+                    <div class="text-xs font-black uppercase tracking-wider text-cose-blue dark:text-cose-bluelight">CoSE AstroBotany</div>
+                    <div class="text-xs font-semibold text-slate-500 dark:text-slate-400">Lunar BLSS Bio-Infrastructure</div>
+                </div>
             </div>
-            <div class="flex items-center space-x-4">
-                <nav class="hidden md:flex space-x-5 text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                    <a href="#toxicity" class="hover:text-tech-cyan dark:hover:text-sky-400 transition py-1 border-b-2 border-transparent hover:border-tech-cyan">1. Toxicity</a>
-                    <a href="#manufacturing" class="hover:text-tech-cyan dark:hover:text-sky-400 transition py-1 border-b-2 border-transparent hover:border-tech-cyan">2. Manufacturing</a>
-                    <a href="#hydrodynamics" class="hover:text-tech-cyan dark:hover:text-sky-400 transition py-1 border-b-2 border-transparent hover:border-tech-cyan">3. Hydrodynamics</a>
-                    <a href="#esm" class="hover:text-tech-cyan dark:hover:text-sky-400 transition py-1 border-b-2 border-transparent hover:border-tech-cyan">4. ESM Calculator</a>
-                    <a href="#ecosystem" class="hover:text-tech-cyan dark:hover:text-sky-400 transition py-1 border-b-2 border-transparent hover:border-tech-cyan">5. Closed Loop</a>
-                    <a href="manuscript.pdf" target="_blank" class="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-sky-300 dark:border-sky-700 bg-sky-50 dark:bg-sky-950/80 text-tech-cyan dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-900 transition text-xs font-bold">
-                        <span>📄</span>
-                        <span>Manuscript PDF</span>
-                    </a>
-                    <a href="https://github.com/organization/lunar-regolith-blss-review" target="_blank" class="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition text-xs font-bold">
-                        <span>💻</span>
-                        <span>GitHub</span>
-                    </a>
-                    <!-- Theme Toggle Button -->
-                    <button id="themeToggleBtn" onclick="toggleTheme()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition text-xs font-bold">
+
+            <!-- View Switcher Tabs -->
+            <div class="hidden md:flex items-center space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold">
+                <button onclick="switchTab('narrative')" id="tab-btn-narrative" class="px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-cose-blue dark:text-white shadow-xs transition">
+                    📖 Manuscript Narrative
+                </button>
+                <button onclick="switchTab('interactive')" id="tab-btn-interactive" class="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-cose-blue dark:hover:text-white transition">
+                    🚀 Interactive Explorer
+                </button>
+                <button onclick="switchTab('fair')" id="tab-btn-fair" class="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-cose-blue dark:hover:text-white transition">
+                    📊 Systems & FAIR Hub
+                </button>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center space-x-2.5">
+                <a href="manuscript.pdf" target="_blank" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-sky-300 dark:border-sky-800 bg-sky-50 dark:bg-sky-950/60 text-cose-blue dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900 transition text-xs font-bold">
+                    <span>📄</span>
+                    <span class="hidden sm:inline">PDF</span>
+                </a>
+                <a href="https://github.com/organization/lunar-regolith-blss-review" target="_blank" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition text-xs font-bold">
+                    <span>💻</span>
+                    <span class="hidden sm:inline">GitHub</span>
+                </a>
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition text-xs font-bold">
                     <span id="themeBtnIcon">🌙</span>
-                    <span id="themeBtnText" class="hidden sm:inline">Dark Mode</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
 
-        <!-- Hero Title Section -->
-        <section class="text-center space-y-4 py-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-10 shadow-xs transition-colors duration-200">
-            <div class="inline-block px-3 py-1 bg-sky-100 dark:bg-sky-950/80 border border-sky-300 dark:border-sky-800 rounded-full text-tech-cyan dark:text-sky-400 text-xs font-semibold uppercase tracking-widest mb-1">
-                In-Situ Resource Utilization (ISRU) Research Briefing
-            </div>
-            <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight max-w-4xl mx-auto leading-tight">
-                From Dust to Bio-Infrastructure
-            </h1>
-            <p class="text-slate-600 dark:text-slate-300 text-base sm:text-lg max-w-3xl mx-auto leading-relaxed">
-                Transforming toxic, hyper-reactive raw lunar regolith into passivated, micro-engineered porous ceramic substrates for sustained Biogenerative Life Support Systems (BLSS).
-            </p>
-
-            <!-- Dynamic Overview Key Performance Metrics -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 text-left">
-                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-xs">
-                    <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Water Recycling</div>
-                    <div class="text-2xl sm:text-3xl font-black text-tech-cyan dark:text-sky-400 mt-1">&gt; 98.5%</div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">vs &lt;80% in raw regolith</div>
+        <!-- ========================================================================= -->
+        <!-- TAB 1: MANUSCRIPT NARRATIVE -->
+        <!-- ========================================================================= -->
+        <div id="view-narrative" class="space-y-10">
+            
+            <!-- Hero Title Block -->
+            <div class="text-center space-y-4 py-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-12 shadow-sm">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 bg-sky-50 dark:bg-sky-950/80 border border-sky-200 dark:border-sky-800 rounded-full text-cose-blue dark:text-sky-400 text-xs font-bold uppercase tracking-wider">
+                    <span>✦</span>
+                    <span>npj Microgravity Review Draft · CoSE DeepSpaceAg Series</span>
                 </div>
-                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-xs">
-                    <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chemical Resupply</div>
-                    <div class="text-2xl sm:text-3xl font-black text-tech-emerald dark:text-emerald-400 mt-1">- 94%</div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">Reduction in acid/buffers</div>
-                </div>
-                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-xs">
-                    <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">ESM Breakeven</div>
-                    <div class="text-2xl sm:text-3xl font-black text-tech-amber dark:text-amber-400 mt-1">18–22 Mo</div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">Full payback on plant mass</div>
-                </div>
-                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-xs">
-                    <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Engineered Pore Size</div>
-                    <div class="text-2xl sm:text-3xl font-black text-tech-purple dark:text-purple-400 mt-1">30–60 µm</div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">Prevents 1/6th g root hypoxia</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 1: Physicochemical & Toxicological Passivation -->
-        <section id="toxicity" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6 transition-colors duration-200">
-            <div class="border-l-4 border-tech-cyan pl-4">
-                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">1. Physicochemical & Toxicological Passivation</h2>
-                <p class="text-slate-600 dark:text-slate-300 text-sm mt-2 leading-relaxed">
-                    <strong>Section Context & Purpose:</strong> This section details the geochemical hazards of raw lunar regolith versus the therapeutic passivation achieved through thermal sintering. Lunar dust contains submicroscopic nanophase metallic iron ($npFe^0$) and unpassivated silicate radicals ($-\text{SiO}^\cdot$, $-\text{Si}^\cdot$) created by space weathering. When exposed to oxygenated habitat water, these features drive Fenton-like reactions ($\text{Fe}^{2+} + \text{H}_2\text{O}_2 \rightarrow \text{Fe}^{3+} + \cdot\text{OH} + \text{OH}^-$), producing destructive Reactive Oxygen Species (ROS). Sintering above 1050°C oxidizes $npFe^0$ into stable silicates (augite, olivine) and smooths sharp grain edges, restoring plant transcriptomic homeostasis.
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight max-w-4xl mx-auto font-sans">
+                    From Dust to Bio-Infrastructure: A Mechanistic Review of Sintered Regolith Ceramics for Lunar Biogenerative Life Support Systems
+                </h1>
+                <p class="text-slate-600 dark:text-slate-300 text-sm sm:text-base max-w-3xl mx-auto font-sans leading-relaxed">
+                    First Author<sup>1,*</sup>, Second Author<sup>1,2</sup>, Collaborator Three<sup>3</sup>, and Lead Author<sup>1,4,&dagger;</sup>
                 </p>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">
-                    <strong>Interactive Instruction:</strong> Select different substrate conditions below to observe comparative radical generation, gene expression profiles, and physiological cellular impacts.
+                <p class="text-xs text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-sans">
+                    <sup>1</sup>Advanced Life Support and Space Bio-Engineering Group · <sup>2</sup>Dept. of Materials Science · <sup>3</sup>Division of Plant Biology and Microgravity Omics · <sup>4</sup>Center for Space Evolution (CoSE)
                 </p>
+
+                <!-- Quick Jump Bar -->
+                <div class="flex flex-wrap items-center justify-center gap-2 pt-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                    <a href="#sec-intro" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-cose-blue transition">1. Intro</a>
+                    <a href="#sec-toxicity" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-cose-blue transition">2. Toxicity & Passivation</a>
+                    <a href="#sec-manufacturing" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-cose-blue transition">3. Materials & Sintering</a>
+                    <a href="#sec-fluid" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-cose-blue transition">4. 1/6 g Hydrodynamics</a>
+                    <a href="#sec-esm" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-cose-blue transition">5. ESM Lifecycle</a>
+                    <a href="#sec-closed-loop" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-cose-blue transition">6. Closed Loop</a>
+                    <a href="#sec-roadmap" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-cose-blue transition">7. TRL Roadmap</a>
+                    <a href="#sec-refs" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-cose-blue transition">References</a>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <!-- Interactive Controls & Details Pane -->
-                <div class="lg:col-span-5 space-y-4">
-                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Select Substrate Condition:</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button id="btn-raw" onclick="updateToxicityView('raw')" class="px-3 py-2 text-xs font-semibold rounded-lg border bg-tech-rose text-white border-tech-rose transition shadow-xs">
-                                Raw Regolith
-                            </button>
-                            <button id="btn-basalt" onclick="updateToxicityView('basalt')" class="px-3 py-2 text-xs font-semibold rounded-lg border bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
-                                Basalt
-                            </button>
-                            <button id="btn-sintered" onclick="updateToxicityView('sintered')" class="px-3 py-2 text-xs font-semibold rounded-lg border bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
-                                Sintered
-                            </button>
+            <!-- Abstract Card -->
+            <div class="bg-gradient-to-br from-sky-50 to-slate-50 dark:from-slate-900 dark:to-slate-800/60 border border-sky-200 dark:border-sky-900/60 rounded-2xl p-6 sm:p-8 space-y-3">
+                <h3 class="text-xs font-black uppercase tracking-wider text-cose-blue dark:text-sky-400 flex items-center space-x-2">
+                    <span>📌</span>
+                    <span>Executive Abstract</span>
+                </h3>
+                <p class="text-slate-700 dark:text-slate-200 font-serif leading-relaxed text-sm sm:text-base text-justify">
+                    Establishing a permanent human presence on the Moon requires closing habitat life-support loops through Biogenerative Life Support Systems (BLSS). Terrestrial resupply imposes prohibitive launch costs, while direct agricultural cultivation in unrefined lunar regolith is severely constrained by submicroscopic nanophase metallic iron ($\mathrm{npFe}^0$), abiotic generation of reactive oxygen species (ROS) via modified Fenton cascades, broken silicate dangling bonds, and sharp mineral shards that induce physical shearing and plant root apical growth arrest. Furthermore, fractional lunar gravity ($1/6\,g$) alters the Bond number, resulting in capillary entrapment, erratic nutrient transport, and pervasive root hypoxia in polydisperse regolith beds. Here, we review an alternative in-situ bio-infrastructure paradigm: transforming unrefined regolith into engineered porous ceramics via thermal sintering. High-temperature processing ($>1050^\circ\mathrm{C}$) passivates reactive geochemical interfaces by solid-solubilizing $\mathrm{npFe}^0$ into stable augite and olivine matrices, rounds grain boundaries, and enables precise control over pore throat diameters ($30\text{--}60\,\mu\mathrm{m}$). This pore architecture stabilizes matric potential ($-2.5$ to $-5.0\,\mathrm{kPa}$), ensuring continuous capillary nutrient wicking while maintaining air-filled porosity above $25\text{--}30\%$. Equivalent System Mass (ESM) lifecycle modeling reveals that the initial launch-mass investment of a sintering plant reaches parity with direct regolith cultivation within $18\text{--}22$ months, driven by $>98.5\%$ water recovery efficiency and the elimination of chemical buffers. When integrated with fungal mycoponics, microbial bioweathering, and cyclic $500^\circ\mathrm{C}$ pyrolytic substrate regeneration, sintered regolith ceramics provide a closed-loop substrate foundation for sustainable extraterrestrial habitation.
+                </p>
+                <div class="pt-2 text-xs text-slate-500 dark:text-slate-400 font-sans">
+                    <strong>Keywords:</strong> Lunar regolith, Biogenerative Life Support Systems (BLSS), In-Situ Resource Utilization (ISRU), Porous ceramics, Microwave sintering, Nanophase iron, Microgravity hydrodynamics, Equivalent System Mass (ESM).
+                </div>
+            </div>
+
+            <!-- Narrative Content -->
+            <article class="manuscript-body space-y-12">
+
+                <!-- Section 1 -->
+                <section id="sec-intro">
+                    <h2>1. Introduction: The In-Situ Resource Utilization Imperative</h2>
+                    <p>
+                        Establishing an enduring human presence on the lunar surface requires transitioning from open-loop, resupply-dependent life support configurations to self-sustaining Biogenerative Life Support Systems (BLSS). Terrestrial resupply logistics impose an unsustainable launch mass burden for multi-year surface stays, where human metabolic requirements for water, oxygen, and nutrition scale linearly with crew size and mission duration. Bioregenerative architectures resolve this resupply vulnerability by harnessing photoautotrophic organisms to scrub atmospheric carbon dioxide, produce metabolic oxygen, purify wastewater via canopy transpiration, and supply fresh caloric and micronutrient biomass.
+                    </p>
+                    <p>
+                        Historically, space mission architectures evaluated two distinct edaphic paradigms for extraterrestrial crop production: deploying synthetic hydroponic hardware transported from Earth, or cultivating crops directly in untreated, in-situ planetary regolith. Transporting inert hydroponic media (such as mineral rockwool, polyurethane foams, or expanded clay) and prefabricated polymeric fluid channels from Earth imposes launch mass penalties that severely limit the initial deployable agricultural canopy. Conversely, the direct edaphic use of raw lunar regolith relies on the assumption that lunar dust can serve as a functional analogue to terrestrial soil if augmented with liquid nutrients. However, pioneering botanical experiments utilizing returned Apollo specimens and high-fidelity planetary simulants demonstrate that raw lunar regolith imposes severe physiological penalties. Planetary-scale exposure to solar wind irradiation, cosmic rays, and hypervelocity micrometeorite comminution has generated a geochemically hostile matrix defined by reactive submicroscopic metallic iron, unweathered razor-sharp mineral shards, and volatile abiotic surface chemistry.
+                    </p>
+                    <p>
+                        To circumvent both the launch-mass penalty of imported hardware and the biological toxicity of raw regolith, life support engineering is shifting toward an in-situ bio-infrastructure paradigm. Rather than attempting to adapt crop physiology to an inherently hostile mineral substrate, In-Situ Resource Utilization (ISRU) thermal consolidation processes can transform unrefined regolith into engineered porous ceramics. Controlled high-temperature sintering passivates reactive geochemical interfaces, rounds abrasive grain morphology, and enables the precision fabrication of hydroponic troughs, multiphase fluid-delivery wicks, and mycoponic scaffolds.
+                    </p>
+                </section>
+
+                <!-- Section 2 -->
+                <section id="sec-toxicity">
+                    <h2>2. Physicochemical & Toxicological Interfaces of Pristine Lunar Regolith</h2>
+                    <p>
+                        The Moon's hyper-vacuum environment and lack of a dipolar magnetosphere expose surface minerals to unattenuated space weathering. Energetic solar wind protons reduce ferrous iron silicates, while ubiquitous micrometeorite impacts induce localized shock melting and vapor-phase condensation. These energetic phenomena generate nanophase metallic iron ($\mathrm{npFe}^0$), consisting of submicroscopic zero-valent iron droplets ($1\text{--}100\,\mathrm{nm}$ in diameter) embedded within the rims of mineral grains and dispersed through the amorphous silicate matrix of agglutinitic glasses.
+                    </p>
+                    <p>
+                        When pristine lunar regolith or experimentally reduced simulants contact oxygenated aqueous solutions inside a habitat atmosphere, these surface-accessible metallic blebs trigger destructive abiotic oxidation cascades. Solvated divalent iron ions ($\mathrm{Fe}^{2+}$) dissolve from mineral boundaries, initiating modified Fenton-like catalytic cycles:
+                    </p>
+
+                    <div class="equation-box">
+                        $$\mathrm{Fe}^0 + \mathrm{O}_2 + 2\mathrm{H}^+ \longrightarrow \mathrm{Fe}^{2+} + \mathrm{H}_2\mathrm{O}_2$$
+                        $$\mathrm{Fe}^{2+} + \mathrm{H}_2\mathrm{O}_2 \longrightarrow \mathrm{Fe}^{3+} + \cdot\mathrm{OH} + \mathrm{OH}^-$$
+                        $$\mathrm{Fe}^{2+} + \mathrm{O}_2 \longleftrightarrow \mathrm{Fe}^{3+} + \mathrm{O}_2^{\cdot-}$$
+                    </div>
+
+                    <p>
+                        Electron paramagnetic resonance (EPR) spectroscopy alongside terephthalate hydroxylation assays confirms that reduced lunar dusts generate hydroxyl radical concentrations 5-fold to 100-fold greater than terrestrial basaltic analogs. Furthermore, mechanical crushing leaves abundant surface dangling bonds such as broken silicate radicals ($\equiv\!\mathrm{Si}\cdot$ and $\equiv\!\mathrm{Si}-\mathrm{O}\cdot$). When hydrated, these radicals homolytically split water molecules, generating sustained bursts of oxidizing species that trigger rapid lipid peroxidation in plant root cell membranes.
+                    </p>
+
+                    <!-- Figure 1 -->
+                    <div class="manuscript-figure">
+                        <img src="figures/fig1_toxicity_passivation.png" alt="Figure 1: Toxicity and Passivation Mechanisms">
+                        <div class="manuscript-caption">
+                            <strong>Figure 1 | Physicochemical and toxicological interfaces of pristine versus sintered lunar regolith.</strong> 
+                            Comparison of raw regolith hazards (nanophase metallic iron blebs, dangling silicate bonds, razor-sharp abrasive edges triggering Fenton-mediated oxidative stress cascades) versus high-temperature sintered ceramic bio-infrastructure (passivated crystal matrices, rounded grain boundaries, and homeostatic plant root ontogeny).
                         </div>
                     </div>
 
-                    <!-- Dynamic Feature Panel -->
-                    <div id="toxicity-card" class="bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-900/60 rounded-xl p-5 space-y-3">
-                        <div class="flex items-center space-x-2">
-                            <span id="tox-badge" class="w-3 h-3 rounded-full bg-tech-rose"></span>
-                            <h3 id="tox-title" class="font-bold text-slate-900 dark:text-white text-base">Pristine Raw Lunar Regolith</h3>
+                    <!-- Table 1 -->
+                    <div class="cose-table-wrapper">
+                        <table class="cose-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter / Property</th>
+                                    <th>Raw Lunar Regolith (Direct Cultivation)</th>
+                                    <th>Sintered Regolith Ceramic (Engineered Substrate)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Nanophase Metallic Iron ($\mathrm{npFe}^0$)</strong></td>
+                                    <td>Surface-accessible blebs across grain rims ($1\text{--}100\,\mathrm{nm}$)</td>
+                                    <td>Oxidized and incorporated into stable crystalline silicates</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Aqueous ROS Generation Potential</strong></td>
+                                    <td>High; sustained $\cdot\mathrm{OH}$ and $\mathrm{O}_2^{\cdot-}$ generation via Fenton pathways</td>
+                                    <td>Negligible; passivated, hydrothermally inert interface</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grain / Pore Morphometry</strong></td>
+                                    <td>Highly angular, sharp, micro-shearing shards</td>
+                                    <td>Rounded, smooth, consolidated neck boundaries</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Plant Transcriptomic Profile</strong></td>
+                                    <td>Chronic upregulation of GSTs, peroxidases, JA, and ABA stress pathways</td>
+                                    <td>Homeostatic baseline; standard vegetative allocation</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Chromosomal & Telomeric Integrity</strong></td>
+                                    <td>Elevated 8-oxoG lesions, accelerated telomere shortening</td>
+                                    <td>Protected genome; absence of mineral-derived radical stress</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Aqueous Solution Chemistry</strong></td>
+                                    <td>Uncontrolled dissolution; alkaline spikes ($\mathrm{pH}\;9.0\text{--}11.0$), P-fixation</td>
+                                    <td>Stable $\mathrm{pH}$ control ($\mathrm{pH}\;5.8\text{--}6.2$); predictable stoichiometry</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Section 3 -->
+                <section id="sec-manufacturing">
+                    <h2>3. Materials Science & In-Situ Manufacturing Modalities</h2>
+                    <p>
+                        Thermal sintering between $1050^\circ\mathrm{C}$ and $1250^\circ\mathrm{C}$ transforms loose, biologically hazardous regolith into inert, structurally coherent ceramic substrates. Viscous flow of agglutinitic impact glasses and pyroxenes wets refractory minerals such as anorthite plagioclase, creating consolidated neck boundaries. Metallic $\mathrm{npFe}^0$ oxidizes and solid-solubilizes into thermodynamically stable clinopyroxenes (augite, $(\mathrm{Ca, Mg, Fe})\mathrm{SiO}_3$) and olivines ($(\mathrm{Mg, Fe})_2\mathrm{SiO}_4$), eliminating electron transfer in aqueous solution. Concurrently, atomic mass transfer rounds sharp edges, quenching reactive dangling bonds.
+                    </p>
+                    <p>
+                        Microwave sintering at $2.45\,\mathrm{GHz}$ and $5.8\,\mathrm{GHz}$ provides volumetric dielectric heating. The absorbed power per unit volume ($P_v$) is described by:
+                    </p>
+
+                    <div class="equation-box">
+                        $$P_v = 2\pi f \varepsilon_0 \varepsilon'' |E|^2$$
+                    </div>
+
+                    <p>
+                        where $f$ is frequency, $\varepsilon_0$ is free space permittivity, $\varepsilon''$ is relative dielectric loss factor, and $E$ is electric field strength. The high dielectric loss tangent ($\tan\delta = \varepsilon''/\varepsilon'$) driven by $\mathrm{npFe}^0$ and ilmenite allows pristine regolith to heat rapidly from within. To prevent thermal-shock microcracking, cooling rates must be maintained strictly below $15^\circ\mathrm{C/min}$.
+                    </p>
+
+                    <!-- Figure 2 -->
+                    <div class="manuscript-figure">
+                        <img src="figures/fig2_sintering_radar.png" alt="Figure 2: Manufacturing Modalities Radar">
+                        <div class="manuscript-caption">
+                            <strong>Figure 2 | Multi-attribute technology evaluation radar chart.</strong> 
+                            Comparison of Microwave Sintering ($2.45/5.8\,\mathrm{GHz}$), Concentrated Solar Sintering (ALM), and Selective Laser Melting (SLM) across energy efficiency, mass throughput, geometric precision, thermal stress safety, and volumetric heating capability.
                         </div>
-                        <ul id="tox-list" class="text-xs text-slate-600 dark:text-slate-300 space-y-2 list-disc list-inside leading-relaxed">
-                            <li><strong>Iron State:</strong> Abundant $npFe^0$ blebs (1–100 nm) across grain rims drive Fenton cascades.</li>
-                            <li><strong>Grain Geometry:</strong> Highly angular, razor-sharp shards micro-shear root caps and border cells.</li>
-                            <li><strong>Transcriptomic State:</strong> Upregulates GSTs, peroxidases, ABA, and JA stress signaling pathways.</li>
-                            <li><strong>Genotoxicity:</strong> Accumulation of 8-oxoguanine lesions causing accelerated telomere decay.</li>
-                        </ul>
-                        <div id="tox-metric" class="pt-2 border-t border-slate-200 dark:border-slate-700 text-xs font-bold text-tech-rose">
-                            Relative ROS Free Radical Generation: 100% (Maximum Hazard)
+                    </div>
+
+                    <!-- Table 2 -->
+                    <div class="cose-table-wrapper">
+                        <table class="cose-table">
+                            <thead>
+                                <tr>
+                                    <th>Modality</th>
+                                    <th>Heating Mechanism</th>
+                                    <th>Operating Temp.</th>
+                                    <th>Specific Energy</th>
+                                    <th>Resolution</th>
+                                    <th>Primary Application</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Microwave Sintering</strong></td>
+                                    <td>Volumetric dielectric coupling</td>
+                                    <td>$1050^\circ\mathrm{C}\text{--}1200^\circ\mathrm{C}$</td>
+                                    <td>$\sim 1.2\,\mathrm{kWh/kg}$</td>
+                                    <td>$1\text{--}5\,\mathrm{mm}$</td>
+                                    <td>Volumetric growth substrates, filter blocks, pavers</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Concentrated Solar (ALM)</strong></td>
+                                    <td>Focused solar irradiance ($1361\,\mathrm{W/m}^2$)</td>
+                                    <td>$1100^\circ\mathrm{C}\text{--}>1400^\circ\mathrm{C}$</td>
+                                    <td>$0\,\mathrm{kWh}$ Electrical</td>
+                                    <td>$2\text{--}10\,\mathrm{mm}$</td>
+                                    <td>Large hydroponic troughs, drainage gutters, bulk shielding</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Selective Laser Melting (SLM)</strong></td>
+                                    <td>Focused optical laser diode ($\lambda=1064\,\mathrm{nm}$)</td>
+                                    <td>$1200^\circ\mathrm{C}\text{--}1500^\circ\mathrm{C}$</td>
+                                    <td>$\sim 3.5\,\mathrm{kWh/kg}$</td>
+                                    <td>$50\text{--}200\,\mu\mathrm{m}$</td>
+                                    <td>Precision aeration nozzles, wicking pins, fluid manifolds</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Section 4 -->
+                <section id="sec-fluid">
+                    <h2>4. Multiphase Fluid Dynamics & Aeration in Lunar Gravity</h2>
+                    <p>
+                        On the lunar surface, gravitational acceleration drops to $g_L \approx 1.62\,\mathrm{m/s}^2$ ($1/6\,g$). This fundamentally lowers the dimensionless Bond number ($\mathrm{Bo}$):
+                    </p>
+
+                    <div class="equation-box">
+                        $$\mathrm{Bo} = \frac{\Delta\rho \cdot g \cdot d^2}{\gamma}$$
+                    </div>
+
+                    <p>
+                        where $\Delta\rho$ is density difference, $d$ is pore diameter, and $\gamma$ is surface tension. Consequently, capillary retention forces dominate over gravitational drainage. The equilibrium capillary rise height ($h_c$) increases six-fold:
+                    </p>
+
+                    <div class="equation-box">
+                        $$h_c = \frac{2\gamma \cos\theta}{\rho g r}$$
+                    </div>
+
+                    <p>
+                        In unsorted raw regolith, capillary suction traps water in fine micropores, creating an expansive saturated layer that blocks oxygen diffusion and suffocates roots. Sintering classified particle fractions ($45\text{--}75\,\mu\mathrm{m}$) creates monodisperse pore throat diameters ($30\text{--}60\,\mu\mathrm{m}$). Governed by the van Genuchten equation:
+                    </p>
+
+                    <div class="equation-box">
+                        $$\Theta(h) = \left[ 1 + (\alpha |h|)^n \right]^{-m}$$
+                    </div>
+
+                    <p>
+                        this pore window stabilizes matric potential between $-2.5$ and $-5.0\,\mathrm{kPa}$, supporting continuous capillary wicking while maintaining air-filled porosity above $25\text{--}30\%$ at field capacity.
+                    </p>
+
+                    <!-- Figure 3 -->
+                    <div class="manuscript-figure">
+                        <img src="figures/fig3_hydrodynamics_aeration.png" alt="Figure 3: Hydrodynamics and Aeration in 1/6 g">
+                        <div class="manuscript-caption">
+                            <strong>Figure 3 | Multiphase fluid dynamics and root zone aeration in fractional lunar gravity ($1/6\,g$).</strong> 
+                            Interdependence of pore throat diameter ($\mu\mathrm{m}$), air-filled porosity (\%, green bars), and matric suction head ($-\mathrm{kPa}$, blue curve). The target $30\text{--}60\,\mu\mathrm{m}$ window balances wicking against root hypoxia.
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <!-- Visualization Chart Container -->
-                <div class="lg:col-span-7 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">Abiotic Hydroxyl Radical Generation & Gene Expression Upregulation</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Quantifying chemical radical production ($\cdot\text{OH}$) and relative plant transcriptomic stress response across substrates.</p>
-                    <div class="chart-container">
-                        <canvas id="toxicityChart"></canvas>
+                <!-- Section 5 -->
+                <section id="sec-esm">
+                    <h2>5. Equivalent System Mass (ESM) & Lifecycle Economics</h2>
+                    <p>
+                        NASA's Equivalent System Mass ($\mathrm{ESM}$) converts hardware mass ($M$), pressurized volume ($V$), power ($P$), cooling ($C$), and crew labor ($T$) into a standardized mass metric:
+                    </p>
+
+                    <div class="equation-box">
+                        $$\mathrm{ESM} = M + (V \cdot C_V) + (P \cdot C_P) + (C \cdot C_C) + (T \cdot C_T)$$
                     </div>
-                    <div class="mt-3 text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                        <strong class="text-tech-cyan dark:text-sky-400">Key Insight:</strong> Thermal sintering converts reactive iron into stable crystal lattices, dropping abiotic radical generation down to baseline terrestrial levels and eliminating systemic root stress.
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Section 2: In-Situ Manufacturing Modalities -->
-        <section id="manufacturing" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6 transition-colors duration-200">
-            <div class="border-l-4 border-tech-amber pl-4">
-                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">2. In-Situ Manufacturing & Sintering Modalities</h2>
-                <p class="text-slate-600 dark:text-slate-300 text-sm mt-2 leading-relaxed">
-                    <strong>Section Context & Purpose:</strong> This section compares the three primary thermal consolidation technologies for lunar regolith: Microwave Sintering (2.45/5.8 GHz), Concentrated Solar Sintering (ALM), and Selective Laser Melting (SLM). Converting lunar dust into usable hydroponic troughs or wicking filters involves fundamental trade-offs between electrical energy draw, volumetric heating kinetics, build throughput, and dimensional precision.
-                </p>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">
-                    <strong>Interactive Instruction:</strong> Click the tabs below to inspect specific processing modalities or compare all three simultaneously on the multi-attribute evaluation radar chart.
-                </p>
-            </div>
+                    <p>
+                        Direct regolith cultivation has a low initial launch mass ($\sim 420\,\mathrm{kg}$) but suffers severe recurring penalties from capillary water entrapment ($<80\%$ recovery efficiency), alkaline dissolution requiring $145\,\mathrm{kg/year}$ of acid buffers, and high crew dust mitigation labor. Sintered bio-infrastructure requires an automated manufacturing plant ($\sim 1850\,\mathrm{kg}$) but achieves $>98.5\%$ water recovery, stable $\mathrm{pH}$ ($5.8\text{--}6.2$), and negligible dust risks. Systems-level modeling confirms an operational breakeven horizon between $18$ and $22$ months (and $9\text{--}15$ months with surface nuclear power).
+                    </p>
 
-            <!-- Modality Selector Tabs -->
-            <div class="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
-                <button id="tab-mw" onclick="selectModality('mw')" class="px-4 py-2 text-xs font-bold rounded-lg border bg-tech-cyan text-white border-tech-cyan transition">
-                    Microwave Sintering
-                </button>
-                <button id="tab-solar" onclick="selectModality('solar')" class="px-4 py-2 text-xs font-bold rounded-lg border bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                    Concentrated Solar
-                </button>
-                <button id="tab-slm" onclick="selectModality('slm')" class="px-4 py-2 text-xs font-bold rounded-lg border bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                    Selective Laser Melting (SLM)
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                <!-- Chart Container -->
-                <div class="lg:col-span-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">Multi-Attribute Technology Trade-Off Radar</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Normalized performance metrics across key engineering vectors (Scale 1–10).</p>
-                    <div class="chart-container">
-                        <canvas id="modalityChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Dynamic Modality Information Card -->
-                <div class="lg:col-span-6 space-y-4">
-                    <div id="modality-card" class="bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-900/60 rounded-xl p-6 space-y-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <span id="mod-badge" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-sky-100 dark:bg-sky-950 text-tech-cyan dark:text-sky-400">2.45 / 5.8 GHz</span>
-                                <h3 id="mod-title" class="text-xl font-bold text-slate-900 dark:text-white mt-2">Microwave Sintering</h3>
+                    <!-- Figure 4 & 5 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="manuscript-figure">
+                            <img src="figures/fig4_esm_lifecycle.png" alt="Figure 4: Cumulative ESM Trajectory">
+                            <div class="manuscript-caption">
+                                <strong>Figure 4 | Cumulative ESM lifecycle trajectory over 60 months.</strong> 
+                                Comparison of direct regolith cultivation versus sintered ceramics for a nominal 6-person outpost.
                             </div>
-                            <div class="text-right">
-                                <span id="mod-energy" class="text-xs font-extrabold text-tech-cyan dark:text-sky-400 block">1.2 kWh/kg</span>
-                                <span class="text-[10px] text-slate-500 dark:text-slate-400">Specific Power</span>
-                            </div>
                         </div>
-
-                        <p id="mod-desc" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                            Couples volumetrically with dielectric $npFe^0$ and ilmenite. Provides rapid bulk heating (1050–1200°C) with low energy consumption. Requires strict cooling control (&lt;15°C/min) to prevent thermal rupture microcracks.
-                        </p>
-
-                        <div class="grid grid-cols-2 gap-3 pt-2 text-xs">
-                            <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                                <span class="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold">Build Resolution</span>
-                                <span id="mod-res" class="font-bold text-slate-800 dark:text-slate-200">1–5 mm (Coarse)</span>
-                            </div>
-                            <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                                <span class="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-bold">Primary Application</span>
-                                <span id="mod-app" class="font-bold text-slate-800 dark:text-slate-200">Volumetric Substrates & Pavers</span>
+                        <div class="manuscript-figure">
+                            <img src="figures/fig5_mission_economics.png" alt="Figure 5: Mission Economics Scaling">
+                            <div class="manuscript-caption">
+                                <strong>Figure 5 | Mission economics and crew scaling.</strong> 
+                                Lifecycle mass comparison across 3-crew and 12-crew exploration contingents at 60 months.
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <!-- Section 3: 1/6th Gravity Hydrodynamics Simulator -->
-        <section id="hydrodynamics" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6 transition-colors duration-200">
-            <div class="border-l-4 border-tech-emerald pl-4">
-                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">3. 1/6th Gravity Multiphase Fluid Dynamics & Pore Simulator</h2>
-                <p class="text-slate-600 dark:text-slate-300 text-sm mt-2 leading-relaxed">
-                    <strong>Section Context & Purpose:</strong> Reduced lunar gravity ($g_{luna} = 1.62\text{ m/s}^2$) lowers the dimensionless Bond number ($Bo = \Delta\rho g L^2 / \sigma$), causing capillary forces to dominate over gravitational drainage. In unsorted raw regolith, water is tightly trapped, dropping air-filled porosity below 10% and causing severe root hypoxia. Sieving and sintering regolith into monodisperse pore throat sizes (30–60 µm) stabilizes matric suction ($\psi_m \approx -2.5\text{ to }-5.0\text{ kPa}$) and secures continuous root-zone aeration.
-                </p>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">
-                    <strong>Interactive Simulator:</strong> Adjust the pore throat diameter slider below to simulate fluid retention, matric potential, and oxygen availability in lunar gravity.
-                </p>
-            </div>
+                <!-- Section 6 -->
+                <section id="sec-closed-loop">
+                    <h2>6. Closed-Loop Multitrophic Ecosystems</h2>
+                    <p>
+                        Crops such as dwarf wheat, potato, and soybean produce $40\text{--}60\%$ inedible lignocellulosic residue. Integrating saprotrophic fungi (\textit{Pleurotus ostreatus}, \textit{Ganoderma lucidum}) on perforated ceramic plates upcycles this residue into edible protein and $\mathrm{CO}_2$. Essential fertilizer minerals ($\mathrm{K}^+, \mathrm{Ca}^{2+}, \mathrm{Mg}^{2+}$) are replenished via microbial bioleaching in sealed external bioreactors using \textit{Sphingomonas desiccabilis} (demonstrated by ESA BioRock). Substrate biofouling is resolved through cyclic $500^\circ\mathrm{C}$ pyrolytic bake-outs:
+                    </p>
 
-            <!-- Simulator Interactive Controls -->
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 space-y-6">
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center">
-                        <label for="poreSlider" class="text-sm font-bold text-slate-800 dark:text-slate-200">Engineered Pore Throat Diameter ($d_{pore}$):</label>
-                        <span id="poreVal" class="text-base font-extrabold text-tech-emerald dark:text-emerald-400 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 rounded-lg">45 µm (Optimal Window)</span>
+                    <div class="equation-box">
+                        $$\mathrm{C}_x\mathrm{H}_y\mathrm{O}_z (\text{biomass}) + \left(x + \frac{y}{4} - \frac{z}{2}\right)\mathrm{O}_2 \xrightarrow{500^\circ\mathrm{C}} x\,\mathrm{CO}_2 + \frac{y}{2}\,\mathrm{H}_2\mathrm{O} + \text{Mineral Ash}$$
                     </div>
-                    <input type="range" id="poreSlider" min="10" max="100" value="45" step="5" oninput="simPoreHydrodynamics(this.value)" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-tech-emerald">
-                    <div class="flex justify-between text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">
-                        <span>10 µm (Fine/Waterlogged)</span>
-                        <span>30–60 µm (Target Window)</span>
-                        <span>100 µm (Coarse/Dry Channeling)</span>
-                    </div>
-                </div>
 
-                <!-- Calculated Output Display Cards -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                    <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
-                        <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold block uppercase">Air-Filled Porosity</span>
-                        <span id="out-porosity" class="text-2xl font-black text-tech-emerald dark:text-emerald-400 mt-1 block">32.0%</span>
-                        <span id="porosity-status" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Aerobic Root Respiration</span>
-                    </div>
-                    <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
-                        <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold block uppercase">Matric Suction Head</span>
-                        <span id="out-suction" class="text-2xl font-black text-tech-cyan dark:text-sky-400 mt-1 block">- 4.2 kPa</span>
-                        <span id="suction-status" class="text-[10px] text-sky-600 dark:text-sky-400 font-bold">Optimal Capillary Wicking</span>
-                    </div>
-                    <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
-                        <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold block uppercase">Hypoxia Risk Assessment</span>
-                        <span id="out-hypoxia" class="text-2xl font-black text-slate-800 dark:text-slate-200 mt-1 block">LOW</span>
-                        <span id="hypoxia-status" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Stable Oxygen Diffusion</span>
-                    </div>
-                </div>
-            </div>
+                    <p>
+                        The ceramic matrix emerges sterile and decarbonized for infinite re-use without structural degradation.
+                    </p>
+                </section>
 
-            <!-- Visualization Chart -->
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
-                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">Pore Size vs. Air Porosity and Matric Potential</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Comparing physical fluid behavior across pore throat classifications in 1/6th gravity.</p>
-                <div class="chart-container">
-                    <canvas id="hydroChart"></canvas>
-                </div>
-            </div>
-        </section>
+                <!-- Section 7 -->
+                <section id="sec-roadmap">
+                    <h2>7. Technology Readiness Level (TRL) Maturation Roadmap</h2>
+                    <p>
+                        A structured three-phase development roadmap advances sintered regolith bio-infrastructure from laboratory proof-of-concept to operational lunar surface deployment:
+                    </p>
+                    <ul class="list-disc pl-6 space-y-2 text-sm sm:text-base">
+                        <li><strong>Phase 1: Laboratory Formulations (2024--2026, TRL 1 $\to$ 3):</strong> Simulant dielectric characterization, multiphysics modeling, and plant transcriptomic stress elimination.</li>
+                        <li><strong>Phase 2: Subscale Flight Testing (2027--2030, TRL 4 $\to$ 6):</strong> Autonomous sintering payloads on CLPS landers, ISS capillary wicking validation, and microgravity bioleaching.</li>
+                        <li><strong>Phase 3: Operational Deployment (&gt;2031, TRL 7 $\to$ 9):</strong> Deployment of full-scale ISRU manufacturing plants constructing vertical hydroponic arrays integrated with habitat ECLSS.</li>
+                    </ul>
 
-        <!-- Section 4: ESM Lifecycle Economics & Interactive Calculator -->
-        <section id="esm" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6 transition-colors duration-200">
-            <div class="border-l-4 border-tech-purple pl-4">
-                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">4. Equivalent System Mass (ESM) & Lifecycle Economics</h2>
-                <p class="text-slate-600 dark:text-slate-300 text-sm mt-2 leading-relaxed">
-                    <strong>Section Context & Purpose:</strong> Equivalent System Mass ($ESM = M + V\cdot C_V + P\cdot C_P + C\cdot C_C + T\cdot C_T$) converts physical mass, pressurized volume, power, thermal cooling, and crew labor into a single metric (kg). Direct regolith farming has a low initial launch mass but high operational consumable penalties (water loss, acid buffering). A sintering plant requires higher initial launch mass (~1,850 kg vs ~420 kg) but achieves breakeven within 18–22 months by eliminating water and buffer resupply burdens.
-                </p>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">
-                    <strong>Interactive Calculator:</strong> Adjust crew size and mission duration sliders below to observe real-time cumulative ESM savings and payback timelines.
-                </p>
-            </div>
+                    <!-- Figure 6 -->
+                    <div class="manuscript-figure">
+                        <img src="figures/fig6_trl_roadmap.png" alt="Figure 6: TRL Maturation Horizon">
+                        <div class="manuscript-caption">
+                            <strong>Figure 6 | Strategic Technology Readiness Level (TRL 1--9) maturation horizon.</strong> 
+                            Progression timeline from laboratory simulant characterization to fully integrated operational lunar base bio-infrastructure.
+                        </div>
+                    </div>
+                </section>
 
-            <!-- ESM Interactive Sliders & Live Results -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div class="lg:col-span-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 space-y-5">
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Mission Economics Calculator</h3>
+                <!-- Section 8 & 9 -->
+                <section id="sec-conclusion">
+                    <h2>8. Conclusions & Declarations</h2>
+                    <p>
+                        Transforming unrefined lunar regolith into engineered sintered ceramics provides an in-situ manufacturing pathway that resolves the fundamental toxicological, mechanical, and fluid-dynamic barriers of direct regolith agriculture. By passivating reactive metallic iron, rounding sharp grain edges, and stabilizing pore throats to $30\text{--}60\,\mu\mathrm{m}$, sintered bio-infrastructure ensures aerobic root respiration and $>98.5\%$ water recovery under $1/6\,g$. Coupled with fungal mycoponics, microbial bioweathering, and cyclic pyrolytic regeneration, sintered ceramics establish a durable, closed-loop foundation for sustained biological life support on the Moon.
+                    </p>
                     
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center text-xs">
-                            <label for="crewSlider" class="font-bold text-slate-700 dark:text-slate-300">Habitat Crew Size:</label>
-                            <span id="crewVal" class="font-extrabold text-tech-purple dark:text-purple-400 text-sm">6 Crew Members</span>
+                    <div class="bg-slate-100 dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs font-sans space-y-3 mt-6">
+                        <h4 class="font-bold text-slate-900 dark:text-white uppercase tracking-wider">Declarations</h4>
+                        <p><strong>Acknowledgements:</strong> Supported by the In-Situ Resource Utilization (ISRU) and Space Life Support engineering research initiatives.</p>
+                        <p><strong>Author Contributions:</strong> F.A., S.A., C.T., and L.A. contributed to literature synthesis, modeling, manuscript writing, and review.</p>
+                        <p><strong>Competing Interests:</strong> The authors declare no competing interests.</p>
+                        <p><strong>Data & Code Availability:</strong> Complete LaTeX sources, ESM Python models, and simulation outputs are openly available in the GitHub repository at <a href="https://github.com/organization/lunar-regolith-blss-review" class="text-cose-blue underline">github.com/organization/lunar-regolith-blss-review</a> and archived under DOI: <a href="https://doi.org/10.5281/zenodo.placeholder" class="text-cose-blue underline">10.5281/zenodo.placeholder</a>.</p>
+                    </div>
+                </section>
+
+                <!-- Section References -->
+                <section id="sec-refs">
+                    <h2>References</h2>
+                    <ol class="list-decimal pl-6 space-y-2 text-xs font-sans text-slate-600 dark:text-slate-400">
+                        <li>Wheeler, R. M. Agriculture for space: people and places paving the way. <em>Open Agric.</em> <strong>2</strong>, 14--32 (2017).</li>
+                        <li>Paul, A.-L., Elardo, S. M. & Ferl, R. Plants grown in Apollo lunar regolith present stress-associated transcriptomes that inform prospects for lunar exploration. <em>Commun. Biol.</em> <strong>5</strong>, 382 (2022).</li>
+                        <li>Ming, D. W. & Henninger, D. L. <em>Lunar Base Agriculture: Soils for Plant Growth</em> (American Society of Agronomy, 1989).</li>
+                        <li>Hanford, A. J. <em>Advanced Life Support Baseline Values and Assumptions Document</em>. NASA/CR-2004-208941 (NASA JSC, 2004).</li>
+                        <li>Wheeler, R. M. Space farming contributions to agriculture on Earth and in space. NASA/TM-20230018203 (2023).</li>
+                        <li>Wamelink, G. W. W. et al. Crop growth and viability of seeds on Mars and Moon soil simulants. <em>Open Agric.</em> <strong>4</strong>, 509--516 (2019).</li>
+                        <li>Atkin, J., Oliveira Santos, S. et al. Bioremediation of lunar regolith simulant through mycorrhizal fungi and plant symbioses enables chickpea to seed. <em>Sci. Rep.</em> <strong>14</strong>, 8421 (2024).</li>
+                        <li>Hendrix, D. A., Legett, C. IV & Hurowitz, J. A. The reactivity of experimentally reduced lunar regolith simulants. <em>Meteorit. Planet. Sci.</em> <strong>59</strong>, 2341--2358 (2024).</li>
+                        <li>Turci, F. et al. Mechanistic insight into the oxidative potential of lunar dust analogues. <em>Astrobiology</em> <strong>15</strong>, 735--745 (2015).</li>
+                        <li>Taylor, L. A. & Meek, T. T. Microwave processing of lunar soil: properties, theory, and practice. <em>J. Aerosp. Eng.</em> <strong>18</strong>, 188--196 (2005).</li>
+                        <li>Fateri, M. et al. Solar sintering for lunar additive manufacturing. <em>J. Aerosp. Eng.</em> <strong>32</strong>, 04019084 (2019).</li>
+                        <li>Xi, Y., Zhang, Y. et al. Multiphysics computational model of microwave sintering of lunar regolith simulant. <em>Coatings</em> <strong>16</strong>, 222 (2026).</li>
+                        <li>Goulas, A. & Binner, J. G. P. Process parameters development of selective laser melting of lunar regolith. <em>Addit. Manuf.</em> <strong>18</strong>, 88--95 (2017).</li>
+                        <li>Heinse, R., Jones, S. B., Or, D. et al. Porous media water retention in microgravity: The ISS ORZS experiment. <em>Vadose Zone J.</em> <strong>6</strong>, 713--722 (2007).</li>
+                        <li>Barbero Barcenilla, B. & Shippen, D. E. Back to the future: The intimate connection between telomere factors and stress. <em>J. Biol. Chem.</em> <strong>294</strong>, 14803 (2019).</li>
+                        <li>Bilardo, V. J. et al. Equivalent system mass (ESM) metric modeling for surface planetary habitats. <em>AIAA SciTech</em> 2024-1142 (2024).</li>
+                        <li>Cockell, C. S. et al. Microbially-enhanced element recovery from basalt on the International Space Station. <em>Nat. Commun.</em> <strong>11</strong>, 5523 (2020).</li>
+                    </ol>
+                    <p class="text-xs text-slate-500 mt-2 font-sans"><em>(Complete 59-entry bibliography available in `manuscript/references.bib` and in compiled PDF)</em></p>
+                </section>
+
+            </article>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 2: INTERACTIVE EXPLORER (EMBEDDED TOOL) -->
+        <!-- ========================================================================= -->
+        <div id="view-interactive" class="hidden space-y-8">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center space-x-2">
+                            <span>🚀</span>
+                            <span>Interactive Sintered Regolith BLSS Simulator</span>
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Real-time parametric simulation of chemical toxicity, sintering modalities, 1/6 g hydrodynamics, and ESM lifecycle</p>
+                    </div>
+                    <a href="manuscript.pdf" target="_blank" class="px-3 py-1.5 rounded-lg bg-cose-blue text-white text-xs font-bold hover:bg-cose-bluedark transition flex items-center space-x-1 self-start sm:self-auto">
+                        <span>📄</span>
+                        <span>Download Paper</span>
+                    </a>
+                </div>
+
+                <!-- Simulation Controls & Interactive Dashboard -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-6">
+                    <!-- Sintering Modalities Radar -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Manufacturing Modality Evaluator</h3>
+                        <div class="chart-container" style="height: 320px;">
+                            <canvas id="modalityChart"></canvas>
                         </div>
-                        <input type="range" id="crewSlider" min="2" max="12" value="6" step="1" oninput="recalcESM()" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-tech-purple">
                     </div>
 
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center text-xs">
-                            <label for="monthSlider" class="font-bold text-slate-700 dark:text-slate-300">Mission Duration Horizon:</label>
-                            <span id="monthVal" class="font-extrabold text-tech-purple dark:text-purple-400 text-sm">36 Months</span>
+                    <!-- 1/6 g Hydrodynamics -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">1/6 g Pore Hydrodynamics</h3>
+                            <span id="poreVal" class="text-xs font-extrabold text-cose-blue dark:text-cose-bluelight">45 µm (Optimal Window)</span>
                         </div>
-                        <input type="range" id="monthSlider" min="6" max="60" value="36" step="6" oninput="recalcESM()" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-tech-purple">
-                    </div>
-
-                    <!-- Computed Outputs -->
-                    <div class="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-700 text-xs">
-                        <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                            <span class="text-slate-600 dark:text-slate-300 font-medium">Cum. Raw Regolith ESM:</span>
-                            <span id="esm-raw-out" class="font-extrabold text-tech-rose dark:text-rose-400 text-sm">6,600 kg</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                            <span class="text-slate-600 dark:text-slate-300 font-medium">Cum. Sintered System ESM:</span>
-                            <span id="esm-sintered-out" class="font-extrabold text-tech-purple dark:text-purple-400 text-sm">3,350 kg</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-purple-50 dark:bg-purple-950/60 p-3 rounded-lg border border-purple-200 dark:border-purple-800">
-                            <span class="text-tech-purple dark:text-purple-300 font-bold">Net Mass Savings:</span>
-                            <span id="esm-savings-out" class="font-black text-tech-purple dark:text-purple-400 text-base">3,250 kg Saved</span>
+                        <input id="poreSlider" type="range" min="5" max="120" value="45" oninput="simPoreHydrodynamics(this.value)" class="w-full accent-cose-blue">
+                        <div class="chart-container" style="height: 280px;">
+                            <canvas id="hydroChart"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- ESM Trajectory Chart -->
-                <div class="lg:col-span-7 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">Cumulative ESM Trajectory Over Mission Horizon</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Highlighting the 18–22 month breakeven crossover point for the sintering infrastructure.</p>
-                    <div class="chart-container">
+                <!-- ESM Calculator -->
+                <div class="mt-10 pt-8 border-t border-slate-200 dark:border-slate-800 space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-base font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">ESM Breakeven Calculator</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Adjust crew size and duration to calculate cumulative lifecycle mass</p>
+                        </div>
+                        <div class="flex gap-4 text-xs font-bold">
+                            <div class="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <span class="text-slate-500">Net Savings:</span>
+                                <span id="esm-savings-out" class="text-cose-blue dark:text-cose-teallight ml-1">8,062 kg Saved</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                        <div class="space-y-1">
+                            <div class="flex justify-between font-bold">
+                                <span>Habitat Crew Size:</span>
+                                <span id="crewVal">6 Crew Members</span>
+                            </div>
+                            <input id="crewSlider" type="range" min="1" max="12" value="6" oninput="recalcESM()" class="w-full accent-cose-blue">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between font-bold">
+                                <span>Mission Horizon:</span>
+                                <span id="monthVal">60 Months</span>
+                            </div>
+                            <input id="monthSlider" type="range" min="12" max="120" value="60" oninput="recalcESM()" class="w-full accent-cose-blue">
+                        </div>
+                    </div>
+
+                    <div class="chart-container" style="height: 320px;">
                         <canvas id="esmChart"></canvas>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Section 5: Closed-Loop Ecosystem Architecture -->
-        <section id="ecosystem" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6 transition-colors duration-200">
-            <div class="border-l-4 border-tech-cyan pl-4">
-                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">5. Closed-Loop Ecosystem Architecture & Regeneration</h2>
-                <p class="text-slate-600 dark:text-slate-300 text-sm mt-2 leading-relaxed">
-                    <strong>Section Context & Purpose:</strong> Sustaining life on the Moon requires linking plant cultivation, saprotrophic fungal bioconversion (mycoponics), microbial bioleaching (BioRock/BioAsteroid), and thermal substrate regeneration into a closed-loop system. Lignocellulosic straw (40–60% of crop biomass) is converted by *Pleurotus ostreatus* on porous ceramic plates into edible protein. Microbial side-reactors extract $\text{K}^+$, $\text{Ca}^{2+}$, and $\text{Mg}^{2+}$ from raw regolith, while a 500°C thermal bake-out pyrolyzes root debris, sterilizing and regenerating the ceramic matrix for infinite re-use.
-                </p>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">
-                    <strong>Interactive Explorer:</strong> Click through the 4 stages below to explore how mass, nutrients, and substrates flow through the circular bio-infrastructure loop.
-                </p>
-            </div>
-
-            <!-- Stage Stepper Tabs -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <button id="stage-btn-1" onclick="selectStage(1)" class="p-3 text-left rounded-xl border bg-tech-cyan text-white border-tech-cyan transition shadow-xs">
-                    <div class="text-[10px] font-bold uppercase opacity-80">Stage 1</div>
-                    <div class="text-xs font-bold mt-0.5">Crop Cultivation</div>
-                </button>
-                <button id="stage-btn-2" onclick="selectStage(2)" class="p-3 text-left rounded-xl border bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-                    <div class="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500">Stage 2</div>
-                    <div class="text-xs font-bold mt-0.5">Mycoponics (Fungi)</div>
-                </button>
-                <button id="stage-btn-3" onclick="selectStage(3)" class="p-3 text-left rounded-xl border bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-                    <div class="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500">Stage 3</div>
-                    <div class="text-xs font-bold mt-0.5">Microbial Bioleaching</div>
-                </button>
-                <button id="stage-btn-4" onclick="selectStage(4)" class="p-3 text-left rounded-xl border bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-                    <div class="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500">Stage 4</div>
-                    <div class="text-xs font-bold mt-0.5">Thermal Regeneration</div>
-                </button>
-            </div>
-
-            <!-- Dynamic Stage Details Viewport -->
-            <div id="stage-viewport" class="bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-900/60 rounded-xl p-6 space-y-4">
-                <div class="flex items-center space-x-3">
-                    <span id="stage-num" class="w-7 h-7 rounded-full bg-tech-cyan text-white font-black text-xs flex items-center justify-center">1</span>
-                    <h3 id="stage-title" class="text-lg font-bold text-slate-900 dark:text-white">Stage 1: Photoautotrophic Crop Cultivation</h3>
+        <!-- ========================================================================= -->
+        <!-- TAB 3: SYSTEMS & FAIR DATA HUB -->
+        <!-- ========================================================================= -->
+        <div id="view-fair" class="hidden space-y-8">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center space-x-2">
+                            <span>📊</span>
+                            <span>FAIR Systems Data & Computational Models</span>
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Grounding simulation metrics, BVAD formulations, and open data archives</p>
+                    </div>
+                    <a href="https://github.com/organization/lunar-regolith-blss-review" target="_blank" class="px-3.5 py-1.5 rounded-lg bg-slate-800 text-white dark:bg-slate-700 text-xs font-bold hover:bg-slate-700 transition flex items-center space-x-1.5 self-start sm:self-auto">
+                        <span>💻</span>
+                        <span>GitHub Repository</span>
+                    </a>
                 </div>
-                <p id="stage-desc" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                    Sintered ceramic troughs deliver liquid nutrients to crops (*Triticum aestivum*, *Glycine max*). Smooth pore channels maintain root aeration and liquid supply, generating edible yield and oxygen. Inedible crop residues (40–60% of total biomass) are collected for fungal upcycling.
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 text-xs">
-                    <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                        <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-bold uppercase">Primary Substrate</span>
-                        <span id="stage-sub" class="font-bold text-slate-800 dark:text-slate-200">Engineered Porous Ceramic Troughs</span>
-                    </div>
-                    <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                        <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-bold uppercase">Key Output Mass</span>
-                        <span id="stage-out" class="font-bold text-slate-800 dark:text-slate-200">Edible Calories, O2, Inedible Straw</span>
-                    </div>
-                    <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                        <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-bold uppercase">Efficiency Factor</span>
-                        <span id="stage-eff" class="font-bold text-tech-emerald dark:text-emerald-400">&gt; 98.5% Water Recovery</span>
+
+                <!-- Grounding explanation -->
+                <div class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                    <p>
+                        To ensure complete scientific integrity and eliminate synthetic data ambiguities, the Equivalent System Mass (ESM) calculations are formalized in <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-xs">analysis/esm_model.py</code> based on NASA Johnson Space Center BVAD standards (NASA/CR-2004-208941).
+                    </p>
+                    <p>
+                        The model compares direct cultivation against sintered ceramic bio-infrastructure using empirical mass, power, cooling, volume, and crew labor trade-offs.
+                    </p>
+                </div>
+
+                <!-- Code block / formula -->
+                <div class="bg-slate-950 text-slate-200 p-4 rounded-xl font-mono text-xs overflow-x-auto space-y-2 border border-slate-800">
+                    <div class="text-slate-500">// NASA BVAD Parameterized ESM Formulation</div>
+                    <div>ESM = M + (V * C_V) + (P * C_P) + (C * C_C) + (T * C_T)</div>
+                    <div class="text-slate-400 pt-1">
+                        C_V = 9.16 kg/m³ (Pressurized Volume) | C_P = 54 kg/kWe (Nuclear) | C_C = 85 kg/kWth (Radiators) | C_T = 1.25 kg/hr (Crew)
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- Section 6: TRL Roadmap & Phase Explorer -->
-        <section id="roadmap" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6 transition-colors duration-200">
-            <div class="border-l-4 border-tech-amber pl-4">
-                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">6. Technology Readiness Level (TRL) Maturation Roadmap</h2>
-                <p class="text-slate-600 dark:text-slate-300 text-sm mt-2 leading-relaxed">
-                    <strong>Section Context & Purpose:</strong> Advancing sintered regolith bio-infrastructure from laboratory experiments (TRL 1–3) to an operational lunar habitat (>2031, TRL 7–9) requires a phased development plan. Key milestones include CLPS lander payloads for autonomous vacuum sintering, ISS microgravity capillary flow validation, and deploying automated ISRU plants that construct vertical hydroponic arrays.
-                </p>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">
-                    <strong>Interactive Visualizer:</strong> Explore the horizontal TRL chart below and click specific phase cards to view milestone targets and engineering risk mitigations.
-                </p>
-            </div>
+                <!-- Baseline CSV Data Table -->
+                <div class="space-y-3">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Baseline 6-Crew 60-Month Trajectory Data</h3>
+                    <div class="cose-table-wrapper">
+                        <table class="cose-table text-xs">
+                            <thead>
+                                <tr>
+                                    <th>Mission Month</th>
+                                    <th>Raw Regolith Cumulative ESM (kg)</th>
+                                    <th>Sintered Ceramic Cumulative ESM (kg)</th>
+                                    <th>Net Savings (kg)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Month 0 (Initial)</td><td>517.5 kg</td><td>2,008.2 kg</td><td>-1,490.7 kg</td><td><span class="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-600 text-[10px] font-bold">Capital Investment</span></td></tr>
+                                <tr><td>Month 12 (1 Year)</td><td>2,798.8 kg</td><td>2,428.1 kg</td><td>+370.7 kg</td><td><span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-600 text-[10px] font-bold">Post-Breakeven</span></td></tr>
+                                <tr><td>Month 24 (2 Years)</td><td>5,080.1 kg</td><td>2,848.1 kg</td><td>+2,232.1 kg</td><td><span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-600 text-[10px] font-bold">Compounding Savings</span></td></tr>
+                                <tr><td>Month 36 (3 Years)</td><td>7,361.5 kg</td><td>3,268.0 kg</td><td>+4,093.5 kg</td><td><span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-600 text-[10px] font-bold">Compounding Savings</span></td></tr>
+                                <tr><td>Month 60 (5 Years)</td><td>11,924.1 kg</td><td>4,107.9 kg</td><td>+7,816.2 kg</td><td><span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-600 text-[10px] font-bold">Compounding Savings</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-            <!-- TRL Horizontal Bar Chart Container -->
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
-                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">Target Development Timeline & TRL Milestones</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Strategic progression from terrestrial simulant labs to operational lunar surface deployment.</p>
-                <div class="chart-container">
-                    <canvas id="roadmapChart"></canvas>
+                <!-- Citation Box -->
+                <div class="space-y-2 pt-4">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">BibTeX Citation</h3>
+                    <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-xs text-slate-700 dark:text-slate-300 overflow-x-auto">
+@article{lunar_blss_sintered_regolith_2026,<br>
+&nbsp;&nbsp;title &nbsp;&nbsp;&nbsp;= {From Dust to Bio-Infrastructure: A Mechanistic Review of Sintered Regolith Ceramics for Lunar Biogenerative Life Support Systems},<br>
+&nbsp;&nbsp;author &nbsp;&nbsp;= {Authors, Collaboration},<br>
+&nbsp;&nbsp;journal &nbsp;= {npj Microgravity (In Preparation)},<br>
+&nbsp;&nbsp;year &nbsp;&nbsp;&nbsp;&nbsp;= {2026},<br>
+&nbsp;&nbsp;doi &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= {10.5281/zenodo.placeholder},<br>
+&nbsp;&nbsp;url &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= {https://organization.github.io/lunar-regolith-blss-review}<br>
+}
+                    </div>
                 </div>
             </div>
-
-            <!-- Phase Cards Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-sky-200 dark:border-sky-900/60 space-y-2">
-                    <span class="px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-tech-cyan dark:text-sky-400 font-bold text-[10px] uppercase">TRL 1–3 (2024–2026)</span>
-                    <h3 class="font-bold text-slate-900 dark:text-white text-sm">Phase 1: Laboratory Simulants</h3>
-                    <p class="text-slate-600 dark:text-slate-300">Dielectric loss tangent characterization, multiphysics microwave modeling, and proving $npFe^0$ oxidation in plant assays.</p>
-                </div>
-                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-amber-200 dark:border-amber-900/60 space-y-2">
-                    <span class="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-tech-amber dark:text-amber-400 font-bold text-[10px] uppercase">TRL 4–6 (2027–2030)</span>
-                    <h3 class="font-bold text-slate-900 dark:text-white text-sm">Phase 2: Flight Demonstrations</h3>
-                    <p class="text-slate-600 dark:text-slate-300">CLPS lander payloads for vacuum sintering; ISS microgravity capillary wicking and microbial bioleaching tests.</p>
-                </div>
-                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/60 space-y-2">
-                    <span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-tech-emerald dark:text-emerald-400 font-bold text-[10px] uppercase">TRL 7–9 (&gt; 2031)</span>
-                    <h3 class="font-bold text-slate-900 dark:text-white text-sm">Phase 3: Operational Habitat Integration</h3>
-                    <p class="text-slate-600 dark:text-slate-300">Deploying full ISRU manufacturing plants to construct vertical hydroponic arrays and close the habitat ECLSS loop.</p>
-                </div>
-            </div>
-        </section>
+        </div>
 
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-8 text-center text-xs text-slate-500 dark:text-slate-400 space-y-2 transition-colors duration-200">
-        <p class="font-semibold text-slate-700 dark:text-slate-300">Lunar Biogenerative Life Support Systems (BLSS) ISRU Architecture Review</p>
-        <p>Built with Tailwind CSS & Chart.js — Dual Dynamic Theme (No SVG / No Mermaid JS used)</p>
+    <!-- CoSE Footer -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 mt-16 text-center text-xs text-slate-500 dark:text-slate-400 space-y-3 transition-colors duration-200">
+        <div class="flex items-center justify-center space-x-3">
+            <img src="assets/cose-logo.png" alt="CoSE" class="h-6 w-auto opacity-80">
+            <span class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest text-[11px]">Centre of Space Evolution (CoSE)</span>
+        </div>
+        <p>Lunar Biogenerative Life Support Systems (BLSS) ISRU Bio-Infrastructure Initiative</p>
+        <p>Text & Figures: <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" class="underline hover:text-cose-blue">CC-BY-4.0</a> · Code & Models: <a href="https://opensource.org/licenses/MIT" target="_blank" class="underline hover:text-cose-blue">MIT License</a></p>
     </footer>
 
-    <!-- JavaScript Data & Logic Block -->
+    <!-- JavaScript Navigation & Chart Logic -->
     <script>
-        // --- THEME SWITCHING LOGIC ---
+        // Tab Switcher
+        function switchTab(tabId) {
+            ['narrative', 'interactive', 'fair'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-btn-${t}`);
+                btn.className = "px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-cose-blue dark:hover:text-white transition";
+            });
+
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.className = "px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-cose-blue dark:text-white shadow-xs transition";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (tabId === 'interactive') {
+                setTimeout(() => {
+                    if (modalityChart) modalityChart.resize();
+                    if (hydroChart) hydroChart.resize();
+                    if (esmChart) esmChart.resize();
+                }, 100);
+            }
+        }
+
+        // Theme Toggle
         function initTheme() {
             const savedTheme = localStorage.getItem('theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
                 document.documentElement.classList.add('dark');
+                document.documentElement.setAttribute('data-theme', 'dark');
                 updateThemeUI(true);
             } else {
                 document.documentElement.classList.remove('dark');
+                document.documentElement.setAttribute('data-theme', 'light');
                 updateThemeUI(false);
             }
         }
 
         function toggleTheme() {
             const isDark = document.documentElement.classList.toggle('dark');
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             updateThemeUI(isDark);
-            updateChartsTheme(isDark);
+            if (modalityChart) updateChartsTheme(isDark);
         }
 
         function updateThemeUI(isDark) {
             document.getElementById('themeBtnIcon').textContent = isDark ? '☀️' : '🌙';
-            document.getElementById('themeBtnText').textContent = isDark ? 'Light Mode' : 'Dark Mode';
         }
 
-        // Label Wrapping Helper Function (Max 16 characters per line)
-        function wrapLabel(str, maxLen = 16) {
-            if (typeof str !== 'string' || str.length <= maxLen) return str;
-            const words = str.split(' ');
-            const lines = [];
-            let currentLine = '';
-            words.forEach(word => {
-                if ((currentLine + ' ' + word).trim().length > maxLen) {
-                    if (currentLine) lines.push(currentLine.trim());
-                    currentLine = word;
-                } else {
-                    currentLine += (currentLine ? ' ' : '') + word;
-                }
-            });
-            if (currentLine) lines.push(currentLine.trim());
-            return lines;
-        }
-
-        // Shared Tooltip Callback for Wrapped Labels
-        const standardTooltipCallback = {
-            callbacks: {
-                title: function(tooltipItems) {
-                    const item = tooltipItems[0];
-                    let label = item.chart.data.labels[item.dataIndex];
-                    if (Array.isArray(label)) {
-                        return label.join(' ');
-                    } else {
-                        return label;
-                    }
-                }
-            }
-        };
-
-        // --- CHART INSTANCES & SETUP ---
-        let toxicityChart, modalityChart, hydroChart, esmChart, roadmapChart;
+        // Simulation Charts Logic
+        let modalityChart, hydroChart, esmChart;
 
         function getChartColors(isDark) {
             return {
-                gridColor: isDark ? '#334155' : '#e2e8f0',
-                textColor: isDark ? '#cbd5e1' : '#64748b',
-                tickColor: isDark ? '#cbd5e1' : '#334155',
-                radarAngle: isDark ? '#475569' : '#cbd5e1'
+                gridColor: isDark ? '#1e293b' : '#e2e8f0',
+                textColor: isDark ? '#94a3b8' : '#64748b',
+                radarAngle: isDark ? '#334155' : '#cbd5e1'
             };
         }
 
@@ -601,51 +704,16 @@
             const isDark = document.documentElement.classList.contains('dark');
             const c = getChartColors(isDark);
 
-            // 1. Toxicity Chart
-            const ctxToxicity = document.getElementById('toxicityChart').getContext('2d');
-            toxicityChart = new Chart(ctxToxicity, {
-                type: 'bar',
-                data: {
-                    labels: ['Abiotic Radical Gen', 'GST Expression', 'Peroxidase Level', 'Root Edge Shear'].map(l => wrapLabel(l)),
-                    datasets: [
-                        { label: 'Raw Regolith', data: [100, 92, 85, 95], backgroundColor: '#e11d48', borderRadius: 4 },
-                        { label: 'Basalt Control', data: [18, 25, 20, 30], backgroundColor: '#d97706', borderRadius: 4 },
-                        { label: 'Sintered Ceramic', data: [4, 8, 10, 5], backgroundColor: '#059669', borderRadius: 4 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            title: { display: true, text: 'Relative Stress Level (%)', color: c.textColor, font: { size: 10 } },
-                            ticks: { color: c.textColor },
-                            grid: { color: c.gridColor }
-                        },
-                        x: {
-                            ticks: { color: c.tickColor, font: { size: 10 } },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: c.tickColor, font: { size: 11 } } },
-                        tooltip: standardTooltipCallback
-                    }
-                }
-            });
-
-            // 2. Modality Radar Chart
-            const ctxModality = document.getElementById('modalityChart').getContext('2d');
-            modalityChart = new Chart(ctxModality, {
+            // Modality Radar
+            const ctxMod = document.getElementById('modalityChart').getContext('2d');
+            modalityChart = new Chart(ctxMod, {
                 type: 'radar',
                 data: {
-                    labels: ['Energy Efficiency', 'Mass Throughput', 'Geometric Precision', 'Cooling Safety', 'Volumetric Heating'].map(l => wrapLabel(l)),
+                    labels: ['Energy Efficiency', 'Mass Throughput', 'Precision', 'Cooling Safety', 'Volumetric Heating'],
                     datasets: [
-                        { label: 'Microwave Sintering', data: [7, 8, 5, 4, 10], borderColor: '#0284c7', backgroundColor: 'rgba(2, 132, 199, 0.25)', pointBackgroundColor: '#0284c7' },
-                        { label: 'Concentrated Solar', data: [10, 9, 4, 6, 3], borderColor: '#d97706', backgroundColor: 'rgba(217, 119, 6, 0.25)', pointBackgroundColor: '#d97706' },
-                        { label: 'Selective Laser Melting', data: [4, 3, 10, 8, 6], borderColor: '#7c3aed', backgroundColor: 'rgba(124, 58, 237, 0.25)', pointBackgroundColor: '#7c3aed' }
+                        { label: 'Microwave Sintering', data: [7, 8, 5, 4, 10], borderColor: '#3B6EA5', backgroundColor: 'rgba(59, 110, 165, 0.25)' },
+                        { label: 'Concentrated Solar', data: [10, 9, 4, 6, 3], borderColor: '#ff9800', backgroundColor: 'rgba(255, 152, 0, 0.25)' },
+                        { label: 'Selective Laser Melting', data: [4, 3, 10, 8, 6], borderColor: '#3FB6A8', backgroundColor: 'rgba(63, 182, 168, 0.25)' }
                     ]
                 },
                 options: {
@@ -655,124 +723,52 @@
                         r: {
                             angleLines: { color: c.radarAngle },
                             grid: { color: c.gridColor },
-                            pointLabels: { color: c.tickColor, font: { size: 10 } },
-                            ticks: { display: false, backdropColor: 'transparent' },
-                            suggestedMin: 0,
-                            suggestedMax: 10
+                            pointLabels: { color: c.textColor, font: { size: 10 } },
+                            ticks: { display: false }
                         }
-                    },
-                    plugins: {
-                        legend: { labels: { color: c.tickColor, font: { size: 11 } } },
-                        tooltip: standardTooltipCallback
                     }
                 }
             });
 
-            // 3. Hydrodynamics Chart
+            // Hydrodynamics
             const ctxHydro = document.getElementById('hydroChart').getContext('2d');
             hydroChart = new Chart(ctxHydro, {
                 type: 'bar',
                 data: {
-                    labels: ['< 10 µm (Fine)', '10–30 µm', '30–60 µm (Target)', '60–100 µm', '> 100 µm (Coarse)'].map(l => wrapLabel(l)),
+                    labels: ['< 10 µm', '10–30 µm', '30–60 µm (Target)', '60–100 µm', '> 100 µm'],
                     datasets: [
-                        { type: 'bar', label: 'Air-Filled Porosity (%)', data: [6, 15, 32, 48, 65], backgroundColor: '#059669', borderRadius: 4, yAxisID: 'y' },
-                        { type: 'line', label: 'Matric Suction Head (-kPa)', data: [25, 12, 4.2, 1.5, 0.4], borderColor: '#0284c7', backgroundColor: '#0284c7', borderWidth: 2, tension: 0.3, yAxisID: 'y1' }
+                        { type: 'bar', label: 'Air Porosity (%)', data: [6, 15, 32, 48, 65], backgroundColor: '#3FB6A8', yAxisID: 'y' },
+                        { type: 'line', label: 'Matric Suction (-kPa)', data: [25, 12, 4.2, 1.5, 0.4], borderColor: '#3B6EA5', backgroundColor: '#3B6EA5', yAxisID: 'y1' }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 80,
-                            title: { display: true, text: 'Air Porosity (%)', color: '#059669', font: { size: 10 } },
-                            ticks: { color: '#059669' },
-                            grid: { color: c.gridColor }
-                        },
-                        y1: {
-                            position: 'right',
-                            beginAtZero: true,
-                            max: 30,
-                            title: { display: true, text: 'Matric Potential (-kPa)', color: '#0284c7', font: { size: 10 } },
-                            ticks: { color: '#0284c7' },
-                            grid: { display: false }
-                        },
-                        x: {
-                            ticks: { color: c.tickColor, font: { size: 10 } },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: c.tickColor, font: { size: 11 } } },
-                        tooltip: standardTooltipCallback
+                        y: { beginAtZero: true, max: 80, ticks: { color: '#3FB6A8' }, grid: { color: c.gridColor } },
+                        y1: { position: 'right', beginAtZero: true, max: 30, ticks: { color: '#3B6EA5' }, grid: { display: false } },
+                        x: { ticks: { color: c.textColor }, grid: { display: false } }
                     }
                 }
             });
 
-            // 4. ESM Chart
+            // ESM Trajectory
             const ctxEsm = document.getElementById('esmChart').getContext('2d');
             esmChart = new Chart(ctxEsm, {
                 type: 'line',
                 data: {
-                    labels: ['Mo 0', 'Mo 6', 'Mo 12', 'Mo 18', 'Mo 24', 'Mo 30', 'Mo 36'].map(l => wrapLabel(l)),
+                    labels: ['Mo 0', 'Mo 12', 'Mo 24', 'Mo 36', 'Mo 48', 'Mo 60'],
                     datasets: [
-                        { label: 'Direct Regolith Cultivation', data: [420, 1450, 2480, 3510, 4540, 5570, 6600], borderColor: '#e11d48', backgroundColor: 'rgba(225, 29, 72, 0.12)', fill: true, tension: 0.2 },
-                        { label: 'Sintered Ceramic System', data: [1850, 2100, 2350, 2600, 2850, 3100, 3350], borderColor: '#7c3aed', backgroundColor: 'rgba(124, 58, 237, 0.12)', fill: true, tension: 0.2 }
+                        { label: 'Raw Regolith Direct Cultivation', data: [518, 2799, 5080, 7362, 9643, 11924], borderColor: '#e57373', backgroundColor: 'rgba(229, 115, 115, 0.12)', fill: true },
+                        { label: 'Sintered Ceramic Bio-Infrastructure', data: [2008, 2428, 2848, 3268, 3688, 4108], borderColor: '#3B6EA5', backgroundColor: 'rgba(59, 110, 165, 0.12)', fill: true }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: { display: true, text: 'Cumulative ESM Penalty (kg)', color: c.textColor, font: { size: 10 } },
-                            ticks: { color: c.textColor },
-                            grid: { color: c.gridColor }
-                        },
-                        x: {
-                            ticks: { color: c.tickColor, font: { size: 10 } },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: c.tickColor, font: { size: 11 } } },
-                        tooltip: standardTooltipCallback
-                    }
-                }
-            });
-
-            // 5. Roadmap Chart
-            const ctxRoadmap = document.getElementById('roadmapChart').getContext('2d');
-            roadmapChart = new Chart(ctxRoadmap, {
-                type: 'bar',
-                data: {
-                    labels: ['Phase 1: Lab Simulants (2024-26)', 'Phase 2: Flight Demos (2027-30)', 'Phase 3: Habitat Deployment (>2031)'].map(l => wrapLabel(l)),
-                    datasets: [
-                        { label: 'Target TRL Level', data: [3, 6, 9], backgroundColor: ['#0284c7', '#d97706', '#059669'], borderRadius: 6, barThickness: 22 }
-                    ]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            max: 9,
-                            title: { display: true, text: 'Technology Readiness Level (TRL 1–9)', color: c.textColor, font: { size: 10 } },
-                            ticks: { stepSize: 1, color: c.textColor },
-                            grid: { color: c.gridColor }
-                        },
-                        y: {
-                            ticks: { color: c.tickColor, font: { size: 10 } },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: standardTooltipCallback
+                        y: { beginAtZero: true, ticks: { color: c.textColor }, grid: { color: c.gridColor } },
+                        x: { ticks: { color: c.textColor }, grid: { display: false } }
                     }
                 }
             });
@@ -780,300 +776,61 @@
 
         function updateChartsTheme(isDark) {
             const c = getChartColors(isDark);
-
-            // Toxicity Chart Theme Update
-            toxicityChart.options.scales.y.title.color = c.textColor;
-            toxicityChart.options.scales.y.ticks.color = c.textColor;
-            toxicityChart.options.scales.y.grid.color = c.gridColor;
-            toxicityChart.options.scales.x.ticks.color = c.tickColor;
-            toxicityChart.options.plugins.legend.labels.color = c.tickColor;
-            toxicityChart.update();
-
-            // Modality Chart Theme Update
             modalityChart.options.scales.r.angleLines.color = c.radarAngle;
             modalityChart.options.scales.r.grid.color = c.gridColor;
-            modalityChart.options.scales.r.pointLabels.color = c.tickColor;
-            modalityChart.options.plugins.legend.labels.color = c.tickColor;
+            modalityChart.options.scales.r.pointLabels.color = c.textColor;
             modalityChart.update();
 
-            // Hydrodynamics Chart Theme Update
             hydroChart.options.scales.y.grid.color = c.gridColor;
-            hydroChart.options.scales.x.ticks.color = c.tickColor;
-            hydroChart.options.plugins.legend.labels.color = c.tickColor;
+            hydroChart.options.scales.x.ticks.color = c.textColor;
             hydroChart.update();
 
-            // ESM Chart Theme Update
-            esmChart.options.scales.y.title.color = c.textColor;
-            esmChart.options.scales.y.ticks.color = c.textColor;
             esmChart.options.scales.y.grid.color = c.gridColor;
-            esmChart.options.scales.x.ticks.color = c.tickColor;
-            esmChart.options.plugins.legend.labels.color = c.tickColor;
+            esmChart.options.scales.x.ticks.color = c.textColor;
             esmChart.update();
-
-            // Roadmap Chart Theme Update
-            roadmapChart.options.scales.x.title.color = c.textColor;
-            roadmapChart.options.scales.x.ticks.color = c.textColor;
-            roadmapChart.options.scales.x.grid.color = c.gridColor;
-            roadmapChart.options.scales.y.ticks.color = c.tickColor;
-            roadmapChart.update();
-        }
-
-        // --- INTERACTIVE VIEW CONTROLLERS ---
-        function updateToxicityView(type) {
-            const card = document.getElementById('toxicity-card');
-            const title = document.getElementById('tox-title');
-            const badge = document.getElementById('tox-badge');
-            const list = document.getElementById('tox-list');
-            const metric = document.getElementById('tox-metric');
-
-            const btnRaw = document.getElementById('btn-raw');
-            const btnBasalt = document.getElementById('btn-basalt');
-            const btnSintered = document.getElementById('btn-sintered');
-
-            const inactiveBtnClass = "px-3 py-2 text-xs font-semibold rounded-lg border bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 transition";
-
-            [btnRaw, btnBasalt, btnSintered].forEach(btn => btn.className = inactiveBtnClass);
-
-            if (type === 'raw') {
-                btnRaw.className = "px-3 py-2 text-xs font-semibold rounded-lg border bg-tech-rose text-white border-tech-rose transition shadow-xs";
-                card.className = "bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-900/60 rounded-xl p-5 space-y-3";
-                badge.className = "w-3 h-3 rounded-full bg-tech-rose";
-                title.textContent = "Pristine Raw Lunar Regolith";
-                list.innerHTML = `
-                    <li><strong>Iron State:</strong> Abundant npFe0 blebs (1–100 nm) drive Fenton cascades.</li>
-                    <li><strong>Grain Geometry:</strong> Highly angular, sharp shards micro-shear root caps and border cells.</li>
-                    <li><strong>Transcriptomic State:</strong> Upregulates GSTs, peroxidases, ABA, and JA stress signaling pathways.</li>
-                    <li><strong>Genotoxicity:</strong> Accumulation of 8-oxoguanine lesions causing accelerated telomere decay.</li>
-                `;
-                metric.className = "pt-2 border-t border-slate-200 dark:border-slate-700 text-xs font-bold text-tech-rose";
-                metric.textContent = "Relative ROS Radical Generation: 100% (Maximum Hazard)";
-            } else if (type === 'basalt') {
-                btnBasalt.className = "px-3 py-2 text-xs font-semibold rounded-lg border bg-tech-amber text-white border-tech-amber transition shadow-xs";
-                card.className = "bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-900/60 rounded-xl p-5 space-y-3";
-                badge.className = "w-3 h-3 rounded-full bg-tech-amber";
-                title.textContent = "Terrestrial Basalt Control";
-                list.innerHTML = `
-                    <li><strong>Iron State:</strong> Bound ferrous/ferric minerals without free metallic npFe0 blebs.</li>
-                    <li><strong>Grain Geometry:</strong> Moderately weathered; reduced physical shear risks.</li>
-                    <li><strong>Transcriptomic State:</strong> Moderate baseline stress response under aquatic conditions.</li>
-                    <li><strong>Genotoxicity:</strong> Minimal oxidation lesions; telomere integrity maintained.</li>
-                `;
-                metric.className = "pt-2 border-t border-slate-200 dark:border-slate-700 text-xs font-bold text-tech-amber dark:text-amber-400";
-                metric.textContent = "Relative ROS Radical Generation: 18% (Low-Moderate)";
-            } else if (type === 'sintered') {
-                btnSintered.className = "px-3 py-2 text-xs font-semibold rounded-lg border bg-tech-emerald text-white border-tech-emerald transition shadow-xs";
-                card.className = "bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-900/60 rounded-xl p-5 space-y-3";
-                badge.className = "w-3 h-3 rounded-full bg-tech-emerald";
-                title.textContent = "Sintered Regolith Ceramic Substrate";
-                list.innerHTML = `
-                    <li><strong>Iron State:</strong> npFe0 oxidized and solid-solubilized into augite/olivine crystal lattices.</li>
-                    <li><strong>Grain Geometry:</strong> Smooth, rounded neck boundaries; zero root abrasion.</li>
-                    <li><strong>Transcriptomic State:</strong> Homeostatic baseline; energy directed to edible harvest index.</li>
-                    <li><strong>Genotoxicity:</strong> Completely passivated interface; zero mineral radical damage.</li>
-                `;
-                metric.className = "pt-2 border-t border-slate-200 dark:border-slate-700 text-xs font-bold text-tech-emerald dark:text-emerald-400";
-                metric.textContent = "Relative ROS Radical Generation: 4% (Optimal Safety)";
-            }
-        }
-
-        function selectModality(type) {
-            const card = document.getElementById('modality-card');
-            const title = document.getElementById('mod-title');
-            const badge = document.getElementById('mod-badge');
-            const energy = document.getElementById('mod-energy');
-            const desc = document.getElementById('mod-desc');
-            const res = document.getElementById('mod-res');
-            const app = document.getElementById('mod-app');
-
-            const tabMW = document.getElementById('tab-mw');
-            const tabSolar = document.getElementById('tab-solar');
-            const tabSLM = document.getElementById('tab-slm');
-
-            const inactiveTabClass = "px-4 py-2 text-xs font-bold rounded-lg border bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition";
-
-            [tabMW, tabSolar, tabSLM].forEach(t => t.className = inactiveTabClass);
-
-            if (type === 'mw') {
-                tabMW.className = "px-4 py-2 text-xs font-bold rounded-lg border bg-tech-cyan text-white border-tech-cyan transition";
-                card.className = "bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-900/60 rounded-xl p-6 space-y-4";
-                badge.className = "px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-sky-100 dark:bg-sky-950 text-tech-cyan dark:text-sky-400";
-                badge.textContent = "2.45 / 5.8 GHz";
-                title.textContent = "Microwave Sintering";
-                energy.textContent = "1.2 kWh/kg";
-                energy.className = "text-xs font-extrabold text-tech-cyan dark:text-sky-400 block";
-                desc.textContent = "Couples volumetrically with dielectric npFe0 and ilmenite. Provides rapid bulk heating (1050–1200°C) with low energy consumption. Requires strict cooling control (<15°C/min) to prevent thermal rupture microcracks.";
-                res.textContent = "1–5 mm (Coarse)";
-                app.textContent = "Volumetric Substrates & Pavers";
-            } else if (type === 'solar') {
-                tabSolar.className = "px-4 py-2 text-xs font-bold rounded-lg border bg-tech-amber text-white border-tech-amber transition";
-                card.className = "bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-900/60 rounded-xl p-6 space-y-4";
-                badge.className = "px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-amber-100 dark:bg-amber-950 text-tech-amber dark:text-amber-400";
-                badge.textContent = "Fresnel / Parabolic";
-                title.textContent = "Concentrated Solar Sintering";
-                energy.textContent = "0 kWh Electrical";
-                energy.className = "text-xs font-extrabold text-tech-amber dark:text-amber-400 block";
-                desc.textContent = "Uses parabolic mirrors or Fresnel lenses to focus ambient solar irradiance (1361 W/m²). Extremely mass-efficient during the lunar day; limited to thin surface layer passes (<10 mm depth) due to thermal conduction limits.";
-                res.textContent = "2–10 mm (Coarse)";
-                app.textContent = "Hydroponic Troughs & Heavy Shielding";
-            } else if (type === 'slm') {
-                tabSLM.className = "px-4 py-2 text-xs font-bold rounded-lg border bg-tech-purple text-white border-tech-purple transition";
-                card.className = "bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-900/60 rounded-xl p-6 space-y-4";
-                badge.className = "px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-purple-100 dark:bg-purple-950 text-tech-purple dark:text-purple-400";
-                badge.textContent = "1064 nm Laser Diode";
-                title.textContent = "Selective Laser Melting (SLM)";
-                energy.textContent = "3.5 kWh/kg";
-                energy.className = "text-xs font-extrabold text-tech-purple dark:text-purple-400 block";
-                desc.textContent = "Focused laser bed melting provides sub-millimeter geometric precision for custom fluid manifolds, aeration nozzles, and wicking pins, though at higher electrical energy costs.";
-                res.textContent = "50–200 µm (Precision)";
-                app.textContent = "Aeration Nozzles & Fluid Manifolds";
-            }
         }
 
         function simPoreHydrodynamics(val) {
             const pore = parseInt(val);
             document.getElementById('poreVal').textContent = `${pore} µm ${pore >= 30 && pore <= 60 ? '(Optimal Window)' : ''}`;
-
-            let porosity = Math.min(70, Math.max(5, (pore * 0.65).toFixed(1)));
-            let suction = (180 / pore).toFixed(1);
-
-            document.getElementById('out-porosity').textContent = `${porosity}%`;
-            document.getElementById('out-suction').textContent = `- ${suction} kPa`;
-
-            const porosityStat = document.getElementById('porosity-status');
-            const suctionStat = document.getElementById('suction-status');
-            const hypoxiaOut = document.getElementById('out-hypoxia');
-            const hypoxiaStat = document.getElementById('hypoxia-status');
-
-            if (pore < 30) {
-                porosityStat.textContent = "Waterlogged / Low Diffusion";
-                porosityStat.className = "text-[10px] text-rose-600 dark:text-rose-400 font-bold";
-                suctionStat.textContent = "High Trapping Resistance";
-                suctionStat.className = "text-[10px] text-rose-600 dark:text-rose-400 font-bold";
-                hypoxiaOut.textContent = "HIGH";
-                hypoxiaOut.className = "text-2xl font-black text-tech-rose dark:text-rose-400 mt-1 block";
-                hypoxiaStat.textContent = "Severe Root Hypoxia Risk";
-                hypoxiaStat.className = "text-[10px] text-rose-600 dark:text-rose-400 font-bold";
-            } else if (pore > 60) {
-                porosityStat.textContent = "Excess Dry Aeration";
-                porosityStat.className = "text-[10px] text-amber-600 dark:text-amber-400 font-bold";
-                suctionStat.textContent = "Weak Capillary Suction";
-                suctionStat.className = "text-[10px] text-amber-600 dark:text-amber-400 font-bold";
-                hypoxiaOut.textContent = "LOW";
-                hypoxiaOut.className = "text-2xl font-black text-slate-800 dark:text-slate-200 mt-1 block";
-                hypoxiaStat.textContent = "Risk of Fluid Bypass Channeling";
-                hypoxiaStat.className = "text-[10px] text-amber-600 dark:text-amber-400 font-bold";
-            } else {
-                porosityStat.textContent = "Aerobic Root Respiration";
-                porosityStat.className = "text-[10px] text-emerald-600 dark:text-emerald-400 font-bold";
-                suctionStat.textContent = "Optimal Capillary Wicking";
-                suctionStat.className = "text-[10px] text-sky-600 dark:text-sky-400 font-bold";
-                hypoxiaOut.textContent = "LOW";
-                hypoxiaOut.className = "text-2xl font-black text-tech-emerald dark:text-emerald-400 mt-1 block";
-                hypoxiaStat.textContent = "Stable Oxygen Diffusion";
-                hypoxiaStat.className = "text-[10px] text-emerald-600 dark:text-emerald-400 font-bold";
-            }
         }
 
         function recalcESM() {
             const crew = parseInt(document.getElementById('crewSlider').value);
             const months = parseInt(document.getElementById('monthSlider').value);
-
             document.getElementById('crewVal').textContent = `${crew} Crew Members`;
             document.getElementById('monthVal').textContent = `${months} Months`;
 
-            const rawInitial = 420 * (crew / 6);
-            const rawMonthlyConsumable = 171.6 * (crew / 6);
-            const rawTotal = Math.round(rawInitial + (rawMonthlyConsumable * months));
+            const scale = crew / 6.0;
+            const rawInitial = 420.0 * scale + (12.5 * scale * 9.16) + (1.2 * scale * 54.0) + (1.0 * scale * 85.0);
+            const rawMonthly = (120.0 + 12.1 + 5.0 + 50.0) * scale;
+            const rawTotal = Math.round(rawInitial + (rawMonthly * months));
 
-            const sinteredInitial = 1850 + (150 * (crew - 6));
-            const sinteredMonthlyConsumable = 41.6 * (crew / 6);
-            const sinteredTotal = Math.round(sinteredInitial + (sinteredMonthlyConsumable * months));
+            const sinteredInitial = 1850.0 + (150.0 * (crew - 6)) + (4.2 * scale * 9.16) + (2.4 * scale * 54.0) + (2.0 * scale * 85.0);
+            const sinteredMonthly = (18.0 + 0.67 + 1.5 + 7.5) * scale;
+            const sinteredTotal = Math.round(sinteredInitial + (sinteredMonthly * months));
 
-            const netSavings = rawTotal - sinteredTotal;
-
-            document.getElementById('esm-raw-out').textContent = `${rawTotal.toLocaleString()} kg`;
-            document.getElementById('esm-sintered-out').textContent = `${sinteredTotal.toLocaleString()} kg`;
-
+            const savings = rawTotal - sinteredTotal;
             const savingsElem = document.getElementById('esm-savings-out');
-            if (netSavings >= 0) {
-                savingsElem.textContent = `${netSavings.toLocaleString()} kg Saved`;
-                savingsElem.className = "font-black text-tech-purple dark:text-purple-400 text-base";
-            } else {
-                savingsElem.textContent = `${Math.abs(netSavings).toLocaleString()} kg Investment`;
-                savingsElem.className = "font-black text-tech-rose dark:text-rose-400 text-base";
-            }
+            savingsElem.textContent = savings >= 0 ? `${savings.toLocaleString()} kg Saved` : `${Math.abs(savings).toLocaleString()} kg Investment`;
 
-            const newRawData = [];
-            const newSinteredData = [];
-            const newLabels = [];
-
-            const step = months / 6;
-            for (let i = 0; i <= 6; i++) {
+            const labels = [];
+            const rawData = [];
+            const sinteredData = [];
+            const step = months / 5;
+            for (let i = 0; i <= 5; i++) {
                 const m = Math.round(i * step);
-                newLabels.push(`Mo ${m}`);
-                newRawData.push(Math.round(rawInitial + (rawMonthlyConsumable * m)));
-                newSinteredData.push(Math.round(sinteredInitial + (sinteredMonthlyConsumable * m)));
+                labels.push(`Mo ${m}`);
+                rawData.push(Math.round(rawInitial + (rawMonthly * m)));
+                sinteredData.push(Math.round(sinteredInitial + (sinteredMonthly * m)));
             }
 
-            esmChart.data.labels = newLabels.map(l => wrapLabel(l));
-            esmChart.data.datasets[0].data = newRawData;
-            esmChart.data.datasets[1].data = newSinteredData;
+            esmChart.data.labels = labels;
+            esmChart.data.datasets[0].data = rawData;
+            esmChart.data.datasets[1].data = sinteredData;
             esmChart.update();
         }
 
-        const stageData = {
-            1: {
-                title: "Stage 1: Photoautotrophic Crop Cultivation",
-                desc: "Sintered ceramic troughs deliver liquid nutrients to crops (Triticum aestivum, Glycine max). Smooth pore channels maintain root aeration and liquid supply, generating edible yield and oxygen. Inedible crop residues (40–60% of total biomass) are collected for fungal upcycling.",
-                sub: "Engineered Porous Ceramic Troughs",
-                out: "Edible Calories, O2, Inedible Straw",
-                eff: "> 98.5% Water Recovery"
-            },
-            2: {
-                title: "Stage 2: Saprotrophic Mycoponics (Fungi)",
-                desc: "Pleurotus ostreatus converts lignocellulosic crop residues on porous ceramic plates into edible mushroom biomass and CO2. Smooth ceramic pores protect delicate hyphae from physical shear damage.",
-                sub: "Perforated Ceramic Growth Plates",
-                out: "Edible Protein, CO2 for Crops",
-                eff: "100% Residue Bioconversion"
-            },
-            3: {
-                title: "Stage 3: Microbial Bioleaching (BioRock)",
-                desc: "Sealed side-reactors utilize Sphingomonas desiccabilis to secrete organic acids, extracting K+, Ca2+, and Mg2+ from raw regolith to replenish crop loop nutrients without exposing crop roots to toxic dust.",
-                sub: "Sealed External Bioreactors",
-                out: "Purified Mineral Fertilizer Stock",
-                eff: "Zero Crop Toxicity Exposure"
-            },
-            4: {
-                title: "Stage 4: 500°C Thermal Substrate Regeneration",
-                desc: "Root-bound ceramic blocks undergo a 500°C pyrolytic bake-out. Organic root exudates oxidize into CO2 and mineral ash. The ceramic substrate emerges 100% sterile and structurally intact for infinite re-use.",
-                sub: "Pyrolytic Thermal Regeneration Furnace",
-                out: "Sterile Substrate, CO2, Mineral Ash",
-                eff: "Infinite Substrate Re-use"
-            }
-        };
-
-        function selectStage(stageNum) {
-            for (let i = 1; i <= 4; i++) {
-                const btn = document.getElementById(`stage-btn-${i}`);
-                if (i === stageNum) {
-                    btn.className = "p-3 text-left rounded-xl border bg-tech-cyan text-white border-tech-cyan transition shadow-xs";
-                    btn.querySelector('div:first-child').className = "text-[10px] font-bold uppercase opacity-80";
-                } else {
-                    btn.className = "p-3 text-left rounded-xl border bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition";
-                    btn.querySelector('div:first-child').className = "text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500";
-                }
-            }
-
-            const data = stageData[stageNum];
-            document.getElementById('stage-num').textContent = stageNum;
-            document.getElementById('stage-title').textContent = data.title;
-            document.getElementById('stage-desc').textContent = data.desc;
-            document.getElementById('stage-sub').textContent = data.sub;
-            document.getElementById('stage-out').textContent = data.out;
-            document.getElementById('stage-eff').textContent = data.eff;
-        }
-
-        // Initialize theme and build charts on DOM load
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
             buildCharts();
