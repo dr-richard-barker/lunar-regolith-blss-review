@@ -426,7 +426,37 @@
                             Chronological outfitting from cargo landing (Months 0--6) to serial sintering manufacturing (Months 3--15), canopy scaling, and the critical mass breakeven horizon at Month 18.5, yielding compounding savings (&gt;8,000 kg net mass saved by Month 60).
                         </div>
                     </div>
-                </section>
+
+                    <!-- Figure 10: 3D Photorealistic Moon Base Evolution (Shackleton Crater Rim) -->
+                    <div class="manuscript-figure mt-6 p-4 bg-slate-900 text-slate-100 rounded-2xl border border-slate-700 shadow-xl">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3 pb-3 border-b border-slate-800">
+                            <div>
+                                <span class="px-2.5 py-1 bg-cose-blue/30 text-cose-bluelight text-xs font-black rounded-md uppercase tracking-wider border border-cose-blue/40">3D Architecture</span>
+                                <h3 class="text-base sm:text-lg font-bold text-white mt-1">Figure 10 | 3D Photorealistic Progression: Shackleton Crater Rim Outpost</h3>
+                            </div>
+                            <!-- Phase Switcher Tabs -->
+                            <div class="flex flex-wrap gap-1 text-xs font-semibold" id="render-phase-nav">
+                                <button onclick="selectRenderPhase('montage')" id="btn-phase-montage" class="px-3 py-1.5 rounded-lg bg-cose-blue text-white shadow-xs transition">🌌 All 4 Phases</button>
+                                <button onclick="selectRenderPhase('phase1')" id="btn-phase-phase1" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Phase I (M0-9)</button>
+                                <button onclick="selectRenderPhase('phase2')" id="btn-phase-phase2" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Phase II (M6-18)</button>
+                                <button onclick="selectRenderPhase('phase3')" id="btn-phase-phase3" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Phase III (M12-24)</button>
+                                <button onclick="selectRenderPhase('phase4')" id="btn-phase-phase4" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Phase IV (M24-60+)</button>
+                            </div>
+                        </div>
+
+                        <!-- Render Display Frame -->
+                        <div class="relative overflow-hidden rounded-xl bg-black aspect-video flex items-center justify-center border border-slate-800">
+                            <img id="render-main-img" src="figures/fig10_moonbase_phases_montage.png" alt="Moon Base 3D Render" class="w-full h-full object-cover transition-all duration-300">
+                            <div id="render-overlay-badge" class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-200">
+                                <strong id="render-badge-title" class="text-cose-bluelight">Full Phased Architecture:</strong> <span id="render-badge-desc">Composite 4-Panel Evolution at Lunar South Pole</span>
+                            </div>
+                        </div>
+
+                        <div class="manuscript-caption text-slate-300 mt-3">
+                            <strong>Figure 10 | Photorealistic 3D architectural progression of autonomous ISRU habitat manufacturing and BLSS bio-infrastructure phasing on the Shackleton Crater rim.</strong>
+                            Rendered with Blender 5.2 Cycles PBR physics under realistic low-angle polar sunlight ($5.5^\circ$) with Earth in the sky. Visualizes the progression from initial CLPS lander logistics and regolith sorting (Phase I), continuous microwave sintering plant (Phase II), pressurized Artemis habitat and glowing multi-tier LED geodesic greenhouse dome (Phase III, ESM breakeven at Month 18.5), to the mature closed-loop outpost with dual domes, pyrolytic regenerators, and bioweathering chemostats (Phase IV).
+                        </div>
+                    </div>
 
                 <!-- Section 6 -->
                 <section id="sec-closed-loop">
@@ -1152,6 +1182,57 @@ gantt
             esmChart.data.datasets[0].data = rawData;
             esmChart.data.datasets[1].data = sinteredData;
             esmChart.update();
+        }
+
+        const RENDER_PHASES = {
+            'montage': {
+                src: 'figures/fig10_moonbase_phases_montage.png',
+                title: 'Full Phased Architecture:',
+                desc: 'Composite 4-Panel Evolution at Lunar South Pole (Shackleton Crater Rim)'
+            },
+            'phase1': {
+                src: 'figures/phase1_logistics_excavation.png',
+                title: 'Phase I (Months 0–9):',
+                desc: 'CLPS Cargo Lander • 40 kWe Kilopower FSP • Magnetic npFe⁰ Regolith Beneficiation'
+            },
+            'phase2': {
+                src: 'figures/phase2_sintering_plant.png',
+                title: 'Phase II (Months 6–18):',
+                desc: 'Automated Microwave Sintering Kiln • 3D Regolith Printing • 30–60 µm Ceramic Substrates'
+            },
+            'phase3': {
+                src: 'figures/phase3_canopy_breakeven.png',
+                title: 'Phase III (Months 12–24 | Breakeven M18.5):',
+                desc: 'Pressurized Artemis Habitat • Geodesic BLSS Greenhouse Dome • Multi-Tier LED Hydroponics'
+            },
+            'phase4': {
+                src: 'figures/phase4_mature_outpost.png',
+                title: 'Phase IV (Months 24–60+):',
+                desc: 'Multi-Module Hab Complex • Dual BLSS Ag Domes • Pyrolytic & Bioweathering Recycling'
+            }
+        };
+
+        function selectRenderPhase(phaseKey) {
+            const data = RENDER_PHASES[phaseKey];
+            if (!data) return;
+
+            const img = document.getElementById('render-main-img');
+            const title = document.getElementById('render-badge-title');
+            const desc = document.getElementById('render-badge-desc');
+
+            if (img) img.src = data.src;
+            if (title) title.textContent = data.title;
+            if (desc) desc.textContent = data.desc;
+
+            // Update button styles
+            const buttons = document.querySelectorAll('#render-phase-nav button');
+            buttons.forEach(btn => {
+                btn.className = 'px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition';
+            });
+            const activeBtn = document.getElementById(`btn-phase-${phaseKey}`);
+            if (activeBtn) {
+                activeBtn.className = 'px-3 py-1.5 rounded-lg bg-cose-blue text-white shadow-xs transition';
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
