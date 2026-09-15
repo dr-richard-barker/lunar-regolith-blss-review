@@ -58,14 +58,17 @@ Here, we review an alternative in-situ bio-infrastructure paradigm: transforming
 │   └── index.html                  # Local copy of interactive web explorer
 ├── manuscript/
 │   ├── main.tex                    # Master LaTeX document (npj Microgravity style)
-│   ├── references.bib              # Verified 59-entry BibTeX bibliography
+│   ├── references.bib              # Verified 68-entry BibTeX bibliography
 │   ├── figures/                    # Publication-grade figures (PNG / vector)
 │   │   ├── fig1_toxicity_passivation.png
 │   │   ├── fig2_sintering_radar.png
 │   │   ├── fig3_hydrodynamics_aeration.png
 │   │   ├── fig4_esm_lifecycle.png
 │   │   ├── fig5_mission_economics.png
-│   │   └── fig6_trl_roadmap.png
+│   │   ├── fig6_trl_roadmap.png
+│   │   ├── fig7_trl_gantt.png
+│   │   ├── fig8_multitrophic_gantt.png
+│   │   └── fig9_isru_esm_gantt.png
 │   └── sections/                   # Modular LaTeX sections
 │       ├── 00_abstract.tex
 │       ├── 01_introduction.tex
