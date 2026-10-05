@@ -57,7 +57,7 @@ Here, we review an alternative in-situ bio-infrastructure paradigm: transforming
 │   └── index.html                  # Local copy of interactive web explorer
 ├── manuscript/
 │   ├── main.tex                    # Master LaTeX document (npj Microgravity style)
-│   ├── references.bib              # Verified 68-entry BibTeX bibliography
+│   ├── references.bib              # BibTeX bibliography (audit: REFERENCES_AUDIT.md)
 │   ├── figures/                    # Publication-grade figures (PNG / vector)
 │   │   ├── fig1_toxicity_passivation.png
 │   │   ├── fig2_sintering_radar.png
