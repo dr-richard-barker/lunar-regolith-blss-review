@@ -4,7 +4,6 @@
 [![License: MIT](https://img.shields.io/badge/Code-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Build Manuscript](https://github.com/dr-richard-barker/lunar-regolith-blss-review/actions/workflows/build-manuscript.yml/badge.svg)](https://github.com/dr-richard-barker/lunar-regolith-blss-review/actions)
 [![GitHub Pages](https://img.shields.io/badge/Interactive%20Explorer-Live%20Demo-sky.svg)](https://dr-richard-barker.github.io/lunar-regolith-blss-review)
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.placeholder-orange.svg)](https://doi.org/10.5281/zenodo.placeholder)
 [![Style](https://img.shields.io/badge/Format-npj%20Microgravity-red.svg)](https://www.nature.com/npjmgrav/)
 
 An open, collaborative, and FAIR (Findable, Accessible, Interoperable, Reusable) research repository containing the complete LaTeX source, verified citation database, publication figures, interactive simulation tools, and systems engineering Equivalent System Mass (ESM) models for the review manuscript:
@@ -95,7 +94,7 @@ Here, we review an alternative in-situ bio-infrastructure paradigm: transforming
 
 | Principle | Implementation in this Repository |
 | :--- | :--- |
-| **Findable** | Persistent Zenodo DOI integration (`.zenodo.json`), structured metadata in `CITATION.cff`, standard keywords, and public GitHub indexing. |
+| **Findable** | Zenodo-ready metadata (`.zenodo.json`; a DOI is minted on first deposit, not yet made), structured metadata in `CITATION.cff`, standard keywords, and public GitHub indexing. |
 | **Accessible** | Full open-access text under Creative Commons Attribution 4.0 (CC-BY-4.0), and open-source computational scripts under MIT License. |
 | **Interoperable** | Standard modular LaTeX source adhering to Springer Nature / Nature Portfolio conventions, standard BibTeX bibliographic references, and standard CSV data exports. |
 | **Reusable** | Automated GitHub Actions CI/CD workflows for PDF compilation, standalone zero-dependency Python analysis script, and explicit documentation of all BVAD modeling equations. |
@@ -166,12 +165,11 @@ Crew Size  | Horizon    | Raw ESM (kg)   | Sintered ESM (kg)  | Net Savings    |
 If you use this manuscript, repository, or interactive explorer in your research, please cite it as:
 
 ```bibtex
-@article{lunar_blss_sintered_regolith_2026,
+@unpublished{lunar_blss_sintered_regolith_2026,
   title     = {From Dust to Bio-Infrastructure: A Mechanistic Review of Sintered Regolith Ceramics for Lunar Biogenerative Life Support Systems},
   author    = {Authors, Collaboration},
-  journal   = {npj Microgravity (In Preparation)},
+  note      = {Manuscript in preparation for npj Microgravity; a Zenodo DOI will be added when the repository is deposited},
   year      = {2026},
-  doi       = {10.5281/zenodo.placeholder},
   url       = {https://dr-richard-barker.github.io/lunar-regolith-blss-review}
 }
 ```
