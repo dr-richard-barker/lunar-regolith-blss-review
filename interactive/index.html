@@ -473,6 +473,84 @@
                         The ceramic matrix emerges sterile and decarbonized for infinite re-use without structural degradation.
                     </p>
 
+                    <!-- Figure 5: Microbial Succession & Lunar LECA -->
+                    <div class="manuscript-figure mt-4">
+                        <img src="figures/fig5_microbial_succession_leca.png" alt="Figure 5: Microbial Succession and Lunar LECA Dual-Porosity Hydrodynamics">
+                        <div class="manuscript-caption">
+                            <strong>Figure 5 | Microbial succession trajectories and Lunar LECA dual-porosity hydrodynamics.</strong>
+                            (A) Ecological succession across raw lunar regolith, ceramic Winogradsky columns, and resettable sintered/Lunar LECA substrates. (B) Cross-section of foamed Lunar LECA pellets ($0.5\text{--}2.0\,\mathrm{mm}$) coupling inter-pellet aeration ($D_p/D_o > 0.02$) with shear-sheltered surface micropores and micro-anoxic internal vesicles.
+                        </div>
+                    </div>
+
+                    <!-- Interactive Microbial Succession & Lunar LECA Explorer -->
+                    <div class="my-6 p-5 bg-slate-50 dark:bg-slate-800/70 rounded-2xl border border-slate-200 dark:border-slate-700 font-sans">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div>
+                                <span class="px-2 py-0.5 bg-cose-teal/15 text-cose-teal text-[11px] font-bold rounded uppercase tracking-wider">Interactive Explorer</span>
+                                <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">Microbial Succession &amp; Porous Ceramic Variant Matrix</h3>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5" id="leca-tabs">
+                                <button type="button" onclick="selectSuccessionTab('raw')" data-tab="raw" class="leca-tab px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200">Raw Regolith</button>
+                                <button type="button" onclick="selectSuccessionTab('winogradsky')" data-tab="winogradsky" class="leca-tab px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200">Winogradsky Column</button>
+                                <button type="button" onclick="selectSuccessionTab('monolith')" data-tab="monolith" class="leca-tab px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200">Monolithic Ceramic</button>
+                                <button type="button" onclick="selectSuccessionTab('leca')" data-tab="leca" class="leca-tab px-2.5 py-1 text-xs font-semibold rounded-lg border border-cose-teal bg-cose-teal text-white">Lunar LECA Pellets</button>
+                            </div>
+                        </div>
+                        <div id="leca-panel" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                            <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Pore Architecture</div>
+                                <div id="leca-pore" class="mt-1 text-slate-700 dark:text-slate-200 font-medium">Inter-pellet macropores (0.5–2.0 mm) + open surface micropores + closed internal vesicles (1100–1200°C foamed with char/carbonate).</div>
+                            </div>
+                            <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Microbial Succession</div>
+                                <div id="leca-succ" class="mt-1 text-slate-700 dark:text-slate-200 font-medium">Coupled surface-aerobic bioleaching/nitrification sheltered from fluid shear + intra-pellet micro-anoxic metal-sulfide niches.</div>
+                            </div>
+                            <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">1/6 g Hydrodynamics &amp; Reset</div>
+                                <div id="leca-reset" class="mt-1 text-slate-700 dark:text-slate-200 font-medium">Satisfies Jones et al. (2012) aeration (Dp/Do &gt; 0.02); requires extended hydrothermal rinse for tortuous vesicles before 500°C pyrolytic reset.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                    (function() {
+                        const DATA = {
+                            raw: {
+                                pore: "Unconsolidated fines (<75 µm); capillary waterlogging and aquatic habitat fragmentation in 1/6 g.",
+                                succ: "Stress-selected pioneers (Sphingomonas, Bacillus) facing pH 9–11 & ROS bursts, shifting stochastically to anaerobes and N2O loss.",
+                                reset: "Severe hypoxia risk (Dp/Do ≈ 0.0007 when saturated); cannot be thermally regenerated without structural sintering."
+                            },
+                            winogradsky: {
+                                pore: "Vertically stratified ceramic baffles and annular rings sintered inside sealed columns.",
+                                succ: "Deterministic 520-day redox succession (Babcsányi et al., 2017): upper aerobes/nitrifiers → mid Fe/S oxidizers → basal SO4²⁻ reducers.",
+                                reset: "Stabilizes redox gradients in 1/6 g without slumping; periodic core harvesting if sulfide precipitates clog lower baffles."
+                            },
+                            monolith: {
+                                pore: "Engineered unimodal/bimodal channels (30–60 µm wicking pins; 0.5–2.0 mm aeration; PWM open-wedge troughs).",
+                                succ: "Resettable pioneer colonization by inoculated Pleurotus hyphae or PGPR; sustained aerobic nitrification.",
+                                reset: "Rapid 500°C pyrolytic bake-out + mineral ash flush + closed-loop polyol wetting; minimal salt trapping."
+                            },
+                            leca: {
+                                pore: "Inter-pellet macropores (0.5–2.0 mm) + open surface micropores + closed internal vesicles (1100–1200°C foamed with char/carbonate).",
+                                succ: "Coupled surface-aerobic bioleaching/nitrification sheltered from fluid shear + intra-pellet micro-anoxic metal-sulfide niches.",
+                                reset: "Satisfies Jones et al. (2012) aeration (Dp/Do > 0.02); requires extended hydrothermal rinse for tortuous vesicles before 500°C pyrolytic reset."
+                            }
+                        };
+                        window.selectSuccessionTab = function(key) {
+                            const d = DATA[key];
+                            if (!d) return;
+                            document.getElementById('leca-pore').textContent = d.pore;
+                            document.getElementById('leca-succ').textContent = d.succ;
+                            document.getElementById('leca-reset').textContent = d.reset;
+                            document.querySelectorAll('#leca-tabs .leca-tab').forEach(btn => {
+                                const active = btn.getAttribute('data-tab') === key;
+                                btn.className = active
+                                    ? 'leca-tab px-2.5 py-1 text-xs font-semibold rounded-lg border border-cose-teal bg-cose-teal text-white'
+                                    : 'leca-tab px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200';
+                            });
+                        };
+                    })();
+                    </script>
+
                     <!-- Figure 8 Gantt -->
                     <div class="manuscript-figure mt-4">
                         <img src="figures/fig8_multitrophic_gantt.png" alt="Figure 8: Closed-Loop Multitrophic Operational Lifecycle Gantt Chart">
