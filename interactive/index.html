@@ -410,10 +410,10 @@
                             </div>
                         </div>
                         <div class="manuscript-figure">
-                            <img src="figures/fig5_mission_economics.png" alt="Figure 5: Mission Economics Scaling">
+                            <img src="figures/fig5_bioweathering_chambers.png" alt="Figure 5: Regolith Fines Weathering and Microbial Bioleaching">
                             <div class="manuscript-caption">
-                                <strong>Figure 5 | Mission economics and crew scaling.</strong> 
-                                Lifecycle mass comparison across 3-crew and 12-crew exploration contingents at 60 months.
+                                <strong>Figure 5 | Decoupled regolith fines weathering, microbial bioleaching, and heavy-metal separation.</strong> 
+                                External bioreactor pipeline accelerating nutrient mobilization while sequestering $\mathrm{Al^{3+}, Cr, Ti}$ prior to hydroponic loop entry.
                             </div>
                         </div>
                     </div>
@@ -593,7 +593,7 @@
                             <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">1/6 g Pore Hydrodynamics &amp; Boundary Film Simulator</h3>
                             <span id="poreVal" class="text-xs font-extrabold text-cose-blue dark:text-cose-bluelight">45 µm (Optimal Window)</span>
                         </div>
-                        <!-- Fluid Regime Selector (Hasenstein et al., 2026 Grounding) -->
+                        <!-- Fluid Regime & Gravity Selectors (Hasenstein et al., 2026 & Jones et al., 2012) -->
                         <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-1.5 text-xs">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                                 <span class="font-bold text-slate-700 dark:text-slate-300">Fluid Mechanics Model:</span>
@@ -603,8 +603,16 @@
                                     <option value="ideal_water">Classical Continuum Water (Theoretical: Lc = 6.5 mm, γ = 72 mN/m)</option>
                                 </select>
                             </div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                                <span class="font-bold text-slate-700 dark:text-slate-300">Gravity Regime (Jones et al., 2012):</span>
+                                <select id="gravitySelect" onchange="simPoreHydrodynamics(document.getElementById('poreSlider').value)" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg px-2 py-1 text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-cose-blue">
+                                    <option value="0.16" selected>Lunar Gravity (0.16 g | 6× capillary rise)</option>
+                                    <option value="0.38">Martian Gravity (0.38 g | 2.6× capillary rise)</option>
+                                    <option value="1.00">Terrestrial Gravity (1.00 g | Baseline)</option>
+                                </select>
+                            </div>
                             <div id="regime-desc" class="text-[11px] text-slate-500 dark:text-slate-400">
-                                <strong>Blue Origin NS-29 Data:</strong> Microscale wall roughness causes ~35% capillary length suppression and boundary film thickening.
+                                <strong>Blue Origin NS-29 + Jones et al. (2012):</strong> Wall roughness suppresses capillary length; WLR diffusivity $D_p/D_o \ge 0.02$ required to avoid root hypoxia.
                             </div>
                         </div>
                         <input id="poreSlider" type="range" min="5" max="120" value="45" oninput="simPoreHydrodynamics(this.value)" class="w-full accent-cose-blue">
@@ -618,13 +626,17 @@
                 <div class="mt-10 pt-8 border-t border-slate-200 dark:border-slate-800 space-y-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h3 class="text-base font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">ESM Breakeven Calculator</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400">Adjust crew size and duration to calculate cumulative lifecycle mass</p>
+                            <h3 class="text-base font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">4-Architecture ESM &amp; Edible-Yield Calculator</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Compare Conventional Hydroponics, Direct Regolith, Hybrid, and Sintered Ceramic ISRU (BVAD 2022)</p>
                         </div>
-                        <div class="flex gap-4 text-xs font-bold">
+                        <div class="flex flex-wrap gap-2 text-xs font-bold">
                             <div class="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
-                                <span class="text-slate-500">Net Savings:</span>
+                                <span class="text-slate-500">vs. Direct Regolith:</span>
                                 <span id="esm-savings-out" class="text-cose-blue dark:text-cose-teallight ml-1">8,062 kg Saved</span>
+                            </div>
+                            <div class="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <span class="text-slate-500">Sintered / kg Edible:</span>
+                                <span id="esm-edible-out" class="text-emerald-600 dark:text-emerald-400 ml-1">1.00 kg/kg</span>
                             </div>
                         </div>
                     </div>
@@ -1097,14 +1109,16 @@ gantt
                 }
             });
 
-            // ESM Trajectory
+            // ESM Trajectory (4-Architecture AWG Comparison)
             const ctxEsm = document.getElementById('esmChart').getContext('2d');
             esmChart = new Chart(ctxEsm, {
                 type: 'line',
                 data: {
                     labels: ['Mo 0', 'Mo 12', 'Mo 24', 'Mo 36', 'Mo 48', 'Mo 60'],
                     datasets: [
-                        { label: 'Raw Regolith Direct Cultivation', data: [518, 2799, 5080, 7362, 9643, 11924], borderColor: '#e57373', backgroundColor: 'rgba(229, 115, 115, 0.12)', fill: true },
+                        { label: 'Direct Regolith Cultivation', data: [518, 2799, 5080, 7362, 9643, 11924], borderColor: '#e57373', backgroundColor: 'rgba(229, 115, 115, 0.10)', fill: true },
+                        { label: 'Conventional Hydroponics (Imported)', data: [1172, 2100, 3027, 3955, 4882, 5810], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.08)', fill: false, borderDash: [5, 4] },
+                        { label: 'Hydroponic-Regolith Hybrid', data: [1530, 2148, 2766, 3384, 4002, 4620], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.08)', fill: false },
                         { label: 'Sintered Ceramic Bio-Infrastructure', data: [2008, 2428, 2848, 3268, 3688, 4108], borderColor: '#3B6EA5', backgroundColor: 'rgba(59, 110, 165, 0.12)', fill: true }
                     ]
                 },
@@ -1119,6 +1133,7 @@ gantt
             });
 
             simPoreHydrodynamics(45);
+            recalcESM();
         }
 
         function updateChartsTheme(isDark) {
@@ -1140,12 +1155,20 @@ gantt
         function simPoreHydrodynamics(val) {
             const pore = parseInt(val);
             const regime = FLUID_REGIMES[currentFluidRegime] || FLUID_REGIMES['ns29_water'];
+            const gSelect = document.getElementById('gravitySelect');
+            const gRatio = gSelect ? parseFloat(gSelect.value) : 0.16;
             const theta = currentFluidRegime === 'ns29_glycerol' ? 0.95 : 0.866;
             const suctionLive = ((2 * (regime.gammaEff * 1e-3) * theta) / (pore * 1e-6 * 1000)).toFixed(1);
-            const airPorosityLive = Math.min(75, Math.max(5, Math.round(0.52 * pore + 8)));
-            const isOptimal = pore >= 30 && pore <= 60;
-            const statusLabel = isOptimal ? '(Optimal Window)' : (pore < 30 ? '(Hypoxia Risk)' : '(Channeling Risk)');
-            document.getElementById('poreVal').textContent = `${pore} µm | ${airPorosityLive}% Air | -${suctionLive} kPa ${statusLabel}`;
+            // Adjust effective air-filled porosity slightly for gravity drainage (higher g drains more macropores)
+            const gDrainBoost = (gRatio - 0.16) * 8.0;
+            const airPorosityLive = Math.min(75, Math.max(5, Math.round(0.52 * pore + 8 + gDrainBoost)));
+            // Moldrup et al. (2000) WLR diffusivity: Dp/Do = eps^2.5 / phi (phi = 0.40 nominal)
+            const phi = 0.40;
+            const eps = Math.min(phi, (airPorosityLive / 100.0) * phi);
+            const wlr = (Math.pow(eps, 2.5) / phi).toFixed(3);
+            const isOptimal = pore >= 30 && pore <= 60 && parseFloat(wlr) >= 0.02;
+            const statusLabel = isOptimal ? '(Optimal Window)' : (parseFloat(wlr) < 0.02 || pore < 30 ? '(Hypoxia Risk)' : '(Channeling Risk)');
+            document.getElementById('poreVal').textContent = `${pore} µm | ${airPorosityLive}% Air | Dp/Do=${wlr} | -${suctionLive} kPa ${statusLabel}`;
         }
 
         function recalcESM() {
@@ -1159,6 +1182,12 @@ gantt
             const rawMonthly = (120.0 + 12.1 + 5.0 + 50.0) * scale;
             const rawTotal = Math.round(rawInitial + (rawMonthly * months));
 
+            const hydroInitial = 780.0 * scale + (5.0 * scale * 9.16) + (2.8 * scale * 54.0) + (2.3 * scale * 85.0);
+            const hydroMonthly = (28.0 + 13.8 + 18.0 + (14.0 * 1.25)) * scale;
+
+            const hybridInitial = 1150.0 * scale + (5.8 * scale * 9.16) + (2.6 * scale * 54.0) + (2.2 * scale * 85.0);
+            const hybridMonthly = (24.0 + 4.5 + 8.0 + (12.0 * 1.25)) * scale;
+
             const sinteredInitial = 1850.0 + (150.0 * (crew - 6)) + (4.2 * scale * 9.16) + (2.4 * scale * 54.0) + (2.0 * scale * 85.0);
             const sinteredMonthly = (18.0 + 0.67 + 1.5 + 7.5) * scale;
             const sinteredTotal = Math.round(sinteredInitial + (sinteredMonthly * months));
@@ -1167,20 +1196,31 @@ gantt
             const savingsElem = document.getElementById('esm-savings-out');
             savingsElem.textContent = savings >= 0 ? `${savings.toLocaleString()} kg Saved` : `${Math.abs(savings).toLocaleString()} kg Investment`;
 
+            const cumEdibleKg = crew * 10.5 * months * 1.02;
+            const esmPerEdible = (sinteredTotal / cumEdibleKg).toFixed(2);
+            const edibleElem = document.getElementById('esm-edible-out');
+            if (edibleElem) edibleElem.textContent = `${esmPerEdible} kg/kg`;
+
             const labels = [];
             const rawData = [];
+            const hydroData = [];
+            const hybridData = [];
             const sinteredData = [];
             const step = months / 5;
             for (let i = 0; i <= 5; i++) {
                 const m = Math.round(i * step);
                 labels.push(`Mo ${m}`);
                 rawData.push(Math.round(rawInitial + (rawMonthly * m)));
+                hydroData.push(Math.round(hydroInitial + (hydroMonthly * m)));
+                hybridData.push(Math.round(hybridInitial + (hybridMonthly * m)));
                 sinteredData.push(Math.round(sinteredInitial + (sinteredMonthly * m)));
             }
 
             esmChart.data.labels = labels;
             esmChart.data.datasets[0].data = rawData;
-            esmChart.data.datasets[1].data = sinteredData;
+            esmChart.data.datasets[1].data = hydroData;
+            esmChart.data.datasets[2].data = hybridData;
+            esmChart.data.datasets[3].data = sinteredData;
             esmChart.update();
         }
 

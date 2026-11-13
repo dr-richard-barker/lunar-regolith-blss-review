@@ -23,6 +23,7 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{tabularx}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
 \usepackage{makecell}
 \usepackage{caption}
 \usepackage{subcaption}
@@ -61,17 +62,20 @@
 \title{\textbf{\Large From Dust to Bio-Infrastructure: A Mechanistic Review of Sintered Regolith Ceramics for Lunar Biogenerative Life Support Systems}}
 
 \author{
-    \textbf{First Author}$^{1,*}$, \textbf{Second Author}$^{1,2}$, \textbf{Collaborator Three}$^{3}$, and \textbf{Lead Author}$^{1,4,\dagger}$
+    \textbf{Richard Barker}$^{1,\dagger}$, \textbf{Harmeet Multani}$^{2}$, \textbf{Harrison Coker}$^{3}$,\\
+    \textbf{Patrick Grove}$^{4}$, and \textbf{AWG Collaborators}$^{4,*}$
 }
 
 \date{
     \small
-    $^{1}$Advanced Life Support and Space Bio-Engineering Group, Planetary Exploration Directorate\\
-    $^{2}$Department of Materials Science and Engineering, Institute of Technology\\
-    $^{3}$Division of Plant Biology and Microgravity Omics, Aerospace Biological Sciences\\
-    $^{4}$In-Situ Resource Utilization and Planetary Infrastructures Center\\[1ex]
-    $^{*}$Equal contribution; $^{\dagger}$Corresponding author: \texttt{author@organization.edu}\\[2ex]
-    \today
+    \parbox{0.92\textwidth}{\centering
+        $^{1}$Astrobiology and Space Plant Biology Group, University of Wisconsin--Madison / Planetary Life Support Working Group\\
+        $^{2}$ExoFarm Space Systems \& ISRU Materials Engineering (\texttt{harmeet@exofarm.space})\\
+        $^{3}$Department of Soil and Crop Sciences, Texas A\&M University (\texttt{harrison.coker@tamu.edu})\\
+        $^{4}$Artificial Gravity / Lunar Agriculture Working Group (AWG: Rafael, Drew, Laura, Colin --- affiliations TBD)\\[1ex]
+        $^{*}$Contributing working group collaborators; $^{\dagger}$Corresponding author: \texttt{dr-richard-barker@github}\\[2ex]
+        \today
+    }
 }
 
 \maketitle

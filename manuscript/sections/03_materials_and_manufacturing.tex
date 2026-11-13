@@ -35,7 +35,7 @@ Because concentrated radiative flux deposits energy purely at the material bound
 \subsubsection{Selective Laser Melting (SLM)}
 Selective Laser Melting (SLM) and Selective Laser Sintering (SLS) direct a continuous-wave laser beam (typically near-infrared, $\lambda = 1064\,\mathrm{nm}$) across a pre-spread powder bed of classified regolith\cite{ming1989lunar,goulas2017process,goulas2024selective}. The focused beam generates a localized melt pool that completely liquefies and vitrifies the silicate minerals, offering dimensional feature tolerances below $50\text{--}100\,\mu\mathrm{m}$\cite{xi2026multiphysics,goulas2017process}.
 
-While SLM requires higher specific electrical energy ($\sim 3.5\,\mathrm{kWh/kg}$) and exhibits lower volumetric build throughput than bulk microwave or solar sintering, its precision makes it indispensable for fabricating intricate fluid-handling bio-infrastructure\cite{ming1989lunar,goulas2017process}. These include two-phase aeration nozzles, non-clogging porous irrigation emitters, internal capillary manifolds, and sensor-integration ports for monitoring the root-zone microenvironment\cite{ming1989lunar,goulas2017process,balla2021selective}.
+While SLM requires higher specific electrical energy ($\sim 3.5\,\mathrm{kWh/kg}$) and exhibits lower volumetric build throughput than bulk microwave or solar sintering, its precision makes it indispensable for fabricating intricate fluid-handling bio-infrastructure\cite{ming1989lunar,goulas2017process}. These include two-phase aeration nozzles, non-clogging porous irrigation emitters, internal capillary manifolds, and passive open-wedge hydroponic troughs and bubble diverters modeled on flight-proven capillary fluidic geometries\cite{ming1989lunar,goulas2017process,balla2021selective,weislogel2026pwm}.
 
 \begin{figure}[t!]
     \centering
@@ -45,19 +45,20 @@ While SLM requires higher specific electrical energy ($\sim 3.5\,\mathrm{kWh/kg}
 \end{figure}
 
 \begin{table}[t!]
-\small
+\footnotesize
+\setlength{\tabcolsep}{4pt}
 \centering
 \caption{\textbf{Key operational and technological parameters of lunar regolith additive manufacturing modalities for bio-infrastructure.}}
 \label{tab:manufacturing_modalities}
-\begin{tabularx}{\textwidth}{lXXXXX}
+\begin{tabularx}{\textwidth}{p{2.4cm}LLLLL}
 \toprule
 \textbf{Modality} & \textbf{Heating Mechanism} & \textbf{Operating Temp.} & \textbf{Specific Power Footprint} & \textbf{Geometric Resolution} & \textbf{Primary BLSS Application} \\
 \midrule
-Microwave Sintering ($2.45/5.8\,\mathrm{GHz}$) & Volumetric dielectric loss coupling with $\mathrm{npFe}^0$ and ilmenite\cite{taylor2005microwave,xi2026multiphysics,chen2024measurement} & $1050^\circ\mathrm{C}\text{--}1200^\circ\mathrm{C}$\cite{ming1989lunar} & Electrical (Magnetron/Solid-State); $\sim 1.2\,\mathrm{kWh/kg}$\cite{ming1989lunar} & Moderate ($1\text{--}5\,\mathrm{mm}$ feature size)\cite{taylor2005microwave,xi2026multiphysics} & Volumetric growth blocks, filter media, structural pavers\cite{ming1989lunar,metzger2023cost} \\
+Microwave Sintering ($2.45/5.8\,\mathrm{GHz}$) & Volumetric dielectric loss coupling with $\mathrm{npFe}^0$ and ilmenite\cite{taylor2005microwave,xi2026multiphysics,chen2024measurement} & $1050\text{--}1200^\circ\mathrm{C}$\cite{ming1989lunar} & Electrical (Magnetron / Solid-State); $\sim 1.2\,\mathrm{kWh/kg}$\cite{ming1989lunar} & Moderate ($1\text{--}5\,\mathrm{mm}$ feature size)\cite{taylor2005microwave,xi2026multiphysics} & Growth blocks, filter media, structural pavers\cite{ming1989lunar,metzger2023cost} \\
 \addlinespace
-Concentrated Solar Sintering (ALM) & Concentrated radiative flux and surface thermal conduction\cite{ming1989lunar,fateri2019solar,meurisse2018regolight} & $1100^\circ\mathrm{C}\text{--}>1400^\circ\mathrm{C}$\cite{ming1989lunar} & Direct solar; zero electrical draw during lunar day\cite{ming1989lunar} & Coarse-to-Moderate ($2\text{--}10\,\mathrm{mm}$ layer)\cite{fateri2019solar,fateri2018additive} & Hydroponic troughs, drainage gutters, perimeter shielding\cite{ming1989lunar} \\
+Concentrated Solar Sintering (ALM) & Concentrated radiative flux and surface conduction\cite{ming1989lunar,fateri2019solar,meurisse2018regolight} & $1100\text{--}{>}1400^\circ\mathrm{C}$\cite{ming1989lunar} & Direct solar; zero electrical draw during lunar day\cite{ming1989lunar} & Coarse-to-Moderate ($2\text{--}10\,\mathrm{mm}$ layer)\cite{fateri2019solar,fateri2018additive} & Hydroponic troughs, drainage gutters, perimeter shielding\cite{ming1989lunar} \\
 \addlinespace
-Selective Laser Melting (SLM/SLS) & Focused optical absorption, local melt pool fusion\cite{ming1989lunar,goulas2017process} & $1200^\circ\mathrm{C}\text{--}1500^\circ\mathrm{C}$\cite{ming1989lunar} & High electrical draw; laser diodes ($\sim 3.5\,\mathrm{kWh/kg}$)\cite{ming1989lunar} & High ($50\text{--}200\,\mu\mathrm{m}$ resolution)\cite{ming1989lunar,goulas2017process} & Aeration nozzles, porous wicking pins, fluid manifolds\cite{ming1989lunar,goulas2017process,balla2021selective} \\
+Selective Laser Melting (SLM/SLS) & Focused optical absorption, local melt pool fusion\cite{ming1989lunar,goulas2017process} & $1200\text{--}1500^\circ\mathrm{C}$\cite{ming1989lunar} & High electrical draw; laser diodes ($\sim 3.5\,\mathrm{kWh/kg}$)\cite{ming1989lunar} & High ($50\text{--}200\,\mu\mathrm{m}$ resolution)\cite{ming1989lunar,goulas2017process} & Open-wedge capillary troughs, bubble diverters, porous wicking pins\cite{ming1989lunar,goulas2017process,weislogel2026pwm} \\
 \bottomrule
 \end{tabularx}
 \end{table}
