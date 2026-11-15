@@ -187,7 +187,7 @@
                     <div class="flex items-center space-x-3 text-xs font-semibold">
                         <a id="series-dl-link" href="assets/lunar_blss_intro.mp4" download class="text-cose-blue hover:underline">Download Episode MP4</a>
                         <span class="text-slate-300 dark:text-slate-700">|</span>
-                        <a href="assets/lunar_blss_full_series.mp4" download class="text-cose-blue hover:underline">Full 4-Ep Reel (68s)</a>
+                        <a href="assets/lunar_blss_full_series.mp4" download class="text-cose-blue hover:underline">Full 4-Ep Reel (74s)</a>
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2 text-xs font-semibold">
@@ -203,15 +203,15 @@
                     </video>
                 </div>
                 <p id="series-caption" class="text-xs text-slate-500 dark:text-slate-400 font-sans">
-                    Episode 1 (18s): CLPS cargo lander touchdown on a sintered regolith pad, 2.45 GHz microwave sintering kiln cutaway, and BLSS PWM capillary hydroponics greenhouse. Auto-advances through all 4 episodes.
+                    Episode 1 (18s): Cratered lunar terrain, CLPS cargo lander touchdown on an octagonal sintered pad, 2.45 GHz microwave kiln cutaway, and geodesic BLSS greenhouse. Auto-advances through all 4 episodes.
                 </p>
                 <script>
                     (function() {
                         const episodes = [
-                            { src: 'assets/lunar_blss_intro.mp4', poster: 'assets/lunar_blss_intro_poster.png', caption: 'Episode 1 (18s): CLPS cargo lander touchdown on a sintered regolith pad, 2.45 GHz microwave sintering kiln cutaway, and BLSS PWM capillary hydroponics greenhouse. Auto-advances through all 4 episodes.' },
-                            { src: 'assets/ep2_vadose_capillary_physics.mp4', poster: 'assets/ep2_poster.png', caption: 'Episode 2 (16s): Vadose zone pore-scale cutaway, Earth (1.0g) vs Mars (0.38g) vs Moon (0.165g) capillary rise scaling, and PWM (PSI-187) passive capillary fluidics.' },
-                            { src: 'assets/ep3_esm_habitat_scaling.mp4', poster: 'assets/ep3_poster.png', caption: 'Episode 3 (18s): NASA BVAD ESM equation anatomy, crew scaling (3/6/12 crew -> 15.4/9.4/6.5 mo breakeven), nuclear vs solar power scaling, and 4-architecture mission horizon crossover.' },
-                            { src: 'assets/ep4_closed_loop_scaling.mp4', poster: 'assets/ep4_poster.png', caption: 'Episode 4 (16s): 500 °C pyrolytic ceramic regeneration, saprotrophic mycoponics straw upcycling, and external BioRock/LECA tailings valorization.' }
+                            { src: 'assets/lunar_blss_intro.mp4', poster: 'assets/lunar_blss_intro_poster.png', caption: 'Episode 1 (18s): Cratered lunar terrain, CLPS cargo lander touchdown on an octagonal sintered pad, 2.45 GHz microwave kiln cutaway, and geodesic BLSS greenhouse. Auto-advances through all 4 episodes.' },
+                            { src: 'assets/ep2_vadose_capillary_physics.mp4', poster: 'assets/ep2_poster.png', caption: 'Episode 2 (18s): Vadose soil columns, Earth (1.0g) vs Mars (0.38g) vs Moon (0.165g) capillary rise, PWM dome cutaway, and live Fig. 3 pore-throat aeration/suction curve.' },
+                            { src: 'assets/ep3_esm_habitat_scaling.mp4', poster: 'assets/ep3_poster.png', caption: 'Episode 3 (20s): Kilopower fission vs solar/RFC arrays, 3/6/12-crew linked habitat domes, and live Fig. 4 4-architecture ESM crossover (20.5 mo parity, 8,062 kg saved).' },
+                            { src: 'assets/ep4_closed_loop_scaling.mp4', poster: 'assets/ep4_poster.png', caption: 'Episode 4 (18s): 500 °C pyrolytic furnace, Pleurotus mycoponics bay, BioRock chemostat + tailings tanks, and >98.5% closed-loop water recovery curve.' }
                         ];
                         let currentEp = 0;
                         window.selectEpisode = function(idx, autoplay) {

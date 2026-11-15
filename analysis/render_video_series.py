@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-Render Episodes 2, 3, and 4 of the orthographic isometric miniature video series,
-plus concatenate Episodes 1-4 into lunar_blss_full_series.mp4.
+v2 Complete Remake of Episodes 2, 3, and 4:
+Recognizable 3D isometric miniature objects + live animated research graphs
+from analysis/output/esm_4arch_comparison.csv and paper hydrodynamics/ESM models.
 """
 
+import csv
+import math
 import os
 import shutil
 import subprocess
@@ -13,12 +16,21 @@ from typing import List, Tuple
 from PIL import Image, ImageDraw
 
 from iso_engine import (
+    ACCENT_COLOR,
     BG_COLOR,
+    DARK_COLOR,
     H,
+    INK_COLOR,
     IsoBox,
+    IsoCylinder,
+    IsoDome,
+    IsoDrawable,
+    IsoStrut,
+    MID_COLOR,
     SS,
     W,
     clamp,
+    draw_graph_panel,
     draw_hud,
     draw_leader_label,
     ease_in_out_cubic,
@@ -27,274 +39,310 @@ from iso_engine import (
     zone_cam,
 )
 
+
+def load_esm_csv(repo_root: str) -> List[dict]:
+    path = os.path.join(repo_root, "analysis", "output", "esm_4arch_comparison.csv")
+    rows = []
+    with open(path, newline="") as f:
+        for r in csv.DictReader(f):
+            rows.append({k: float(v) for k, v in r.items()})
+    return rows
+
+
 # ===========================================================================
-# EPISODE 2: Vadose Zone & Gravity Scaling (16.0 s = 480 frames)
+# EPISODE 2 (v2): Pore Physics, Gravity Scaling & Live Fig. 3 Graph (18s = 540f)
 # ===========================================================================
 def render_ep2(frame: int, fonts: Tuple) -> Image.Image:
     _, _, f_lbl, f_sub = fonts
     img = Image.new("RGB", (W, H), BG_COLOR)
     draw = ImageDraw.Draw(img)
 
-    c1 = zone_cam(0.0, 0.0)
-    c2 = zone_cam(7.5, -2.5)
-    c3 = zone_cam(14.5, -5.0)
-    if frame < 155:
+    # Shift camera slightly right of world objects so the live Fig. 3 graph sits cleanly on the right
+    c1 = (zone_cam(0.0, 0.0)[0] + 240, zone_cam(0.0, 0.0)[1])
+    c2 = (zone_cam(7.5, -2.5)[0] + 240, zone_cam(7.5, -2.5)[1])
+    c3 = (zone_cam(14.5, -5.0)[0] + 240, zone_cam(14.5, -5.0)[1])
+
+    if frame < 180:
         cam_x, cam_y = c1
-    elif frame < 190:
-        u = ease_in_out_cubic((frame - 155) / 35.0)
+    elif frame < 215:
+        u = ease_in_out_cubic((frame - 180) / 35.0)
         cam_x = c1[0] + (c2[0] - c1[0]) * u
         cam_y = c1[1] + (c2[1] - c1[1]) * u
-    elif frame < 320:
+    elif frame < 360:
         cam_x, cam_y = c2
-    elif frame < 355:
-        u = ease_in_out_cubic((frame - 320) / 35.0)
+    elif frame < 395:
+        u = ease_in_out_cubic((frame - 360) / 35.0)
         cam_x = c2[0] + (c3[0] - c2[0]) * u
         cam_y = c2[1] + (c3[1] - c2[1]) * u
     else:
         cam_x, cam_y = c3
 
-    boxes: List[IsoBox] = []
+    objs: List[IsoDrawable] = []
 
-    # --- SCENE 1: Side-by-side Soil Column Cutaways (x=-1.6 & x=+1.6) ---
-    # Base plinths
-    for idx, (bx, by) in enumerate([(-2.2, -0.6), (-1.1, -0.6), (0.8, -0.6), (1.9, -0.6)]):
-        boxes.append(IsoBox(bx, by, -0.25, 1.05, 1.2, 0.25, "dark", start_frame=idx * 3, layer=0))
+    # --- SCENE 1: Cylindrical Soil Column Cutaways ---
+    # Left: Raw Regolith Cylinder (waterlogged accent bottom + hypoxic dust top)
+    objs.append(IsoCylinder(-1.7, 0.0, -0.20, 0.95, 0.95, 0.20, "dark", segments=12, start_frame=0, layer=0))
+    objs.append(IsoCylinder(-1.7, 0.0, 0.0, 0.78, 0.78, 0.85, "accent", segments=12, start_frame=9, layer=1))
+    objs.append(IsoCylinder(-1.7, 0.0, 0.85, 0.78, 0.78, 0.65, "mid", segments=12, start_frame=12, layer=1))
+    lift1 = -95.0 * SS * ease_in_out_cubic(clamp((frame - 50) / 30.0)) if frame >= 50 else 0.0
+    objs.append(IsoCylinder(-1.7, 0.0, 1.50, 0.86, 0.86, 0.18, "dark", segments=12, start_frame=18, dz_px_extra=lift1, layer=5))
 
-    # Left column: Raw Regolith (<1-1000 um) -> waterlogged accent lower half + hypoxic seal
-    boxes.append(IsoBox(-2.0, -0.4, 0.0, 1.5, 0.9, 0.85, "accent", start_frame=12, layer=1))
-    boxes.append(IsoBox(-2.0, -0.4, 0.85, 1.5, 0.9, 0.75, "mid", start_frame=15, layer=1))
-    # Roof cap lifts at frame 50..80
-    lift1 = -100.0 * SS * ease_in_out_cubic(clamp((frame - 50) / 30.0)) if frame >= 50 else 0.0
-    boxes.append(IsoBox(-2.1, -0.5, 1.60, 1.7, 1.1, 0.22, "dark", start_frame=21, dz_px_extra=lift1, layer=5))
-
-    # Right column: Sintered Ceramic (30-60 um monodisperse pores)
+    # Right: Sintered Ceramic Cylinder (layered monodisperse rings + bio plant sprout on top)
+    objs.append(IsoCylinder(1.2, 0.0, -0.20, 0.95, 0.95, 0.20, "dark", segments=12, start_frame=6, layer=0))
     for ti in range(4):
-        pal = "light" if ti % 2 == 0 else "mid"
-        boxes.append(IsoBox(1.0, -0.4, ti * 0.40, 1.5, 0.9, 0.36, pal, start_frame=24 + ti * 3, layer=1))
-    boxes.append(IsoBox(1.0, -0.4, 1.60, 1.5, 0.9, 0.12, "accent", start_frame=36, layer=1))
-    boxes.append(IsoBox(0.9, -0.5, 1.72, 1.7, 1.1, 0.22, "glass", start_frame=39, dz_px_extra=lift1, layer=5))
+        objs.append(IsoCylinder(1.2, 0.0, ti * 0.36, 0.78, 0.78, 0.32, "light" if ti % 2 == 0 else "mid", segments=12, start_frame=21 + ti * 3, layer=1))
+    objs.append(IsoCylinder(1.2, 0.0, 1.44, 0.32, 0.22, 0.32, "bio", segments=8, start_frame=33, layer=2))
+    objs.append(IsoDome(1.2, 0.0, 1.48, 0.86, 0.55, "glass", rings=2, segments=12, start_frame=36, dz_px_extra=lift1, layer=5))
 
-    # --- SCENE 2: Gravity Capillary Rise Towers (1.0g vs 0.38g vs 0.165g) ---
+    # --- SCENE 2: Gravity Capillary Rise Columns (Earth 1g vs Mars 0.38g vs Moon 0.165g) ---
     kx, ky = 7.5, -2.5
-    s2 = 175
-    for gi, (dx, pal, h_cap, lbl_h) in enumerate([
-        (-2.0, "dark", 0.55, 0.55),   # Earth 1.0 g (2.71 mm)
-        (0.0, "mid", 1.25, 1.25),     # Mars 0.38 g
-        (2.0, "accent", 2.35, 2.35),  # Moon 0.165 g (6x rise / 4.2-5.2 mm NS-29)
-    ]):
-        boxes.append(IsoBox(kx + dx - 0.55, ky - 0.55, -0.25, 1.1, 1.1, 0.25, "light", start_frame=s2 + gi * 3, layer=0))
-        boxes.append(IsoBox(kx + dx - 0.38, ky - 0.38, 0.0, 0.76, 0.76, h_cap, pal, start_frame=s2 + 12 + gi * 3, layer=1))
+    s2 = 200
+    for gi, (dx, pal, h_cap) in enumerate([(-1.8, "dark", 0.50), (0.0, "mid", 1.20), (1.8, "accent", 2.30)]):
+        objs.append(IsoCylinder(kx + dx, ky, -0.20, 0.62, 0.62, 0.20, "light", segments=10, start_frame=s2 + gi * 3, layer=0))
+        objs.append(IsoCylinder(kx + dx, ky, 0.0, 0.42, 0.42, h_cap, pal, segments=12, start_frame=s2 + 12 + gi * 3, layer=1))
 
-    # --- SCENE 3: PWM Passive Capillary Manifold (PSI-187) ---
+    # --- SCENE 3: PWM Passive Capillary Tapered Manifold (PSI-187) ---
     px0, py0 = 14.5, -5.0
-    s3 = 335
-    for pi in range(3):
-        boxes.append(IsoBox(px0 - 1.5 + pi * 1.05, py0 - 0.9, -0.25, 1.0, 1.8, 0.25, "mid" if pi % 2 else "light", start_frame=s3 + pi * 3, layer=0))
-    # Tapered wedge channels
-    boxes.append(IsoBox(px0 - 1.2, py0 - 0.6, 0.0, 2.4, 1.2, 0.25, "dark", start_frame=s3 + 12, layer=1))
-    boxes.append(IsoBox(px0 - 1.0, py0 - 0.4, 0.25, 2.0, 0.35, 0.45, "accent", start_frame=s3 + 15, layer=2))
-    boxes.append(IsoBox(px0 - 1.0, py0 + 0.1, 0.25, 2.0, 0.35, 0.45, "light", start_frame=s3 + 18, layer=2))
-    lift3 = -105.0 * SS * ease_in_out_cubic(clamp((frame - 385) / 30.0)) if frame >= 385 else 0.0
-    boxes.append(IsoBox(px0 - 1.25, py0 - 0.65, 0.75, 2.5, 1.3, 0.20, "glass", start_frame=s3 + 24, dz_px_extra=lift3, layer=5))
+    s3 = 375
+    objs.append(IsoBox(px0 - 1.4, py0 - 0.9, -0.20, 2.8, 1.8, 0.20, "dark", start_frame=s3, layer=0))
+    objs.append(IsoBox(px0 - 1.2, py0 - 0.7, 0.0, 2.4, 1.4, 0.22, "mid", start_frame=s3 + 6, layer=1))
+    # Tapered wedge capillary channels + fluid reservoir cylinder
+    objs.append(IsoBox(px0 - 1.0, py0 - 0.45, 0.22, 1.9, 0.32, 0.38, "accent", start_frame=s3 + 12, layer=2))
+    objs.append(IsoBox(px0 - 1.0, py0 + 0.08, 0.22, 1.9, 0.32, 0.38, "bio", start_frame=s3 + 15, layer=2))
+    objs.append(IsoCylinder(px0 + 0.95, py0, 0.22, 0.34, 0.34, 0.65, "light", segments=10, start_frame=s3 + 18, layer=2))
+    lift3 = -95.0 * SS * ease_in_out_cubic(clamp((frame - 425) / 30.0)) if frame >= 425 else 0.0
+    objs.append(IsoBox(px0 - 1.25, py0 - 0.75, 0.65, 2.5, 1.5, 0.16, "glass", start_frame=s3 + 24, dz_px_extra=lift3, layer=5))
 
-    boxes.sort(key=lambda b: b.sort_key())
-    for b in boxes:
-        b.draw(draw, frame, cam_x, cam_y)
+    objs.sort(key=lambda o: o.sort_key())
+    for o in objs:
+        o.draw(draw, frame, cam_x, cam_y)
 
-    # Labels
-    if 70 <= frame < 165:
-        p = clamp((frame - 70) / 20.0)
-        draw_leader_label(draw, (-1.2, 0.0, 0.6), (-110, -130), "RAW REGOLITH (<1-1000 um)", "CAPILLARY HYPOXIA (<12% AIR)", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
-        draw_leader_label(draw, (1.8, 0.0, 1.0), (120, -110), "SINTERED CERAMIC (30-60 um)", ">25-30% AIR · -2.5 TO -5.0 kPa", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-    if 215 <= frame < 330:
-        p = clamp((frame - 215) / 20.0)
-        draw_leader_label(draw, (kx + 2.0, ky, 2.35), (140, -135), "LUNAR 0.165 g CAPILLARY RISE", "6x HEAD EXPANSION · Lc = 4.2-5.2 mm", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-        draw_leader_label(draw, (kx, ky, 1.25), (140, 45), "MARS 0.38 g vs EARTH 1.0 g", "REDUCED GRAVITY SHIFTS AERATION", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-    if 405 <= frame:
-        p = clamp((frame - 405) / 20.0)
-        draw_leader_label(draw, (px0, py0, 0.65), (145, -165), "PWM PASSIVE CAPILLARY MANIFOLD", "PSI-187 · ZERO-PUMP BUBBLE CONTROL", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-        draw_leader_label(draw, (px0 + 0.8, py0 + 0.2, 0.35), (145, 30), "SLM CERAMIC WICK CHANNELS", "MOLDRUP WLR GAS DIFFUSION", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
+    # Live Fig. 3 Hydrodynamics Graph on right side of frame
+    air_curve = [(0.0, 0.08), (0.15, 0.14), (0.28, 0.42), (0.45, 0.56), (0.65, 0.72), (0.85, 0.86), (1.0, 0.92)]
+    suction_curve = [(0.0, 0.95), (0.18, 0.72), (0.30, 0.46), (0.48, 0.34), (0.70, 0.18), (1.0, 0.08)]
+    g_rev = clamp((frame - 45) / 140.0)
+    draw_graph_panel(
+        draw,
+        (1140, 180, 700, 480),
+        "FIG. 3 · PORE THROAT AERATION & SUCTION (1/6 g)",
+        "Pore Throat Diameter (um)",
+        "Air Porosity (%) / Suction",
+        [(0.0, "5"), (0.25, "30"), (0.45, "60"), (0.75, "100"), (1.0, "150")],
+        [(0.0, "0%"), (0.35, "25%"), (0.70, "50%"), (1.0, "75%")],
+        [
+            (air_curve, ACCENT_COLOR, "Air-Filled Porosity (>25-30%)", 3.2),
+            (suction_curve, DARK_COLOR, "Matric Suction (-kPa)", 2.8),
+        ],
+        g_rev,
+        fonts,
+        highlight_band=(0.25, 0.45, "OPTIMAL: 30-60 um"),
+    )
 
-    sub = "01 / PORE-SCALE CUTAWAY" if frame < 165 else ("02 / GRAVITY SCALING (1g -> 0.38g -> 0.165g)" if frame < 330 else "03 / PWM PASSIVE CAPILLARY FLUIDICS")
-    draw_hud(draw, "EPISODE 2 · VADOSE PHYSICS & GRAVITY SCALING", sub, frame, 480, fonts)
+    if 75 <= frame < 185:
+        p = clamp((frame - 75) / 20.0)
+        draw_leader_label(draw, (-1.7, 0.0, 0.45), (-70, -145), "RAW REGOLITH (<12% AIR)", "WATERLOGGED HYPOXIA", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
+        draw_leader_label(draw, (1.2, 0.0, 1.55), (100, -120), "SINTERED CERAMIC", "AERATED 30-60 um PORES", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
+    if 240 <= frame < 365:
+        p = clamp((frame - 240) / 20.0)
+        draw_leader_label(draw, (kx + 1.8, ky, 2.30), (-110, -110), "LUNAR 0.165 g RISE", "6x EXPANSION (NS-29 Lc=4.2-5.2mm)", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
+    if 445 <= frame:
+        p = clamp((frame - 445) / 20.0)
+        draw_leader_label(draw, (px0, py0, 0.55), (-95, -145), "PWM MANIFOLD (PSI-187)", "PASSIVE CAPILLARY AERATION", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
+
+    sub = "01 / PORE-SCALE CUTAWAY & FIG. 3" if frame < 195 else ("02 / GRAVITY SCALING (1g -> 0.38g -> 0.165g)" if frame < 375 else "03 / PWM PASSIVE CAPILLARY FLUIDICS")
+    draw_hud(draw, "EPISODE 2 · VADOSE PHYSICS & GRAVITY SCALING", sub, frame, 540, fonts)
     return img.resize((1920, 1080), Image.Resampling.LANCZOS)
 
 
 # ===========================================================================
-# EPISODE 3: ESM Equation & Lunar Habitat Scaling Factors (18.0 s = 540 frames)
+# EPISODE 3 (v2): Habitat Scaling Clusters + Live Fig. 4 ESM Graph (20s = 600f)
 # ===========================================================================
-def render_ep3(frame: int, fonts: Tuple) -> Image.Image:
+def render_ep3(frame: int, fonts: Tuple, esm_rows: List[dict]) -> Image.Image:
     _, _, f_lbl, f_sub = fonts
     img = Image.new("RGB", (W, H), BG_COLOR)
     draw = ImageDraw.Draw(img)
 
-    c1 = zone_cam(0.0, 0.0)
-    c2 = zone_cam(7.5, -2.5)
-    c3 = zone_cam(15.0, -5.0)
-    if frame < 165:
+    c1 = (zone_cam(0.0, 0.0)[0] + 240, zone_cam(0.0, 0.0)[1])
+    c2 = (zone_cam(7.5, -2.5)[0] + 240, zone_cam(7.5, -2.5)[1])
+    if frame < 260:
         cam_x, cam_y = c1
-    elif frame < 205:
-        u = ease_in_out_cubic((frame - 165) / 40.0)
+    elif frame < 305:
+        u = ease_in_out_cubic((frame - 260) / 45.0)
         cam_x = c1[0] + (c2[0] - c1[0]) * u
         cam_y = c1[1] + (c2[1] - c1[1]) * u
-    elif frame < 350:
-        cam_x, cam_y = c2
-    elif frame < 390:
-        u = ease_in_out_cubic((frame - 350) / 40.0)
-        cam_x = c2[0] + (c3[0] - c2[0]) * u
-        cam_y = c2[1] + (c3[1] - c2[1]) * u
     else:
-        cam_x, cam_y = c3
+        cam_x, cam_y = c2
 
-    boxes: List[IsoBox] = []
+    objs: List[IsoDrawable] = []
 
-    # --- SCENE 1: 5 Terms of the ESM Equation Stacked (Raw vs Sintered at 60 mo) ---
-    # Left stack: Raw Regolith ESM (11,910 kg @ 60 mo)
-    # Right stack: Sintered Ceramic ESM (3,848 kg @ 60 mo)
-    for idx, (bx, pal, h) in enumerate([
-        (-1.4, "dark", 0.35),    # M initial
-        (-1.4, "mid", 0.45),     # V*Cv
-        (-1.4, "light", 0.30),   # P*Cp + C*Cc
-        (-1.4, "accent", 1.85),  # Recurring H2O + Buffers + T*Ct
-    ]):
-        z_acc = [0.0, 0.35, 0.80, 1.10][idx]
-        boxes.append(IsoBox(bx, -0.45, z_acc, 1.1, 1.1, h, pal, start_frame=10 + idx * 6, layer=1))
+    # --- SCENE 1: Power & Hardware Scaling (Fission Kilopower vs Solar + RFC) ---
+    # Left: 40 kWe Kilopower Reactor (cylinder core + vertical radiator fins)
+    objs.append(IsoCylinder(-1.6, 0.2, -0.20, 0.85, 0.85, 0.20, "dark", segments=10, start_frame=0, layer=0))
+    objs.append(IsoCylinder(-1.6, 0.2, 0.0, 0.36, 0.30, 1.35, "accent", segments=10, start_frame=9, layer=2))
+    objs.append(IsoBox(-2.45, 0.12, 0.95, 1.70, 0.16, 0.55, "light", start_frame=15, layer=2))
+    # Right: Solar PV + RFC Battery Arrays (tall recurring mass)
+    objs.append(IsoBox(0.6, -0.5, -0.20, 1.8, 1.6, 0.20, "dark", start_frame=6, layer=0))
+    objs.append(IsoBox(0.8, -0.3, 0.0, 1.4, 0.55, 0.65, "mid", start_frame=18, layer=2))
+    objs.append(IsoBox(0.7, 0.45, 0.0, 1.6, 0.45, 0.12, "dark", start_frame=21, layer=2))
 
-    for idx, (bx, pal, h) in enumerate([
-        (1.0, "dark", 0.72),     # M sintering plant (1850 kg)
-        (1.0, "mid", 0.18),      # V*Cv (66% smaller volume)
-        (1.0, "light", 0.25),    # P*Cp + C*Cc
-        (1.0, "accent", 0.22),   # Minimal recurring consumables
-    ]):
-        z_acc = [0.0, 0.72, 0.90, 1.15][idx]
-        boxes.append(IsoBox(bx, -0.45, z_acc, 1.1, 1.1, h, pal, start_frame=36 + idx * 6, layer=1))
+    # --- SCENE 2: Crew Scaling Habitat Clusters (3 / 6 / 12 Crew Linked Domes) ---
+    hx, hy = 7.5, -2.5
+    s2 = 275
+    # 3-Crew (1 dome) -> 15.4 mo
+    objs.append(IsoCylinder(hx - 2.3, hy + 0.5, 0.0, 0.68, 0.68, 0.25, "dark", segments=10, start_frame=s2, layer=1))
+    objs.append(IsoDome(hx - 2.3, hy + 0.5, 0.25, 0.68, 0.45, "light", rings=2, segments=10, start_frame=s2 + 3, layer=2))
+    # 6-Crew (2 linked domes) -> 9.4 mo
+    for di, dy in enumerate([-0.5, 0.6]):
+        objs.append(IsoCylinder(hx - 0.3, hy + dy, 0.0, 0.65, 0.65, 0.25, "dark", segments=10, start_frame=s2 + 9 + di * 3, layer=1))
+        objs.append(IsoDome(hx - 0.3, hy + dy, 0.25, 0.65, 0.45, "mid", rings=2, segments=10, start_frame=s2 + 12 + di * 3, layer=2))
+    # 12-Crew (4 linked domes with accent hub) -> 6.5 mo
+    for ci, (dx, dy) in enumerate([(1.5, -0.6), (2.6, -0.6), (1.5, 0.5), (2.6, 0.5)]):
+        objs.append(IsoCylinder(hx + dx, hy + dy, 0.0, 0.55, 0.55, 0.28, "dark", segments=10, start_frame=s2 + 18 + ci * 3, layer=1))
+        objs.append(IsoDome(hx + dx, hy + dy, 0.28, 0.55, 0.40, "accent", rings=2, segments=10, start_frame=s2 + 21 + ci * 3, layer=2))
 
-    # --- SCENE 2: Crew & Power Scaling (3 / 6 / 12 Crew + Nuclear vs Solar) ---
-    cx0, cy0 = 7.5, -2.5
-    s2 = 190
-    for ci, (dx, h_raw, h_sin) in enumerate([
-        (-2.1, 1.1, 0.65),   # 3 Crew -> 15.4 mo breakeven
-        (0.0, 2.0, 0.95),    # 6 Crew -> 9.4 mo breakeven
-        (2.1, 3.2, 1.35),    # 12 Crew -> 6.5 mo breakeven
-    ]):
-        boxes.append(IsoBox(cx0 + dx - 0.65, cy0 - 0.4, 0.0, 0.60, 0.80, h_raw, "mid", start_frame=s2 + ci * 6, layer=1))
-        boxes.append(IsoBox(cx0 + dx + 0.05, cy0 - 0.4, 0.0, 0.60, 0.80, h_sin, "accent", start_frame=s2 + 3 + ci * 6, layer=1))
+    objs.sort(key=lambda o: o.sort_key())
+    for o in objs:
+        o.draw(draw, frame, cam_x, cam_y)
 
-    # --- SCENE 3: 4-Architecture Mission Horizon Scaling ---
-    mx0, my0 = 15.0, -5.0
-    s3 = 375
-    # 4 columns: Raw (11.9t), Hydroponics (5.6t), Hybrid (4.6t), Sintered (3.8t) at 60 mo
-    for ai, (dx, h, pal) in enumerate([
-        (-2.2, 2.8, "dark"),     # Raw Regolith
-        (-0.7, 1.35, "mid"),     # Hydroponics (best <6 mo)
-        (0.8, 1.10, "light"),    # Hybrid (6-24 mo bridge)
-        (2.3, 0.92, "accent"),   # Sintered ISRU (best >24 mo)
-    ]):
-        boxes.append(IsoBox(mx0 + dx - 0.45, my0 - 0.5, -0.25, 0.95, 1.0, 0.25, "mid", start_frame=s3 + ai * 3, layer=0))
-        boxes.append(IsoBox(mx0 + dx - 0.40, my0 - 0.45, 0.0, 0.85, 0.9, h, pal, start_frame=s3 + 12 + ai * 3, layer=1))
+    # Live Fig. 4 Cumulative ESM Crossover Graph driven directly by analysis/output/esm_4arch_comparison.csv
+    max_esm = 12500.0
+    raw_pts = [(r["month"] / 60.0, r["raw_esm"] / max_esm) for r in esm_rows]
+    hydro_pts = [(r["month"] / 60.0, r["hydro_esm"] / max_esm) for r in esm_rows]
+    hybrid_pts = [(r["month"] / 60.0, r["hybrid_esm"] / max_esm) for r in esm_rows]
+    sin_pts = [(r["month"] / 60.0, r["sintered_esm"] / max_esm) for r in esm_rows]
 
-    boxes.sort(key=lambda b: b.sort_key())
-    for b in boxes:
-        b.draw(draw, frame, cam_x, cam_y)
+    g_rev = clamp((frame - 35) / 240.0)
+    draw_graph_panel(
+        draw,
+        (1110, 175, 740, 500),
+        "FIG. 4 · 4-ARCHITECTURE ESM TRAJECTORY (6 CREW, NUCLEAR)",
+        "Mission Duration (Months)",
+        "Cumulative ESM (kg)",
+        [(0.0, "0"), (9.4 / 60.0, "9.4"), (20.5 / 60.0, "20.5"), (0.6, "36"), (1.0, "60 mo")],
+        [(0.0, "0"), (3848 / max_esm, "3.8t"), (5665 / max_esm, "5.7t"), (11910 / max_esm, "11.9t")],
+        [
+            (raw_pts, DARK_COLOR, "Raw Regolith (11,910 kg)", 2.8),
+            (hydro_pts, MID_COLOR, "Hydroponics (5,665 kg)", 2.6),
+            (hybrid_pts, INK_COLOR, "Hybrid (4,625 kg)", 2.4),
+            (sin_pts, ACCENT_COLOR, "Sintered ISRU (3,848 kg)", 3.5),
+        ],
+        g_rev,
+        fonts,
+        highlight_band=(20.5 / 60.0, 1.0, "SINTERED OPTIMAL >20.5 MO (8,062 kg SAVED vs RAW)"),
+    )
 
-    if 65 <= frame < 170:
-        p = clamp((frame - 65) / 20.0)
-        draw_leader_label(draw, (-0.85, 0.1, 2.5), (-110, -90), "RAW ESM = M + V·Cv + P·Cp + C·Cc + T·Ct", "11,910 kg @ 60 MO (80% H2O + 145 kg/yr BUFFER)", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
-        draw_leader_label(draw, (1.55, 0.1, 1.15), (125, -135), "SINTERED CERAMIC ESM", "3,848 kg @ 60 MO · 8,062 kg SAVED", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-    if 230 <= frame < 355:
-        p = clamp((frame - 230) / 20.0)
-        draw_leader_label(draw, (cx0 + 2.1, cy0, 1.35), (140, -175), "CREW SCALING (3 / 6 / 12 CREW)", "BREAKEVEN SHRINKS: 15.4 -> 9.4 -> 6.5 MO", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-        draw_leader_label(draw, (cx0, cy0, 0.95), (140, 40), "POWER SCALING: NUCLEAR vs SOLAR", "Cp = 54 kg/kWe (FISSION) vs 237 kg/kWe (PV+RFC)", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-    if 420 <= frame:
-        p = clamp((frame - 420) / 20.0)
-        draw_leader_label(draw, (mx0 + 2.3, my0, 0.92), (135, -175), "PHASED ARCHITECTURE CROSSOVER", "<6 MO HYDROPONICS · 6-24 MO HYBRID · >24 MO SINTERED", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-        draw_leader_label(draw, (mx0 + 0.8, my0, 0.55), (135, 35), "MARS 0.38 g SENSITIVITY", "7,198 kg NET SAVINGS @ 60 MO (6 CREW)", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
+    if 55 <= frame < 265:
+        p = clamp((frame - 55) / 20.0)
+        draw_leader_label(draw, (-1.6, 0.2, 1.35), (-70, -140), "FISSION POWER (Cp=54)", "BREAKEVEN: 9.4 MO", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
+        draw_leader_label(draw, (1.5, 0.0, 0.65), (90, -100), "SOLAR PV+RFC (Cp=237)", "14-DAY NIGHT: 18-22 MO", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
+    if 325 <= frame:
+        p = clamp((frame - 325) / 20.0)
+        draw_leader_label(draw, (hx - 2.3, hy + 0.5, 0.70), (-85, -165), "3 CREW (15.4 MO)", "1 HABITAT MODULE", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
+        draw_leader_label(draw, (hx + 2.0, hy, 0.68), (-30, -210), "12 CREW (6.5 MO)", "ECONOMIES OF SCALE · 4 MODULES", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
 
-    sub = "01 / BVAD ESM EQUATION ANATOMY" if frame < 170 else ("02 / CREW & POWER INFRASTRUCTURE SCALING" if frame < 355 else "03 / 4-ARCHITECTURE MISSION HORIZON SCALING")
-    draw_hud(draw, "EPISODE 3 · ESM MODEL & HABITAT SCALING FACTORS", sub, frame, 540, fonts)
+    sub = "01 / POWER SCALING & FIG. 4 ESM CROSSOVER" if frame < 275 else "02 / CREW HABITAT SCALING (3 / 6 / 12 CREW)"
+    draw_hud(draw, "EPISODE 3 · ESM MODEL & HABITAT SCALING FACTORS", sub, frame, 600, fonts)
     return img.resize((1920, 1080), Image.Resampling.LANCZOS)
 
 
 # ===========================================================================
-# EPISODE 4: Closed-Loop Multitrophic Scaling (16.0 s = 480 frames)
+# EPISODE 4 (v2): Multitrophic Bays + Recovery Metrics Panel (18s = 540f)
 # ===========================================================================
 def render_ep4(frame: int, fonts: Tuple) -> Image.Image:
     _, _, f_lbl, f_sub = fonts
     img = Image.new("RGB", (W, H), BG_COLOR)
     draw = ImageDraw.Draw(img)
 
-    c1 = zone_cam(0.0, 0.0)
-    c2 = zone_cam(7.0, -2.5)
-    c3 = zone_cam(14.0, -5.0)
-    if frame < 155:
+    c1 = (zone_cam(0.0, 0.0)[0] + 240, zone_cam(0.0, 0.0)[1])
+    c2 = (zone_cam(7.0, -2.5)[0] + 240, zone_cam(7.0, -2.5)[1])
+    c3 = (zone_cam(14.0, -5.0)[0] + 240, zone_cam(14.0, -5.0)[1])
+    if frame < 180:
         cam_x, cam_y = c1
-    elif frame < 190:
-        u = ease_in_out_cubic((frame - 155) / 35.0)
+    elif frame < 215:
+        u = ease_in_out_cubic((frame - 180) / 35.0)
         cam_x = c1[0] + (c2[0] - c1[0]) * u
         cam_y = c1[1] + (c2[1] - c1[1]) * u
-    elif frame < 320:
+    elif frame < 360:
         cam_x, cam_y = c2
-    elif frame < 355:
-        u = ease_in_out_cubic((frame - 320) / 35.0)
+    elif frame < 395:
+        u = ease_in_out_cubic((frame - 360) / 35.0)
         cam_x = c2[0] + (c3[0] - c2[0]) * u
         cam_y = c2[1] + (c3[1] - c2[1]) * u
     else:
         cam_x, cam_y = c3
 
-    boxes: List[IsoBox] = []
+    objs: List[IsoDrawable] = []
 
-    # --- BAY A: 500 C Pyrolytic Regeneration Chamber ---
-    for i in range(4):
-        boxes.append(IsoBox(-1.3 + (i % 2) * 1.3, -1.3 + (i // 2) * 1.3, -0.25, 1.25, 1.25, 0.25, "light" if i % 2 else "mid", start_frame=i * 3, layer=0))
-    boxes.append(IsoBox(-1.1, -1.1, 0.0, 2.2, 2.2, 0.20, "dark", start_frame=12, layer=1))
-    boxes.append(IsoBox(-1.1, -1.1, 0.20, 0.22, 2.2, 1.35, "mid", start_frame=15, layer=2))
-    boxes.append(IsoBox(-0.88, -1.1, 0.20, 1.98, 0.22, 1.35, "mid", start_frame=18, layer=2))
-    # Pyrolytic heater + ceramic tray stack inside
-    boxes.append(IsoBox(-0.55, -0.55, 0.20, 1.1, 1.1, 0.55, "accent", start_frame=21, layer=3))
-    boxes.append(IsoBox(-0.40, -0.40, 0.75, 0.8, 0.8, 0.25, "light", start_frame=24, layer=3))
-    lift1 = -110.0 * SS * ease_in_out_cubic(clamp((frame - 55) / 30.0)) if frame >= 55 else 0.0
-    boxes.append(IsoBox(-1.2, -1.2, 1.55, 2.4, 2.4, 0.22, "dark", start_frame=30, dz_px_extra=lift1, layer=6))
+    # --- BAY A: 500 C Cylindrical Pyrolytic Furnace ---
+    objs.append(IsoCylinder(0.0, 0.0, -0.20, 1.45, 1.45, 0.20, "dark", segments=12, start_frame=0, layer=0))
+    objs.append(IsoCylinder(0.0, 0.0, 0.0, 0.95, 0.95, 0.72, "accent", segments=12, start_frame=9, layer=2))
+    objs.append(IsoBox(-0.45, -0.45, 0.72, 0.90, 0.90, 0.25, "light", start_frame=15, layer=3))
+    lift1 = -105.0 * SS * ease_in_out_cubic(clamp((frame - 50) / 30.0)) if frame >= 50 else 0.0
+    objs.append(IsoDome(0.0, 0.0, 1.15, 1.15, 0.65, "dark", rings=2, segments=12, start_frame=21, dz_px_extra=lift1, layer=6))
 
-    # --- BAY B: Mycoponics Bay (Pleurotus straw upcycling) ---
+    # --- BAY B: Mycoponics Bay (Ceramic trays + Pleurotus mushroom clusters) ---
     bx0, by0 = 7.0, -2.5
-    s2 = 180
-    boxes.append(IsoBox(bx0 - 1.2, by0 - 1.2, -0.25, 2.4, 2.4, 0.25, "dark", start_frame=s2, layer=0))
-    boxes.append(IsoBox(bx0 - 1.1, by0 - 1.1, 0.0, 0.22, 2.2, 1.35, "mid", start_frame=s2 + 3, layer=2))
-    boxes.append(IsoBox(bx0 - 0.88, by0 - 1.1, 0.0, 1.98, 0.22, 1.35, "mid", start_frame=s2 + 6, layer=2))
+    s2 = 200
+    objs.append(IsoBox(bx0 - 1.2, by0 - 1.2, -0.20, 2.4, 2.4, 0.20, "dark", start_frame=s2, layer=0))
+    objs.append(IsoBox(bx0 - 1.1, by0 - 1.1, 0.0, 0.20, 2.2, 1.30, "mid", start_frame=s2 + 3, layer=2))
+    objs.append(IsoBox(bx0 - 0.9, by0 - 1.1, 0.0, 2.0, 0.20, 1.30, "mid", start_frame=s2 + 6, layer=2))
     for ti in range(3):
-        boxes.append(IsoBox(bx0 - 0.65, by0 - 0.65, 0.1 + ti * 0.42, 1.3, 1.3, 0.18, "light", start_frame=s2 + 12 + ti * 3, layer=3))
-        boxes.append(IsoBox(bx0 - 0.35, by0 - 0.35, 0.28 + ti * 0.42, 0.45, 0.45, 0.14, "accent", start_frame=s2 + 15 + ti * 3, layer=3))
-    lift2 = -110.0 * SS * ease_in_out_cubic(clamp((frame - 225) / 30.0)) if frame >= 225 else 0.0
-    boxes.append(IsoBox(bx0 - 1.2, by0 - 1.2, 1.35, 2.4, 2.4, 0.22, "mid", start_frame=s2 + 24, dz_px_extra=lift2, layer=6))
+        tz = 0.10 + ti * 0.40
+        objs.append(IsoBox(bx0 - 0.7, by0 - 0.7, tz, 1.4, 1.4, 0.14, "light", start_frame=s2 + 12 + ti * 3, layer=3))
+        # Stylized mushroom stems + caps
+        for mx, my in [(-0.25, -0.2), (0.25, 0.2)]:
+            objs.append(IsoCylinder(bx0 + mx, by0 + my, tz + 0.14, 0.08, 0.06, 0.12, "light", segments=8, start_frame=s2 + 15 + ti * 3, layer=3))
+            objs.append(IsoCylinder(bx0 + mx, by0 + my, tz + 0.26, 0.22, 0.10, 0.08, "accent", segments=8, start_frame=s2 + 18 + ti * 3, layer=3))
+    lift2 = -105.0 * SS * ease_in_out_cubic(clamp((frame - 250) / 30.0)) if frame >= 250 else 0.0
+    objs.append(IsoBox(bx0 - 1.2, by0 - 1.2, 1.30, 2.4, 2.4, 0.20, "mid", start_frame=s2 + 24, dz_px_extra=lift2, layer=6))
 
-    # --- BAY C: External BioRock Chemostat & LECA Tailings Yard ---
+    # --- BAY C: BioRock Chemostat & LECA Tailings Yard ---
     cx0, cy0 = 14.0, -5.0
-    s3 = 340
-    for i in range(4):
-        boxes.append(IsoBox(cx0 - 1.3 + (i % 2) * 1.3, cy0 - 1.3 + (i // 2) * 1.3, -0.25, 1.25, 1.25, 0.25, "light" if i % 2 else "mid", start_frame=s3 + i * 3, layer=0))
-    # Bioreactor cylinder-like tower + LECA tailings pavers
-    boxes.append(IsoBox(cx0 - 0.8, cy0 - 0.8, 0.0, 1.1, 1.1, 1.35, "dark", start_frame=s3 + 12, layer=2))
-    boxes.append(IsoBox(cx0 - 0.6, cy0 - 0.6, 1.35, 0.7, 0.7, 0.35, "accent", start_frame=s3 + 15, layer=3))
+    s3 = 375
+    objs.append(IsoCylinder(cx0 - 0.3, cy0 - 0.2, -0.20, 1.45, 1.45, 0.20, "dark", segments=12, start_frame=s3, layer=0))
+    objs.append(IsoCylinder(cx0 - 0.4, cy0 - 0.3, 0.0, 0.65, 0.65, 1.25, "glass", segments=12, start_frame=s3 + 9, layer=2))
+    objs.append(IsoCylinder(cx0 - 0.4, cy0 - 0.3, 0.15, 0.52, 0.52, 0.65, "bio", segments=12, start_frame=s3 + 12, layer=2))
+    objs.append(IsoCylinder(cx0 - 0.4, cy0 - 0.3, 1.25, 0.35, 0.35, 0.25, "accent", segments=10, start_frame=s3 + 15, layer=3))
     for ti in range(3):
-        boxes.append(IsoBox(cx0 + 0.55, cy0 - 0.9 + ti * 0.65, 0.0, 0.55, 0.55, 0.28, "light", start_frame=s3 + 18 + ti * 3, layer=2))
+        objs.append(IsoCylinder(cx0 + 0.65, cy0 - 0.8 + ti * 0.65, 0.0, 0.26, 0.24, 0.24, "light", segments=6, start_frame=s3 + 18 + ti * 3, layer=2))
 
-    boxes.sort(key=lambda b: b.sort_key())
-    for b in boxes:
-        b.draw(draw, frame, cam_x, cam_y)
+    objs.sort(key=lambda o: o.sort_key())
+    for o in objs:
+        o.draw(draw, frame, cam_x, cam_y)
 
-    if 75 <= frame < 165:
+    # Live Recovery & Closure Curves
+    h2o_sin = [(0.0, 0.985), (0.33, 0.986), (0.66, 0.987), (1.0, 0.988)]
+    h2o_raw = [(0.0, 0.82), (0.33, 0.80), (0.66, 0.79), (1.0, 0.78)]
+    g_rev = clamp((frame - 35) / 180.0)
+    draw_graph_panel(
+        draw,
+        (1140, 185, 700, 460),
+        "CLOSED-LOOP RECOVERY & BIOMASS CLOSURE",
+        "Cultivation Cycles (500°C Pyrolytic Reset)",
+        "Water Recovery Efficiency (%)",
+        [(0.0, "Cycle 1"), (0.33, "Cycle 5"), (0.66, "Cycle 10"), (1.0, "Cycle 20")],
+        [(0.70, "70%"), (0.80, "80%"), (0.90, "90%"), (1.0, "100%")],
+        [
+            (h2o_sin, ACCENT_COLOR, "Sintered Ceramic (>98.5%)", 3.4),
+            (h2o_raw, DARK_COLOR, "Raw Regolith (78-82%)", 2.8),
+        ],
+        g_rev,
+        fonts,
+        highlight_band=(0.0, 1.0, None),
+    )
+
+    if 75 <= frame < 185:
         p = clamp((frame - 75) / 20.0)
-        draw_leader_label(draw, (0.0, 0.0, 0.85), (145, -175), "500 °C PYROLYTIC BAKE-OUT", "OXIDIZES BIOFILMS · RECOVERS CO2, H2O & ASH", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-    if 240 <= frame < 330:
-        p = clamp((frame - 240) / 20.0)
-        draw_leader_label(draw, (bx0, by0, 0.95), (145, -175), "SAPROTROPHIC MYCOPONICS", "UPCYCLES 40-60% INEDIBLE STRAW + POLYOLS", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-    if 395 <= frame:
-        p = clamp((frame - 395) / 20.0)
-        draw_leader_label(draw, (cx0 - 0.2, cy0 - 0.2, 1.35), (145, -175), "DECOUPLED BIOWEATHERING REACTOR", "MINERAL REPLENISHMENT · ZERO DUST IN HABITAT", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
-        draw_leader_label(draw, (cx0 + 0.8, cy0 + 0.4, 0.25), (145, 35), "LECA & SINTERED TAILINGS", "DRAINAGE BEDS + ROADWAY PAVERS", cam_x, cam_y, p, f_lbl, f_sub, align_right=False)
+        draw_leader_label(draw, (0.0, 0.0, 0.85), (-85, -145), "500 °C PYROLYTIC FURNACE", "CO2 + H2O + ASH RECOVERY", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
+    if 270 <= frame < 365:
+        p = clamp((frame - 270) / 20.0)
+        draw_leader_label(draw, (bx0, by0, 0.95), (-85, -145), "MYCOPONICS (PLEUROTUS)", "UPCYCLES 40-60% STRAW + POLYOLS", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
+    if 415 <= frame:
+        p = clamp((frame - 415) / 20.0)
+        draw_leader_label(draw, (cx0 - 0.4, cy0 - 0.3, 1.25), (-85, -145), "BIOROCK CHEMOSTAT & LECA", "MINERAL EXTRACTION + PAVERS", cam_x, cam_y, p, f_lbl, f_sub, align_right=True)
 
-    sub = "01 / PYROLYTIC SUBSTRATE REGENERATION" if frame < 165 else ("02 / MYCOPONIC BIOMASS UPCYCLING" if frame < 330 else "03 / BIO-ISRU & TAILINGS VALORIZATION")
-    draw_hud(draw, "EPISODE 4 · CLOSED-LOOP MULTITROPHIC SCALING", sub, frame, 480, fonts)
+    sub = "01 / PYROLYTIC REGENERATION" if frame < 195 else ("02 / MYCOPONIC BIOMASS UPCYCLING" if frame < 375 else "03 / BIO-ISRU & TAILINGS VALORIZATION")
+    draw_hud(draw, "EPISODE 4 · CLOSED-LOOP MULTITROPHIC SCALING", sub, frame, 540, fonts)
     return img.resize((1920, 1080), Image.Resampling.LANCZOS)
 
 
@@ -305,11 +353,12 @@ def main():
     os.makedirs(docs_assets, exist_ok=True)
     os.makedirs(inter_assets, exist_ok=True)
     fonts = load_fonts()
+    esm_rows = load_esm_csv(repo_root)
 
     specs = [
-        ("Ep2", 480, 110, render_ep2, "ep2_vadose_capillary_physics.mp4", "ep2_poster.png"),
-        ("Ep3", 540, 120, render_ep3, "ep3_esm_habitat_scaling.mp4", "ep3_poster.png"),
-        ("Ep4", 480, 110, render_ep4, "ep4_closed_loop_scaling.mp4", "ep4_poster.png"),
+        ("Ep2-v2", 540, 120, lambda f, fn: render_ep2(f, fn), "ep2_vadose_capillary_physics.mp4", "ep2_poster.png"),
+        ("Ep3-v2", 600, 150, lambda f, fn: render_ep3(f, fn, esm_rows), "ep3_esm_habitat_scaling.mp4", "ep3_poster.png"),
+        ("Ep4-v2", 540, 120, lambda f, fn: render_ep4(f, fn), "ep4_closed_loop_scaling.mp4", "ep4_poster.png"),
     ]
     for label, total_f, p_frame, fn, mp4_name, p_name in specs:
         mp4_out = os.path.join(docs_assets, mp4_name)
@@ -318,7 +367,6 @@ def main():
         shutil.copy2(mp4_out, os.path.join(inter_assets, mp4_name))
         shutil.copy2(p_out, os.path.join(inter_assets, p_name))
 
-    # Concatenate Episodes 1-4 into lunar_blss_full_series.mp4
     concat_txt = os.path.join(docs_assets, "_concat_list.txt")
     with open(concat_txt, "w") as f:
         for name in [
@@ -340,7 +388,7 @@ def main():
         print("Concat failed:", res.stderr, file=sys.stderr)
         sys.exit(res.returncode)
     shutil.copy2(full_mp4, os.path.join(inter_assets, "lunar_blss_full_series.mp4"))
-    print(f"[OK] Full 4-episode reel -> {full_mp4}")
+    print(f"[OK] Full 4-episode v2 reel -> {full_mp4}")
 
 
 if __name__ == "__main__":
