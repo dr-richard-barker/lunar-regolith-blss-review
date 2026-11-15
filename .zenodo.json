@@ -3,8 +3,32 @@
   "description": "Complete research compendium including LaTeX manuscript, bibliography (audited against CrossRef/NTRS; see REFERENCES_AUDIT.md), publication figures, interactive simulation tools, and NASA BVAD Equivalent System Mass analysis models.",
   "creators": [
     {
-      "name": "Lunar BLSS Research Collaboration",
-      "affiliation": "Planetary Exploration Directorate"
+      "name": "Barker, Richard J.",
+      "affiliation": "NASA GeneLab / OSDR Plant Analysis Working Group (AWG)"
+    },
+    {
+      "name": "Fackrell, Laura E.",
+      "affiliation": "NASA Jet Propulsion Laboratory / Planetary Protection & Regolith Simulants Group"
+    },
+    {
+      "name": "Brereton, Nicholas J. B.",
+      "affiliation": "University College Dublin"
+    },
+    {
+      "name": "Barbero Barcenilla, Borja",
+      "affiliation": "Texas A&M University"
+    },
+    {
+      "name": "Multani, Harmeet",
+      "affiliation": "NASA GeneLab / OSDR Plant Analysis Working Group (AWG)"
+    },
+    {
+      "name": "Coker, Harrison",
+      "affiliation": "In-Situ Resource Utilization and Planetary Bioregenerative Systems Group"
+    },
+    {
+      "name": "Grove, Patrick",
+      "affiliation": "NASA GeneLab / OSDR Plant Analysis Working Group (AWG)"
     }
   ],
   "access_right": "open",

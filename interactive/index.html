@@ -136,10 +136,10 @@
                     From Dust to Bio-Infrastructure: A Mechanistic Review of Sintered Regolith Ceramics for Lunar Biogenerative Life Support Systems
                 </h1>
                 <p class="text-slate-600 dark:text-slate-300 text-sm sm:text-base max-w-3xl mx-auto font-sans leading-relaxed">
-                    First Author<sup>1,*</sup>, Second Author<sup>1,2</sup>, Collaborator Three<sup>3</sup>, and Lead Author<sup>1,4,&dagger;</sup>
+                    Richard J. Barker<sup>1,&dagger;</sup>, Laura E. Fackrell<sup>2</sup>, Nicholas J. B. Brereton<sup>3</sup>, Borja Barbero Barcenilla<sup>4</sup>, Harmeet Multani<sup>1</sup>, Harrison Coker<sup>5</sup>, and Patrick Grove<sup>1</sup>
                 </p>
-                <p class="text-xs text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-sans">
-                    <sup>1</sup>Advanced Life Support and Space Bio-Engineering Group · <sup>2</sup>Dept. of Materials Science · <sup>3</sup>Division of Plant Biology and Microgravity Omics · <sup>4</sup>Center for Space Evolution (CoSE)
+                <p class="text-xs text-slate-500 dark:text-slate-400 max-w-3xl mx-auto font-sans">
+                    <sup>1</sup>NASA GeneLab / OSDR Plant Analysis Working Group (AWG) · <sup>2</sup>NASA JPL / Regolith Simulants Group · <sup>3</sup>University College Dublin · <sup>4</sup>Texas A&amp;M University · <sup>5</sup>ISRU &amp; Planetary Bioregenerative Systems Group
                 </p>
 
                 <!-- Quick Jump Bar -->
@@ -167,6 +167,26 @@
                 <div class="pt-2 text-xs text-slate-500 dark:text-slate-400 font-sans">
                     <strong>Keywords:</strong> Lunar regolith, Biogenerative Life Support Systems (BLSS), In-Situ Resource Utilization (ISRU), Porous ceramics, Microwave sintering, Nanophase iron, Microgravity hydrodynamics, Equivalent System Mass (ESM).
                 </div>
+            </div>
+
+            <!-- Introductory Isometric Video Card -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xs space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-cose-blue dark:text-sky-400 flex items-center space-x-2">
+                        <span>🎬</span>
+                        <span>Introductory Infographic: Lunar Cargo Landing &amp; ISRU Bio-Infrastructure</span>
+                    </h3>
+                    <a href="assets/lunar_blss_intro.mp4" download class="text-xs font-semibold text-cose-blue hover:underline">Download MP4 (1080p)</a>
+                </div>
+                <div class="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-[#eef2f3]">
+                    <video controls playsinline preload="metadata" poster="assets/lunar_blss_intro_poster.png" class="w-full h-auto block">
+                        <source src="assets/lunar_blss_intro.mp4" type="video/mp4">
+                        Your browser does not support the HTML5 video tag.
+                    </video>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-sans">
+                    Orthographic isometric miniature animation illustrating the CLPS cargo lander touchdown on a sintered regolith pad, 2.45 GHz microwave sintering kiln cutaway, and BLSS PWM capillary hydroponics greenhouse.
+                </p>
             </div>
 
             <!-- Narrative Content -->
@@ -364,15 +384,15 @@
                     </div>
 
                     <p class="pt-2">
-                        In unsorted raw regolith, capillary suction traps water in fine micropores ($&lt;10\,\mu\mathrm{m}$), establishing an expansive saturated zone that suffocates aerobic root respiration. Furthermore, surface dust is intrinsically hydrophobic (confirmed on Chang'e-5 samples; Zhang et al., 2025), and coarse grains ($0.5\text{--}2.0\,\mathrm{mm}$) required for root aeration exist only at multi-meter depths (Zhao et al., 2023). Sintering classified fines ($45\text{--}75\,\mu\mathrm{m}$) bypasses deep excavation by creating monodisperse pore throat diameters ($30\text{--}60\,\mu\mathrm{m}$). Governed by the van Genuchten equation:
+                        In unsorted raw regolith, capillary suction traps water in fine micropores ($&lt;10\,\mu\mathrm{m}$), establishing an expansive saturated zone that suffocates aerobic root respiration. Furthermore, surface dust is intrinsically hydrophobic (confirmed on Chang'e-5 samples; Zhang et al., 2025), and coarse grains ($0.5\text{--}2.0\,\mathrm{mm}$) required for root aeration exist only at multi-meter depths (Zhao et al., 2023). Sintering classified fines ($45\text{--}75\,\mu\mathrm{m}$) bypasses deep excavation by creating monodisperse pore throat diameters ($30\text{--}60\,\mu\mathrm{m}$). Governed by the van Genuchten water-retention relation and the Moldrup water-induced linear reduction (WLR) gas-diffusivity model (Jones et al., 2012; Moldrup et al., 2000):
                     </p>
 
                     <div class="equation-box">
-                        $$\Theta(h) = \left[ 1 + (\alpha |h|)^n \right]^{-m}$$
+                        $$\Theta(h) = \left[ 1 + (\alpha |h|)^n \right]^{-m}, \qquad \frac{D_s}{D_0} = \frac{\varepsilon^{1.5}(\varepsilon/\Phi)}{\Phi}$$
                     </div>
 
                     <p>
-                        this pore window stabilizes matric potential between $-2.5$ and $-5.0\,\mathrm{kPa}$, supporting continuous capillary wicking against fractional gravity while maintaining air-filled porosity above $25\text{--}30\%$ at field capacity.
+                        this pore window stabilizes matric potential between $-2.5$ and $-5.0\,\mathrm{kPa}$, supporting continuous capillary wicking against fractional gravity while maintaining air-filled porosity ($\varepsilon$) above $25\text{--}30\%$ at field capacity. Furthermore, NASA's <strong>Plant Water Management (PWM-5 &amp; PWM-6; PSI-187, doi:10.60555/bvbr-k768)</strong> flight datasets demonstrate that passive capillary fluidics—using tapered channel geometry and controlled wetting angles—deliver aerated nutrient solutions and manage gas bubbles without mechanical pumps, directly informing SLM-printed ceramic irrigation manifolds for both lunar ($0.165\,g$) and Martian ($0.38\,g$) habitats.
                     </p>
 
                     <!-- Figure 3 -->
@@ -522,11 +542,11 @@
                     </p>
                     
                     <div class="bg-slate-100 dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs font-sans space-y-3 mt-6">
-                        <h4 class="font-bold text-slate-900 dark:text-white uppercase tracking-wider">Declarations</h4>
-                        <p><strong>Acknowledgements:</strong> Supported by the In-Situ Resource Utilization (ISRU) and Space Life Support engineering research initiatives.</p>
-                        <p><strong>Author Contributions:</strong> F.A., S.A., C.T., and L.A. contributed to literature synthesis, modeling, manuscript writing, and review.</p>
+                        <h4 class="font-bold text-slate-900 dark:text-white uppercase tracking-wider">Declarations &amp; NASA GeneLab / OSDR AWG Attribution</h4>
+                        <p><strong>Acknowledgements:</strong> Developed within the <strong>NASA Open Science Data Repository (OSDR) / GeneLab Plant Analysis Working Group (AWG)</strong> (Gebre et al., 2025). Open multi-omics baselines include <code class="px-1 py-0.5 rounded bg-slate-200 dark:bg-slate-700">OSD-267</code>, <code class="px-1 py-0.5 rounded bg-slate-200 dark:bg-slate-700">OSD-269</code>, and <code class="px-1 py-0.5 rounded bg-slate-200 dark:bg-slate-700">OSD-655</code>; microgravity passive capillary datasets are from NASA PSI Investigation <code class="px-1 py-0.5 rounded bg-slate-200 dark:bg-slate-700">PSI-187</code> (<a href="https://doi.org/10.60555/bvbr-k768" target="_blank" class="text-cose-blue underline">doi:10.60555/bvbr-k768</a>). We also acknowledge AWG discussion contributions from Rafael [TBD], Drew [TBD], and Colin [TBD]. See <a href="AWG_RESPONSE_AND_PWM_ASSESSMENT.md" class="text-cose-blue underline">AWG Response &amp; PWM Assessment</a>.</p>
+                        <p><strong>Author Contributions:</strong> R.J.B. conceptualized the review, led the NASA GeneLab/OSDR AWG synthesis, and integrated the vadose/PWM fluidics and ESM trade-offs. L.E.F., N.J.B.B., and B.B.B. contributed regolith biogeochemistry, bioweathering/mycoponics, and plant telomere/ROS stress expertise. H.M., H.C., and P.G. contributed closed-loop hydroponic benchmarks, dust containment, and systems integration.</p>
                         <p><strong>Competing Interests:</strong> The authors declare no competing interests.</p>
-                        <p><strong>Data & Code Availability:</strong> Complete LaTeX sources, ESM Python models, and simulation outputs are openly available in the GitHub repository at <a href="https://github.com/dr-richard-barker/lunar-regolith-blss-review" class="text-cose-blue underline">github.com/dr-richard-barker/lunar-regolith-blss-review</a>; a Zenodo archive DOI will be added when the repository is deposited.</p>
+                        <p><strong>Data &amp; Code Availability:</strong> Complete LaTeX sources, CrossRef/NTRS-audited bibliography, ESM Python models, and simulation outputs are openly available at <a href="https://github.com/dr-richard-barker/lunar-regolith-blss-review" class="text-cose-blue underline">github.com/dr-richard-barker/lunar-regolith-blss-review</a>.</p>
                     </div>
                 </section>
 
@@ -534,25 +554,29 @@
                 <section id="sec-refs">
                     <h2>References</h2>
                     <ol class="list-decimal pl-6 space-y-2 text-xs font-sans text-slate-600 dark:text-slate-400">
-                        <li>Wheeler, R. M. Agriculture for space: people and places paving the way. <em>Open Agric.</em> <strong>2</strong>, 14--32 (2017).</li>
-                        <li>Paul, A.-L., Elardo, S. M. & Ferl, R. Plants grown in Apollo lunar regolith present stress-associated transcriptomes that inform prospects for lunar exploration. <em>Commun. Biol.</em> <strong>5</strong>, 382 (2022).</li>
-                        <li>Ming, D. W. & Henninger, D. L. <em>Lunar Base Agriculture: Soils for Plant Growth</em> (American Society of Agronomy, 1989).</li>
-                        <li>Hanford, A. J. <em>Advanced Life Support Baseline Values and Assumptions Document</em>. NASA/CR-2004-208941 (NASA JSC, 2004).</li>
-                        <li>Wheeler, R. M. Space farming contributions to agriculture on Earth and in space. NASA/TM-20230018203 (2023).</li>
-                        <li>Wamelink, G. W. W. et al. Crop growth and viability of seeds on Mars and Moon soil simulants. <em>Open Agric.</em> <strong>4</strong>, 509--516 (2019).</li>
-                        <li>Atkin, J., Oliveira Santos, S. et al. Bioremediation of lunar regolith simulant through mycorrhizal fungi and plant symbioses enables chickpea to seed. <em>Sci. Rep.</em> <strong>14</strong>, 8421 (2024).</li>
-                        <li>Hendrix, D. A., Legett, C. IV & Hurowitz, J. A. The reactivity of experimentally reduced lunar regolith simulants. <em>Meteorit. Planet. Sci.</em> <strong>59</strong>, 2341--2358 (2024).</li>
-                        <li>Turci, F. et al. Mechanistic insight into the oxidative potential of lunar dust analogues. <em>Astrobiology</em> <strong>15</strong>, 735--745 (2015).</li>
-                        <li>Taylor, L. A. & Meek, T. T. Microwave processing of lunar soil: properties, theory, and practice. <em>J. Aerosp. Eng.</em> <strong>18</strong>, 188--196 (2005).</li>
-                        <li>Fateri, M. et al. Solar sintering for lunar additive manufacturing. <em>J. Aerosp. Eng.</em> <strong>32</strong>, 04019084 (2019).</li>
-                        <li>Xi, Y., Zhang, Y. et al. Multiphysics computational model of microwave sintering of lunar regolith simulant. <em>Coatings</em> <strong>16</strong>, 222 (2026).</li>
-                        <li>Goulas, A. & Binner, J. G. P. Process parameters development of selective laser melting of lunar regolith. <em>Addit. Manuf.</em> <strong>18</strong>, 88--95 (2017).</li>
-                        <li>Heinse, R., Jones, S. B., Or, D. et al. Porous media water retention in microgravity: The ISS ORZS experiment. <em>Vadose Zone J.</em> <strong>6</strong>, 713--722 (2007).</li>
-                        <li>Barbero Barcenilla, B. & Shippen, D. E. Back to the future: The intimate connection between telomere factors and stress. <em>J. Biol. Chem.</em> <strong>294</strong>, 14803 (2019).</li>
-                        <li>Bilardo, V. J. et al. Equivalent system mass (ESM) metric modeling for surface planetary habitats. <em>AIAA SciTech</em> 2024-1142 (2024).</li>
-                        <li>Cockell, C. S. et al. Microbially-enhanced element recovery from basalt on the International Space Station. <em>Nat. Commun.</em> <strong>11</strong>, 5523 (2020).</li>
+                        <li>Wheeler, R. M. Agriculture for space: people and places paving the way. <em>Open Agric.</em> <strong>2</strong>, 14–32 (2017). doi:10.1515/opag-2017-0002</li>
+                        <li>Paul, A.-L., Elardo, S. M. &amp; Ferl, R. Plants grown in Apollo lunar regolith present stress-associated transcriptomes that inform prospects for lunar exploration. <em>Commun. Biol.</em> <strong>5</strong>, 382 (2022). doi:10.1038/s42003-022-03334-8</li>
+                        <li>Ming, D. W. &amp; Henninger, D. L. <em>Lunar Base Agriculture: Soils for Plant Growth</em> (American Society of Agronomy, 1989). doi:10.2134/1989.lunarbaseagriculture</li>
+                        <li>Ewert, M. K., Chen, T. T. &amp; Powell, C. D. <em>Life Support Baseline Values and Assumptions Document</em>. NASA/TP-2015-218570/REV2 (NASA JSC, 2022).</li>
+                        <li>Wheeler, R. M. Carbon balance in bioregenerative life support systems: Some effects of system closure, waste management, and crop harvest index. <em>Adv. Space Res.</em> <strong>31</strong>, 169–175 (2003). doi:10.1016/S0273-1177(02)00742-1</li>
+                        <li>Wamelink, G. W. W. et al. Crop growth and viability of seeds on Mars and Moon soil simulants. <em>Open Agric.</em> <strong>4</strong>, 509–516 (2019). doi:10.1515/opag-2019-0051</li>
+                        <li>Atkin, J. et al. Bioremediation of lunar regolith simulant through mycorrhizal fungi and plant symbioses enables chickpea to seed. <em>Sci. Rep.</em> <strong>16</strong>, 7498 (2026). doi:10.1038/s41598-026-35759-0</li>
+                        <li>Hendrix, D. A. et al. The reactivity of experimentally reduced lunar regolith simulants. <em>Meteorit. Planet. Sci.</em> <strong>59</strong>, 2487–2504 (2024). doi:10.1111/maps.14228</li>
+                        <li>Turci, F. et al. Free-radical chemistry as a means to evaluate lunar dust health hazard in view of future missions to the Moon. <em>Astrobiology</em> <strong>15</strong>, 371–380 (2015). doi:10.1089/ast.2014.1216</li>
+                        <li>Taylor, L. A. &amp; Meek, T. T. Microwave processing of lunar soil: properties, theory, and practice. <em>J. Aerosp. Eng.</em> <strong>18</strong>, 188–196 (2005). doi:10.1061/(ASCE)0893-1321(2005)18:3(188)</li>
+                        <li>Fateri, M. et al. Solar sintering for lunar additive manufacturing. <em>J. Aerosp. Eng.</em> <strong>32</strong>, 04019084 (2019). doi:10.1061/(ASCE)AS.1943-5525.0001093</li>
+                        <li>Xi, Z., Wei, Q. &amp; Liu, Y. Thermal stress evolution and microstructural development in simulated lunar regolith during microwave sintering and cooling. <em>Coatings</em> <strong>16</strong>, 222 (2026). doi:10.3390/coatings16020222</li>
+                        <li>Fateri, M. &amp; Gebhardt, A. Process parameters development of selective laser melting of lunar regolith for on-site manufacturing applications. <em>Int. J. Appl. Ceram. Technol.</em> <strong>12</strong>, 46–52 (2014). doi:10.1111/ijac.12326</li>
+                        <li>Jones, S. B., Or, D., Heinse, R. &amp; Tuller, M. Beyond Earth: Designing root zone environments for reduced gravity conditions. <em>Vadose Zone J.</em> <strong>11</strong>(1) (2012). doi:10.2136/vzj2011.0081</li>
+                        <li>Møldrup, P. et al. Predicting the gas diffusion coefficient in repacked soil: Water-induced linear reduction model. <em>Soil Sci. Soc. Am. J.</em> <strong>64</strong>, 1588–1594 (2000). doi:10.2136/sssaj2000.6451588x</li>
+                        <li>van Genuchten, M. T. A closed-form equation for predicting the hydraulic conductivity of unsaturated soils. <em>Soil Sci. Soc. Am. J.</em> <strong>44</strong>, 892–898 (1980). doi:10.2136/sssaj1980.03615995004400050002x</li>
+                        <li>Weislogel, M. M., McQuillen, J. &amp; Jenson, R. M. Plant Water Management (PSI-187): PWM-5 and PWM-6 Microgravity Capillary Hydroponics Dataset. <em>NASA PSI Data Repository</em> (2026). doi:10.60555/bvbr-k768</li>
+                        <li>Hatch, T. et al. Plant Water Management in Microgravity. <em>ICES-2022-28</em>, NASA NTRS 20220003535 (2022).</li>
+                        <li>Ho, D., Makrygiorgos, G., Hill, A. &amp; Berliner, A. J. Towards an extension of equivalent system mass for human exploration missions on Mars. <em>npj Microgravity</em> <strong>8</strong>, 30 (2022). doi:10.1038/s41526-022-00214-7</li>
+                        <li>Cockell, C. S. et al. Space station biomining experiment demonstrates rare earth element extraction in microgravity and Mars gravity. <em>Nat. Commun.</em> <strong>11</strong>, 5523 (2020). doi:10.1038/s41467-020-19276-w</li>
+                        <li>Gebre, S. G. et al. NASA Open Science Data Repository: open science for life in space. <em>Nucleic Acids Res.</em> <strong>53</strong>, D1697–D1710 (2025). doi:10.1093/nar/gkae1116</li>
                     </ol>
-                    <p class="text-xs text-slate-500 mt-2 font-sans"><em>(Complete 59-entry bibliography available in `manuscript/references.bib` and in compiled PDF)</em></p>
+                    <p class="text-xs text-slate-500 mt-2 font-sans"><em>(Complete CrossRef/DataCite/NTRS-audited bibliography available in <code>manuscript/references.bib</code> and in the compiled PDF)</em></p>
                 </section>
 
             </article>
@@ -880,7 +904,7 @@ gantt
                     <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-xs text-slate-700 dark:text-slate-300 overflow-x-auto">
 @unpublished{lunar_blss_sintered_regolith_2026,<br>
 &nbsp;&nbsp;title &nbsp;&nbsp;&nbsp;= {From Dust to Bio-Infrastructure: A Mechanistic Review of Sintered Regolith Ceramics for Lunar Biogenerative Life Support Systems},<br>
-&nbsp;&nbsp;author &nbsp;&nbsp;= {Authors, Collaboration},<br>
+&nbsp;&nbsp;author &nbsp;&nbsp;= {Barker, Richard J. and Fackrell, Laura E. and Brereton, Nicholas J. B. and Barbero Barcenilla, Borja and Multani, Harmeet and Coker, Harrison and Grove, Patrick},<br>
 &nbsp;&nbsp;note &nbsp;&nbsp;&nbsp;&nbsp;= {Manuscript in preparation for npj Microgravity; a Zenodo DOI will be added when the repository is deposited},<br>
 &nbsp;&nbsp;year &nbsp;&nbsp;&nbsp;&nbsp;= {2026},<br>
 &nbsp;&nbsp;url &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= {https://dr-richard-barker.github.io/lunar-regolith-blss-review}<br>

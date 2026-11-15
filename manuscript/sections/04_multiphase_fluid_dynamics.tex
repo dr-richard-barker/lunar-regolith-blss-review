@@ -11,7 +11,7 @@ Fluid dynamics in terrestrial soils reflect a dynamic equilibrium between gravit
 \end{equation}
 where $\Delta\rho$ is the density difference between the liquid nutrient solution and the habitat atmosphere ($\mathrm{kg/m}^3$), $g$ is the local gravitational acceleration ($\mathrm{m/s}^2$), $d$ is the characteristic pore-throat diameter ($\mathrm{m}$), and $\gamma$ is the liquid-gas surface tension ($\mathrm{N/m}$)\cite{ming1989lunar,jones1999microgravity}.
 
-Because lunar gravity is reduced by a factor of 6 while fluid surface tension remains intrinsically fluid-dependent, the Bond number decreases by nearly an order of magnitude\cite{ming1989lunar,ostrach1982low,podolskiy2005capillary}. Consequently, the hydraulic regime transitions from gravity-driven drainage to capillary-dominated retention\cite{ming1989lunar,podolskiy2005capillary}. The characteristic length scale governing this balance is the capillary length ($L_c$):
+Because lunar gravity is reduced by a factor of 6 while fluid surface tension remains intrinsically fluid-dependent, the Bond number decreases by nearly an order of magnitude\cite{ming1989lunar,ostrach1982low,podolsky1994peculiarities}. Consequently, the hydraulic regime transitions from gravity-driven drainage to capillary-dominated retention\cite{ming1989lunar,podolsky1994peculiarities}. The characteristic length scale governing this balance is the capillary length ($L_c$):
 \begin{equation}
     L_c = \sqrt{\frac{\gamma}{\rho g}}
     \label{eq:capillary_length}
@@ -44,14 +44,21 @@ To prevent hypoxia in fractional gravity, microgravity plant cultivation systems
 
 Engineered thermal sintering resolves this dilemma by transforming the abundant, hazardous fine surface dust ($45\text{--}75\,\mu\mathrm{m}$) into structured porous ceramic matrices with monodisperse pore throat diameters concentrated precisely between $30$ and $60\,\mu\mathrm{m}$, and open porosities of $35\text{--}42\%$\cite{ming1989lunar}. High-temperature processing ($>1050^\circ\mathrm{C}$) destroys surface organic/radiation defect layers, rounds angular particle edges, and vitrifies the aluminosilicate matrix into an intrinsically hydrophilic substrate\cite{ming1989lunar,taylor2005microwave,xi2026multiphysics}.
 
-The resulting pore network stabilizes the substrate's soil-water retention curve, formulated via the van Genuchten constitutive relation\cite{jones2002liquid,heinse2007measurement}:
+The resulting pore network stabilizes the substrate's soil-water retention curve, formulated via the van Genuchten constitutive relation\cite{vangenuchten1980closed,jones2012beyond,heinse2007measurement}:
 \begin{equation}
     \Theta(h) = \frac{\theta(h) - \theta_r}{\theta_s - \theta_r} = \left[ 1 + \left(\alpha |h|\right)^n \right]^{-m}
     \label{eq:van_genuchten}
 \end{equation}
-where $\Theta(h)$ is normalized volumetric water content, $\theta(h)$ is volumetric moisture content, $\theta_r$ and $\theta_s$ are residual and saturated moisture contents, $h$ is matric suction head ($\mathrm{cm}$ or $\mathrm{kPa}$), and $\alpha, n$, and $m = 1 - 1/n$ are empirical pore-geometry parameters\cite{jones2002liquid,heinse2007measurement}.
+where $\Theta(h)$ is normalized volumetric water content, $\theta(h)$ is volumetric moisture content, $\theta_r$ and $\theta_s$ are residual and saturated moisture contents, $h$ is matric suction head ($\mathrm{cm}$ or $\mathrm{kPa}$), and $\alpha, n$, and $m = 1 - 1/n$ are empirical pore-geometry parameters\cite{vangenuchten1980closed,jones2012beyond,heinse2007measurement}.
 
-By eliminating both ultra-fine micropores ($<5\,\mu\mathrm{m}$) that trigger capillary waterlogging and macropores ($>150\,\mu\mathrm{m}$) that cause premature draining, sintered ceramics constrain matric suction to an optimal operating window of $-2.5$ to $-5.0\,\mathrm{kPa}$ (Figure~\ref{fig:hydrodynamics_aeration} and Table~\ref{tab:hydraulic_properties})\cite{ming1989lunar}. This suction is sufficient to wick nutrient solutions across the root zone against fractional gravity, even when factoring in boundary film thickening and micro-roughness pinning\cite{hasenstein2026assessing}, while allowing plant roots to extract water with minimal metabolic energy expenditure\cite{ming1989lunar}. Crucially, this pore architecture maintains air-filled porosity above $25\text{--}30\%$ at field capacity under $1/6\,g$\cite{ming1989lunar,heinse2007porous,podolskiy2005capillary}, supporting continuous diffusive oxygen transport to root cell boundaries and preventing hypoxia without requiring deep regolith excavation\cite{hasenstein2026assessing,stout2001evidence}.
+To prevent oxygen starvation in the root zone, sintered pore networks must simultaneously preserve gas-phase diffusivity ($D_s/D_0$), governed by the Moldrup water-induced linear reduction (WLR) tortuosity relation\cite{moldrup2000predicting,jones2012beyond,heinse2015microgravity}:
+\begin{equation}
+    \frac{D_s}{D_0} = \frac{\varepsilon^{2.5}}{\Phi} \quad \text{(or WLR: } \frac{\varepsilon^{1.5}(\varepsilon/\Phi)}{\Phi} \text{)}
+    \label{eq:moldrup_diffusion}
+\end{equation}
+where $\varepsilon = \Phi - \theta$ is the air-filled porosity and $\Phi$ is total open porosity. As synthesized by Jones et al. (2012), reducing gravitational acceleration alters the hydrostatic pressure profile ($dh/dz = -g/g_E$) and causes water-film thickening and phase-configuration hysteresis, shifting the critical aeration threshold upward relative to $1\,g$\cite{jones2012beyond,heinse2007porous,heinse2015microgravity}. Furthermore, NASA's Plant Water Management investigations (PWM-5 and PWM-6; PSI-187, \texttt{doi:10.60555/bvbr-k768}) on the International Space Station demonstrate that passive capillary fluidics—using engineered channel geometry, tapered wedges, and controlled wetting angles—can reliably deliver aerated nutrient solution and manage gas-bubble entrainment in microgravity without mechanical pumps\cite{weislogel2026pwm,hatch2022pwm,pwm2020ntrs}. Sintered regolith ceramics translate these PWM capillary design rules into ISRU porous manifolds and LECA-analog root supports, maintaining air-filled porosity above $25\text{--}30\%$ and scaling robustly from lunar ($0.165\,g$) to Martian ($0.38\,g$) habitats\cite{jones2012beyond,weislogel2026pwm}.
+
+By eliminating both ultra-fine micropores ($<5\,\mu\mathrm{m}$) that trigger capillary waterlogging and macropores ($>150\,\mu\mathrm{m}$) that cause premature draining, sintered ceramics constrain matric suction to an optimal operating window of $-2.5$ to $-5.0\,\mathrm{kPa}$ (Figure~\ref{fig:hydrodynamics_aeration} and Table~\ref{tab:hydraulic_properties})\cite{ming1989lunar}. This suction is sufficient to wick nutrient solutions across the root zone against fractional gravity, even when factoring in boundary film thickening and micro-roughness pinning\cite{hasenstein2026assessing}, while allowing plant roots to extract water with minimal metabolic energy expenditure\cite{ming1989lunar}. Crucially, this pore architecture maintains air-filled porosity above $25\text{--}30\%$ at field capacity under $1/6\,g$\cite{ming1989lunar,heinse2007porous,podolsky1994peculiarities}, supporting continuous diffusive oxygen transport to root cell boundaries and preventing hypoxia without requiring deep regolith excavation\cite{hasenstein2026assessing,stout2001evidence}.
 
 \begin{figure}[t!]
     \centering
@@ -69,7 +76,7 @@ By eliminating both ultra-fine micropores ($<5\,\mu\mathrm{m}$) that trigger cap
 \toprule
 \textbf{Hydraulic / Physical Parameter} & \textbf{Raw Lunar Regolith Bed} & \textbf{Sintered Engineered Ceramic} & \textbf{Physiological \& Systemic Impact} \\
 \midrule
-Grain Size Distribution & Polydisperse ($<1\,\mu\mathrm{m}$ to $1000\,\mu\mathrm{m}$)\cite{ming1989lunar,lytvynenko2021lunar} & Classified, sorted fraction ($45\text{--}75\,\mu\mathrm{m}$)\cite{ming1989lunar} & Eliminates packing collapse and avoids multi-meter excavation\cite{mckay1991lunar,zhao2023variations} \\
+Grain Size Distribution & Polydisperse ($<1\,\mu\mathrm{m}$ to $1000\,\mu\mathrm{m}$)\cite{ming1989lunar,krejci2026lunar} & Classified, sorted fraction ($45\text{--}75\,\mu\mathrm{m}$)\cite{ming1989lunar} & Eliminates packing collapse and avoids multi-meter excavation\cite{mckay1991lunar,zhao2023variations} \\
 \addlinespace
 Pore Throat Diameter ($d_\mathrm{pore}$) & Uncontrolled ($0.1\,\mu\mathrm{m}$ to $250\,\mu\mathrm{m}$)\cite{paul2022plants,ming1989lunar} & Monodisperse control ($30\text{--}60\,\mu\mathrm{m}$)\cite{ming1989lunar} & Stabilizes capillary wicking without fluid entrapment\cite{ming1989lunar} \\
 \addlinespace
@@ -77,11 +84,11 @@ Effective Capillary Length ($L_c$) & Variable / pinned by surface roughness\cite
 \addlinespace
 Wettability / Contact Angle & Hydrophobic grains ($\theta > 70^\circ$)\cite{zhang2025wettability} & Hydrophilic vitrified silicate ($\theta < 30^\circ$)\cite{ming1989lunar} & Rapid fluid imbibition; eliminates dry bypass channels\cite{hasenstein2026assessing} \\
 \addlinespace
-Matric Potential Window ($\psi_m$) & Unstable ($-0.1$ to $<-100\,\mathrm{kPa}$)\cite{ming1989lunar,hendrix2024reactivity} & Controlled ($-2.5$ to $-5.0\,\mathrm{kPa}$)\cite{ming1989lunar} & Matches root water uptake with minimal plant energy expenditure\cite{ming1989lunar,jones2002liquid} \\
+Matric Potential Window ($\psi_m$) & Unstable ($-0.1$ to $<-100\,\mathrm{kPa}$)\cite{ming1989lunar,hendrix2024reactivity} & Controlled ($-2.5$ to $-5.0\,\mathrm{kPa}$)\cite{ming1989lunar} & Matches root water uptake with minimal plant energy expenditure\cite{ming1989lunar,jones2012beyond} \\
 \addlinespace
 Air-Filled Porosity at Field Capacity & $<8\text{--}12\%$ (Severe hypoxia risk)\cite{paul2022plants,ming1989lunar,stout2001evidence} & $>25\text{--}30\%$ (Continuous aeration)\cite{ming1989lunar} & Maintains aerobic root respiration; prevents root decay\cite{hasenstein2026assessing,stout2001evidence} \\
 \addlinespace
-Hydraulic Conductivity ($K_\mathrm{sat}$) & Spatially erratic; causes stagnant zones\cite{paul2022plants,podolskiy2005capillary} & Isotropic; stable convective mass transfer\cite{ming1989lunar} & Prevents localized fertilizer salt accumulation\cite{ming1989lunar,wamelink2024struvite} \\
+Hydraulic Conductivity ($K_\mathrm{sat}$) & Spatially erratic; causes stagnant zones\cite{paul2022plants,podolsky1994peculiarities} & Isotropic; stable convective mass transfer\cite{ming1989lunar} & Prevents localized fertilizer salt accumulation\cite{ming1989lunar,wamelink2024struvite} \\
 \bottomrule
 \end{tabularx}
 \end{table}

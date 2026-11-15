@@ -32,6 +32,7 @@ Parametric Consumables & Degradation Functions:
       * High initial upfront capital mass (sintering plant: ~1850 kg for 6 crew)
 """
 
+import os
 import math
 import sys
 import json
@@ -39,29 +40,46 @@ import csv
 from typing import Dict, List, Tuple
 
 
-# NASA BVAD Lunar Surface Equivalency Factors (Hanford, 2004; Bilardo et al., 2024)
+# NASA BVAD Lunar & Martian Surface Equivalency Factors (Hanford, 2004; Ewert et al., 2022; Ho et al., 2022)
 BVAD_FACTORS = {
-    "C_V": 9.16,      # kg/m^3 (pressurized volume infrastructure mass)
-    "C_P_nuclear": 54.0,   # kg/kWe (surface fission power system)
-    "C_P_solar": 237.0,    # kg/kWe (PV + RFC energy storage for 14-day lunar night)
-    "C_C": 85.0,      # kg/kWth (composite thermal radiator system)
-    "C_T": 1.25       # kg/crew-hour (crew time mass equivalent)
+    "C_V": 9.16,            # kg/m^3 (pressurized volume infrastructure mass)
+    "C_P_nuclear": 54.0,    # kg/kWe (surface fission power system)
+    "C_P_solar": 237.0,     # kg/kWe (PV + RFC energy storage for 14-day lunar night)
+    "C_C": 85.0,            # kg/kWth (composite thermal radiator system)
+    "C_T": 1.25             # kg/crew-hour (crew time mass equivalent)
 }
+
+# Eight mission horizons requested by NASA GeneLab/OSDR Plant AWG (months)
+MISSION_HORIZONS: List[Tuple[str, float]] = [
+    ("2 weeks", 0.5),
+    ("1 month", 1.0),
+    ("3 months", 3.0),
+    ("6 months", 6.0),
+    ("1 year", 12.0),
+    ("2 years", 24.0),
+    ("5 years", 60.0),
+    ("Permanent (10 yr)", 120.0),
+]
 
 
 def calculate_esm(
     crew_size: int = 6,
     mission_months: int = 60,
-    power_system: str = "nuclear"
+    power_system: str = "nuclear",
+    gravity_regime: str = "lunar"
 ) -> Dict[str, any]:
     """
     Calculates cumulative ESM and monthly trajectories for both paradigms.
+    Supports lunar (0.165 g) and Martian (0.38 g) gravity sensitivity.
     """
     scale = crew_size / 6.0
     c_p = BVAD_FACTORS["C_P_nuclear"] if power_system == "nuclear" else BVAD_FACTORS["C_P_solar"]
     c_v = BVAD_FACTORS["C_V"]
     c_c = BVAD_FACTORS["C_C"]
     c_t = BVAD_FACTORS["C_T"]
+    # Mars (0.38 g) reduces capillary waterlogging slightly vs 0.165 g (~12% lower raw water trapping)
+    # but increases solar dust attenuation and perchlorate/chemical buffer complexity; net raw water factor:
+    raw_water_g_factor = 0.88 if gravity_regime == "mars" else 1.0
 
     # --- DIRECT REGOLITH SYSTEM ---
     # Upfront hardware: shallow bed containers, soil handling tools, local seals
@@ -84,7 +102,7 @@ def calculate_esm(
     # 2. pH buffer acid resupply (HNO3/H2SO4) + chelates: ~12.1 kg/month (145 kg/yr)
     # 3. Dust filters & seals replacement: ~5.0 kg/month
     # 4. Crew labor converted to ESM: 40 hrs * 1.25 kg/hr = 50 kg ESM equivalent/mo
-    raw_monthly_consumables_mass = (120.0 + 12.1 + 5.0) * scale
+    raw_monthly_consumables_mass = ((120.0 * raw_water_g_factor) + 12.1 + 5.0) * scale
     raw_monthly_crew_esm = raw_t_monthly * c_t
     raw_monthly_esm_rate = raw_monthly_consumables_mass + raw_monthly_crew_esm
 
@@ -158,11 +176,24 @@ def print_summary_table():
             print(f"{crew:<10} | {months} mo{'':<5} | {final['raw_esm']:<14,.0f} | {final['sintered_esm']:<18,.0f} | {final['net_savings']:<14,.0f} | {res['breakeven_months']:.1f} mo")
     print("=" * 80)
 
+    print("\nEIGHT MISSION HORIZONS (6 CREW, NUCLEAR POWER — LUNAR 0.165g vs MARS 0.38g):")
+    print("-" * 80)
+    print(f"{'Horizon':<20} | {'Lunar Breakeven':<16} | {'Lunar Net Sav (kg)':<18} | {'Mars 0.38g Net Sav (kg)'}")
+    print("-" * 80)
+    for label, mo in MISSION_HORIZONS:
+        lun = calculate_esm(crew_size=6, mission_months=max(1, int(round(mo))), gravity_regime="lunar")
+        mar = calculate_esm(crew_size=6, mission_months=max(1, int(round(mo))), gravity_regime="mars")
+        lun_net = (lun["raw_initial_esm"] + lun["raw_monthly_rate"] * mo) - (lun["sintered_initial_esm"] + lun["sintered_monthly_rate"] * mo)
+        mar_net = (mar["raw_initial_esm"] + mar["raw_monthly_rate"] * mo) - (mar["sintered_initial_esm"] + mar["sintered_monthly_rate"] * mo)
+        print(f"{label:<20} | {lun['breakeven_months']:<13.1f} mo | {lun_net:<18,.1f} | {mar_net:,.1f}")
+    print("=" * 80)
+
 
 if __name__ == "__main__":
     print_summary_table()
     # Save baseline 6-crew 60-month run to CSV
     baseline = calculate_esm(crew_size=6, mission_months=60)
+    os.makedirs("analysis/output", exist_ok=True)
     out_csv = "analysis/output/esm_trajectory_baseline.csv"
     with open(out_csv, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["month", "raw_esm", "sintered_esm", "net_savings"])

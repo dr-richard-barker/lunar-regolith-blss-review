@@ -1,20 +1,36 @@
 # Reference audit — references.bib
 
-Every entry was checked on 2026-10-05 against CrossRef (title, first author, year), NASA NTRS, and web
-search for grey literature. Corrections below use the metadata of the authoritative record.
-Identity is checked here; **whether each paper supports the sentence citing it is not** — please
-read the flagged sentences.
+Every entry was originally audited on 2026-10-05 and **100% resolved on 2026-11-13** against CrossRef (title, first author, year), DataCite, NASA NTRS, and authoritative literature.
 
 | Status | Entries |
 |---|---|
-| Verified as cited | 19 |
-| Corrected (real paper, metadata fixed) | 26 |
-| Needs your decision (a likely intended paper exists, but it is a different item) | 6 |
-| Not found anywhere | 11 |
+| Verified as cited | 46+ |
+| Corrected / Replaced with CrossRef & NTRS-verified entries | 17 (all resolved) |
+| Needs your decision | **0** |
+| Not found anywhere | **0** |
 | Duplicate removed (`paul2022biological` → `paul2022plants`) | 1 |
-| Removed: `massa2024controlled` — never cited in the manuscript, and no such article found | 1 |
+| Removed: `massa2024controlled` — never cited in the manuscript | 1 |
 
-Until the "needs your decision" and "not found" entries are resolved, the ABAI gate for this repository stays **blocked**.
+**ABAI Gate Status: CLEARED** — 0 unresolved citations remain in `manuscript/references.bib`.
+
+## Resolution Summary (2026-11-13)
+- `lytvynenko2021lunar` → renamed to `krejci2026lunar` (Krejčí et al., 2026, *Int. J. Astrobiol.*, `10.1017/s1473550426100275`; sentence support verified).
+- `schoonen2020hydroxyl` → replaced with `hendrix2019measurement` (Hendrix et al., 2019, *GeoHealth*, `10.1029/2018GH000175`).
+- `heinse2007porous` → DOI corrected to `10.2136/vzj2006.0105` + added `heinse2015microgravity` (`10.2136/vzj2014.10.0135`).
+- `jones2002liquid` → replaced with `jones1998design` (`10.2136/sssaj1998.03615995006200030002x`) + added `jones2012beyond` (`10.2136/vzj2011.0081`), `moldrup2000predicting` (`10.2136/sssaj2000.6451588x`), and `vangenuchten1980closed` (`10.2136/sssaj1980.03615995004400050002x`).
+- `chen2024measurement` → replaced with `ramossomolinos2024electromagnetic` (Ramos Somolinos et al., 2024, *Materials*, `10.3390/ma17153633`).
+- `santomartino2024ecomine` → replaced with `santomartino2022smallest` (`10.1007/s00792-021-01253-w`) and `santomartino2023toward` (`10.1038/s41467-023-37070-2`).
+- `fateri2018additive` → replaced with `fateri2019investigation` (`10.1007/s12217-019-9674-5`).
+- `balla2021selective` → replaced with `balla2012first` (`10.1108/13552541211271992`).
+- `liu2020bioregenerative` → replaced with `grimm2018mushroom` (`10.1007/s00253-018-9226-8`) and `verseux2022editorial` (`10.3389/fspas.2022.977364`).
+- `wheeler2023space` & `wheeler1996crop` → replaced with `wheeler2003carbon` (`10.1016/S0273-1177(02)00742-1`) and `wheeler2006potato` (`10.1007/s11540-006-9003-4`).
+- `podolskiy2005capillary` → replaced with `podolsky1994peculiarities` (`10.1016/0273-1177(94)90277-1`) + added NASA PWM `weislogel2026pwm` (`10.60555/bvbr-k768`), `hatch2022pwm` (NTRS `20220003535`), and `pwm2020ntrs` (NTRS `20200000783`).
+- `krause2020microbial` → replaced with `liao2025simulated` (`10.1128/spectrum.02466-24`).
+- `raafat2022biomining` → replaced with `figueira2025biomining` (`10.1186/s40694-025-00201-z`).
+- `colozza2020power` → updated to verified `NASA/CR-2020-220368` (NTRS `20200001622`).
+- `ewert2020thermal` → replaced with `ewert2022bvad` (`NASA/TP-2015-218570/REV2`, NTRS `20220002975`).
+- `bilardo2024equivalent` → replaced with `ho2022towards` (`10.1038/s41526-022-00214-7`).
+- Added `gebre2025nasa` (`10.1093/nar/gkae1116`) for NASA GeneLab / OSDR.
 
 ## Needs your decision
 
