@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>From Dust to Bio-Infrastructure — Visual Story</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #fffdf7;
+            --ink: #222222;
+            --red: #d62828;
+            --blue: #457b9d;
+            --muted: #6b6b66;
+            --rule: rgba(34, 34, 34, 0.14);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--cream);
+            color: var(--ink);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .deck {
+            position: relative;
+            width: 100vw;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 48px 28px;
+        }
+
+        /* Top editorial masthead */
+        .masthead {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1.5px solid var(--rule);
+            padding-bottom: 12px;
+            z-index: 10;
+        }
+
+        .masthead-left {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+        }
+
+        .kicker {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--red);
+        }
+
+        .paper-ref {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .masthead-links {
+            display: flex;
+            gap: 18px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .masthead-links a {
+            color: var(--ink);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+        }
+
+        .masthead-links a:hover {
+            border-bottom-color: var(--red);
+            color: var(--red);
+        }
+
+        /* Slide Stage: One reading per screen */
+        .stage {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            padding: 16px 0;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        .slide-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 32px;
+            margin-bottom: 20px;
+        }
+
+        .headline {
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: clamp(32px, 3.6vw, 48px);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            max-width: 780px;
+        }
+
+        .deck-sub {
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: clamp(20px, 1.8vw, 24px);
+            color: var(--muted);
+            margin-top: 8px;
+            line-height: 1.35;
+        }
+
+        .hero-stat {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .hero-num {
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: clamp(54px, 5.5vw, 76px);
+            font-weight: 700;
+            line-height: 1;
+            color: var(--red);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hero-unit {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-top: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        /* Chart container */
+        .chart-wrap {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            min-height: 360px;
+            max-height: 540px;
+        }
+
+        svg.chart-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            display: block;
+        }
+
+        .handwritten {
+            font-family: 'Caveat', 'Brush Script MT', cursive;
+            font-size: 32px;
+            font-weight: 700;
+            fill: var(--red);
+        }
+
+        .axis-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            fill: var(--ink);
+        }
+
+        .val-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            fill: var(--ink);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .val-label.highlight {
+            fill: var(--red);
+        }
+
+        /* Opener Slide */
+        .opener-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        .opener-title {
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: clamp(44px, 5.2vw, 72px);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.025em;
+        }
+
+        .opener-title em {
+            color: var(--red);
+            font-style: italic;
+        }
+
+        .opener-lead {
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: 26px;
+            line-height: 1.4;
+            color: var(--muted);
+            margin-top: 20px;
+        }
+
+        .opener-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            border-left: 2px solid var(--rule);
+            padding-left: 36px;
+        }
+
+        .opener-metric-num {
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .opener-metric-label {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        /* Bottom Controls */
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1.5px solid var(--rule);
+            padding-top: 14px;
+            z-index: 10;
+        }
+
+        .progress-dots {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 36px;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(34, 34, 34, 0.16);
+            cursor: pointer;
+            transition: background 0.2s, width 0.2s;
+            border: none;
+        }
+
+        .dot.active {
+            background: var(--red);
+            width: 56px;
+        }
+
+        .btn-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 18px;
+            border-radius: 999px;
+            border: 1.5px solid var(--ink);
+            background: transparent;
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--ink);
+            color: var(--cream);
+        }
+
+        .btn.primary {
+            background: var(--red);
+            border-color: var(--red);
+            color: var(--cream);
+        }
+
+        .btn.primary:hover {
+            opacity: 0.9;
+        }
+
+        .slide-counter {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        @media (max-width: 900px) {
+            .deck { padding: 16px 20px; }
+            .opener-grid { grid-template-columns: 1fr; gap: 24px; }
+            .opener-cards { border-left: none; border-top: 2px solid var(--rule); padding-left: 0; padding-top: 20px; }
+            .slide-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .hero-stat { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+    <div class="deck">
+        <header class="masthead">
+            <div class="masthead-left">
+                <span class="kicker">Visual Story</span>
+                <span class="paper-ref">Sintered Lunar Regolith Ceramics for BLSS (6-Crew, 60-Month Outpost)</span>
+            </div>
+            <nav class="masthead-links">
+                <a href="index.html">Interactive Explorer</a>
+                <a href="manuscript.pdf" target="_blank">Manuscript PDF</a>
+            </nav>
+        </header>
+
+        <main class="stage">
+            <!-- SCREEN 1: OPENER -->
+            <section class="slide active" data-slide="0">
+                <div class="opener-grid">
+                    <div>
+                        <h1 class="opener-title">From Lunar Dust to <em>Living</em> Bio-Infrastructure</h1>
+                        <p class="opener-lead">
+                            Raw Moon dust poisons roots and suffocates them in 1/6&nbsp;g. Sintering that same dust into porous ceramics flips the mass budget of a permanent lunar base.
+                        </p>
+                    </div>
+                    <div class="opener-cards">
+                        <div>
+                            <div class="opener-metric-num" style="color: var(--red);" data-counter="9.4" data-decimals="1" data-suffix=" mo">0.0 mo</div>
+                            <div class="opener-metric-label">Breakeven vs. Direct Regolith (Nuclear)</div>
+                        </div>
+                        <div>
+                            <div class="opener-metric-num" style="color: var(--blue);" data-counter="20.5" data-decimals="1" data-suffix=" mo">0.0 mo</div>
+                            <div class="opener-metric-label">Breakeven vs. Earth Hydroponics (6 Crew)</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SCREEN 2: READING 1 - ARABIDOPSIS DEGs -->
+            <section class="slide" data-slide="1">
+                <div class="slide-header">
+                    <div>
+                        <h2 class="headline">Mature lunar regolith triggers a massive transcriptomic stress response.</h2>
+                        <p class="deck-sub">Significantly differentially expressed genes (DEGs) in <em>Arabidopsis</em> vs. JSC-1A control (Paul et al., 2022)</p>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-num" data-counter="465" data-decimals="0" data-suffix="">0</div>
+                        <div class="hero-unit">Stress DEGs in Apollo 11 (10084)</div>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <svg class="chart-svg" id="chart-1" viewBox="0 0 1100 440"></svg>
+                </div>
+            </section>
+
+            <!-- SCREEN 3: READING 2 - GAS DIFFUSIVITY -->
+            <section class="slide" data-slide="2">
+                <div class="slide-header">
+                    <div>
+                        <h2 class="headline">Saturated lunar dust suffocates roots; sintered pores restore oxygen flow.</h2>
+                        <p class="deck-sub">Moldrup WLR relative gas diffusivity (D<sub>p</sub>/D<sub>o</sub>) vs. 0.0200 aerobic threshold (Jones et al., 2012)</p>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-num" data-counter="0.0862" data-decimals="4" data-suffix="">0.0000</div>
+                        <div class="hero-unit">D<sub>p</sub>/D<sub>o</sub> in Sintered Ceramic (123&times; higher)</div>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <svg class="chart-svg" id="chart-2" viewBox="0 0 1100 440"></svg>
+                </div>
+            </section>
+
+            <!-- SCREEN 4: READING 3 - 60-MONTH ESM TRAJECTORY -->
+            <section class="slide" data-slide="3">
+                <div class="slide-header">
+                    <div>
+                        <h2 class="headline">Direct regolith carries a runaway logistics penalty over 60 months.</h2>
+                        <p class="deck-sub">Cumulative Equivalent System Mass (kg) across 4 BLSS architectures for a 6-crew lunar base</p>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-num" data-counter="8062" data-decimals="0" data-suffix=" kg">0 kg</div>
+                        <div class="hero-unit">Net Mass Saved by Month 60</div>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <svg class="chart-svg" id="chart-3" viewBox="0 0 1100 440"></svg>
+                </div>
+            </section>
+
+            <!-- SCREEN 5: READING 4 - ESM PER KG EDIBLE BIOMASS -->
+            <section class="slide" data-slide="4">
+                <div class="slide-header">
+                    <div>
+                        <h2 class="headline">Per kilogram of food, sintered ISRU ceramics cut mission mass by 4.4&times;.</h2>
+                        <p class="deck-sub">60-month Equivalent System Mass normalized to edible dry biomass (kg ESM / kg edible)</p>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-num" data-counter="1.00" data-decimals="2" data-suffix=" kg/kg">0.00 kg/kg</div>
+                        <div class="hero-unit">Sintered Ceramic ISRU (Lowest Cost)</div>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <svg class="chart-svg" id="chart-4" viewBox="0 0 1100 440"></svg>
+                </div>
+            </section>
+
+            <!-- SCREEN 6: READING 5 - WATER RECOVERY & SYNTHESIS -->
+            <section class="slide" data-slide="5">
+                <div class="slide-header">
+                    <div>
+                        <h2 class="headline">Closed-loop recovery turns local regolith into permanent life support.</h2>
+                        <p class="deck-sub">System water recovery (%) comparing raw regolith cultivation against sintered ceramic modules</p>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-num" data-counter="98.5" data-decimals="1" data-suffix="%">0.0%</div>
+                        <div class="hero-unit">Sintered Ceramic Water Recovery</div>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <svg class="chart-svg" id="chart-5" viewBox="0 0 1100 440"></svg>
+                </div>
+            </section>
+        </main>
+
+        <footer class="controls">
+            <div class="progress-dots" id="dots"></div>
+            <div class="slide-counter" id="counter-label">1 / 6</div>
+            <div class="btn-group">
+                <button class="btn" id="btn-prev" title="Previous (Left Arrow)">&larr; Prev</button>
+                <button class="btn" id="btn-replay" title="Replay 20-frame animation (R)">Replay</button>
+                <button class="btn" id="btn-play" title="Auto-play (Space)">Auto-Play</button>
+                <button class="btn primary" id="btn-next" title="Next (Right Arrow)">Next &rarr;</button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+    (function () {
+        const TOTAL_FRAMES = 20;
+        const RED = '#d62828';
+        const BLUE = '#457b9d';
+        const INK = '#222222';
+        const MUTED_RULE = 'rgba(34, 34, 34, 0.14)';
+
+        // Exact cubic ease-out over 20 frames
+        function easeOutCubic(t) {
+            return 1 - Math.pow(1 - t, 3);
+        }
+
+        const slides = Array.from(document.querySelectorAll('.slide'));
+        const dotsEl = document.getElementById('dots');
+        const counterLabel = document.getElementById('counter-label');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnReplay = document.getElementById('btn-replay');
+        const btnPlay = document.getElementById('btn-play');
+
+        let currentSlide = 0;
+        let animRaf = null;
+        let autoTimer = null;
+        let isAutoPlaying = false;
+
+        // Build progress dots
+        slides.forEach((_, idx) => {
+            const b = document.createElement('button');
+            b.className = 'dot' + (idx === 0 ? ' active' : '');
+            b.setAttribute('aria-label', `Go to reading ${idx + 1}`);
+            b.addEventListener('click', () => goToSlide(idx));
+            dotsEl.appendChild(b);
+        });
+
+        function svgEl(tag, attrs = {}) {
+            const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+            for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+            return el;
+        }
+
+        // Generic 20-frame vertical bar chart renderer
+        function renderBarChart(svgId, { bars, maxVal, formatVal, refLine, annotation }) {
+            const svg = document.getElementById(svgId);
+            svg.innerHTML = '';
+
+            const left = 60, right = 1040, top = 56, bottom = 360;
+            const height = bottom - top;
+            const slotW = (right - left) / bars.length;
+            const barW = Math.min(150, slotW * 0.56);
+
+            // Baseline
+            svg.appendChild(svgEl('line', {
+                x1: left, y1: bottom, x2: right, y2: bottom,
+                stroke: INK, 'stroke-width': 2.5
+            }));
+
+            // Optional reference threshold line
+            if (refLine) {
+                const ry = bottom - (refLine.value / maxVal) * height;
+                svg.appendChild(svgEl('line', {
+                    x1: left, y1: ry, x2: right, y2: ry,
+                    stroke: INK, 'stroke-width': 2, 'stroke-dasharray': '8 6'
+                }));
+                const rt = svgEl('text', {
+                    x: left + 8, y: ry - 12,
+                    class: 'axis-label'
+                });
+                rt.textContent = refLine.label;
+                svg.appendChild(rt);
+            }
+
+            const barRects = [];
+            const valLabels = [];
+
+            bars.forEach((b, i) => {
+                const cx = left + slotW * (i + 0.5);
+                const x = cx - barW / 2;
+                const color = b.highlight ? RED : BLUE;
+
+                const rect = svgEl('rect', {
+                    x, y: bottom, width: barW, height: 0,
+                    rx: 4, fill: color
+                });
+                svg.appendChild(rect);
+                barRects.push({ rect, targetH: (b.value / maxVal) * height, b });
+
+                const vLbl = svgEl('text', {
+                    x: cx, y: bottom - 12,
+                    'text-anchor': 'middle',
+                    class: 'val-label' + (b.highlight ? ' highlight' : '')
+                });
+                vLbl.textContent = formatVal(0);
+                svg.appendChild(vLbl);
+                valLabels.push({ el: vLbl, b });
+
+                const xLbl = svgEl('text', {
+                    x: cx, y: bottom + 40,
+                    'text-anchor': 'middle',
+                    class: 'axis-label'
+                });
+                xLbl.textContent = b.label;
+                svg.appendChild(xLbl);
+            });
+
+            // Handwritten annotation + curved pointer
+            if (annotation) {
+                const ann = svgEl('text', {
+                    x: annotation.x, y: annotation.y,
+                    'text-anchor': annotation.anchor || 'start',
+                    class: 'handwritten'
+                });
+                ann.textContent = annotation.text;
+                svg.appendChild(ann);
+
+                if (annotation.path) {
+                    svg.appendChild(svgEl('path', {
+                        d: annotation.path,
+                        fill: 'none',
+                        stroke: RED,
+                        'stroke-width': 3,
+                        'stroke-linecap': 'round'
+                    }));
+                }
+            }
+
+            return function update(p) {
+                barRects.forEach(({ rect, targetH }, idx) => {
+                    const h = targetH * p;
+                    rect.setAttribute('y', bottom - h);
+                    rect.setAttribute('height', Math.max(0, h));
+                    const { el, b } = valLabels[idx];
+                    el.setAttribute('y', bottom - h - 14);
+                    el.textContent = p >= 1 ? formatVal(b.value) : formatVal(b.value * p);
+                });
+            };
+        }
+
+        // 20-frame line chart renderer for Screen 4 (60-Month ESM Trajectory)
+        function renderLineChart(svgId) {
+            const svg = document.getElementById(svgId);
+            svg.innerHTML = '';
+
+            const left = 90, right = 830, top = 40, bottom = 365;
+            const width = right - left;
+            const height = bottom - top;
+            const maxY = 12500;
+
+            // Grid lines & baseline
+            [0, 4000, 8000, 12000].forEach(v => {
+                const y = bottom - (v / maxY) * height;
+                svg.appendChild(svgEl('line', {
+                    x1: left, y1: y, x2: right, y2: y,
+                    stroke: v === 0 ? INK : MUTED_RULE,
+                    'stroke-width': v === 0 ? 2.5 : 1.5
+                }));
+            });
+
+            // X-axis labels (>= 28px)
+            [0, 20, 40, 60].forEach(m => {
+                const x = left + (m / 60) * width;
+                const lbl = svgEl('text', {
+                    x, y: bottom + 40,
+                    'text-anchor': 'middle',
+                    class: 'axis-label'
+                });
+                lbl.textContent = `Mo ${m}`;
+                svg.appendChild(lbl);
+            });
+
+            // Exact endpoints from analysis/output/esm_4arch_comparison.csv
+            const series = [
+                { name: 'Direct Regolith', y0: 684.3, y60: 11910.3, color: RED, w: 6, highlight: true, endLabel: '11,910 kg' },
+                { name: 'Hydroponics', y0: 1172.5, y60: 5810.5, color: BLUE, w: 3.5, highlight: false, endLabel: '5,811 kg' },
+                { name: 'Hybrid', y0: 1530.5, y60: 4620.5, color: BLUE, w: 3.5, highlight: false, endLabel: '4,621 kg' },
+                { name: 'Sintered ISRU', y0: 2188.1, y60: 3848.3, color: BLUE, w: 5, highlight: false, endLabel: '3,848 kg' }
+            ];
+
+            const lines = series.map(s => {
+                const x0 = left;
+                const x1 = right;
+                const sy0 = bottom - (s.y0 / maxY) * height;
+                const sy1 = bottom - (s.y60 / maxY) * height;
+
+                const line = svgEl('line', {
+                    x1: x0, y1: sy0, x2: x0, y2: sy0,
+                    stroke: s.color, 'stroke-width': s.w, 'stroke-linecap': 'round'
+                });
+                svg.appendChild(line);
+
+                const lbl = svgEl('text', {
+                    x: x1 + 14, y: sy1 + 9,
+                    class: 'val-label' + (s.highlight ? ' highlight' : ''),
+                    opacity: 0
+                });
+                lbl.textContent = `${s.name}: ${s.endLabel}`;
+                svg.appendChild(lbl);
+
+                return { line, lbl, x0, x1, sy0, sy1 };
+            });
+
+            // Handwritten annotation
+            const ann = svgEl('text', {
+                x: 135, y: 110,
+                class: 'handwritten'
+            });
+            ann.textContent = '9.4 mo to beat raw dust; 20.5 mo to beat Earth hydroponics';
+            svg.appendChild(ann);
+
+            svg.appendChild(svgEl('path', {
+                d: 'M 250 124 Q 230 220 218 282',
+                fill: 'none', stroke: RED, 'stroke-width': 3, 'stroke-linecap': 'round'
+            }));
+
+            return function update(p) {
+                lines.forEach(item => {
+                    const cx = item.x0 + (item.x1 - item.x0) * p;
+                    const cy = item.sy0 + (item.sy1 - item.sy0) * p;
+                    item.line.setAttribute('x2', cx);
+                    item.line.setAttribute('y2', cy);
+                    item.lbl.setAttribute('opacity', p >= 0.9 ? 1 : 0);
+                });
+            };
+        }
+
+        // Build charts per slide
+        function buildSlideChart(index) {
+            if (index === 1) {
+                return renderBarChart('chart-1', {
+                    maxVal: 520,
+                    formatVal: v => Math.round(v).toString(),
+                    bars: [
+                        { label: 'JSC-1A', value: 0, highlight: false },
+                        { label: 'Apollo 17', value: 113, highlight: false },
+                        { label: 'Apollo 12', value: 265, highlight: false },
+                        { label: 'Apollo 11', value: 465, highlight: true }
+                    ],
+                    annotation: {
+                        x: 110, y: 120,
+                        text: 'Mature dust triggers 4x more stress genes — sintering passivates it',
+                        path: 'M 690 132 Q 775 110 830 84'
+                    }
+                });
+            }
+            if (index === 2) {
+                return renderBarChart('chart-2', {
+                    maxVal: 0.10,
+                    formatVal: v => v.toFixed(4),
+                    refLine: { value: 0.02, label: '0.0200 Aerobic Limit' },
+                    bars: [
+                        { label: 'Saturated Raw Regolith', value: 0.0007, highlight: false },
+                        { label: 'Sintered Ceramic', value: 0.0862, highlight: true }
+                    ],
+                    annotation: {
+                        x: 90, y: 130,
+                        text: 'Raw dust suffocates roots; 0.5–2 mm pores keep them breathing',
+                        path: 'M 635 142 Q 705 120 755 96'
+                    }
+                });
+            }
+            if (index === 3) {
+                return renderLineChart('chart-3');
+            }
+            if (index === 4) {
+                return renderBarChart('chart-4', {
+                    maxVal: 5.0,
+                    formatVal: v => v.toFixed(2),
+                    bars: [
+                        { label: 'Direct Regolith', value: 4.38, highlight: false },
+                        { label: 'Hydroponics', value: 1.54, highlight: false },
+                        { label: 'Hybrid', value: 1.27, highlight: false },
+                        { label: 'Sintered ISRU', value: 1.00, highlight: true }
+                    ],
+                    annotation: {
+                        x: 430, y: 120,
+                        text: '500°C pyrolytic reset + >98.5% water recovery wins on yield',
+                        path: 'M 860 138 Q 905 200 925 268'
+                    }
+                });
+            }
+            if (index === 5) {
+                return renderBarChart('chart-5', {
+                    maxVal: 110,
+                    formatVal: v => v.toFixed(1) + '%',
+                    bars: [
+                        { label: 'Raw Regolith', value: 80.0, highlight: false },
+                        { label: 'Sintered Ceramic', value: 98.5, highlight: true }
+                    ],
+                    annotation: {
+                        x: 110, y: 78,
+                        text: 'Stop hauling water & buffers — sinter the Moon into infrastructure',
+                        path: 'M 710 88 Q 760 80 795 74'
+                    }
+                });
+            }
+            return null;
+        }
+
+        function animateCurrentSlide() {
+            if (animRaf) cancelAnimationFrame(animRaf);
+
+            const slideEl = slides[currentSlide];
+            const counters = Array.from(slideEl.querySelectorAll('[data-counter]'));
+            const chartUpdater = buildSlideChart(currentSlide);
+
+            // Reset counters to 0
+            counters.forEach(el => {
+                const dec = parseInt(el.dataset.decimals || '0', 10);
+                const suf = el.dataset.suffix || '';
+                el.textContent = (0).toFixed(dec) + suf;
+            });
+
+            let frame = 0;
+            let lastTick = 0;
+            const FRAME_MS = 28; // ~20 frames over ~560ms
+
+            function step(ts) {
+                if (!lastTick) lastTick = ts;
+                if (ts - lastTick >= FRAME_MS) {
+                    lastTick = ts;
+                    frame = Math.min(TOTAL_FRAMES, frame + 1);
+                    const p = easeOutCubic(frame / TOTAL_FRAMES);
+
+                    if (chartUpdater) chartUpdater(p);
+
+                    counters.forEach(el => {
+                        const target = parseFloat(el.dataset.counter);
+                        const dec = parseInt(el.dataset.decimals || '0', 10);
+                        const suf = el.dataset.suffix || '';
+                        const val = frame >= TOTAL_FRAMES ? target : target * p;
+                        el.textContent = dec === 0
+                            ? Math.round(val).toLocaleString('en-US') + suf
+                            : val.toFixed(dec) + suf;
+                    });
+                }
+
+                if (frame < TOTAL_FRAMES) {
+                    animRaf = requestAnimationFrame(step);
+                } else {
+                    animRaf = null;
+                }
+            }
+
+            animRaf = requestAnimationFrame(step);
+        }
+
+        function goToSlide(idx) {
+            currentSlide = (idx + slides.length) % slides.length;
+            slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+            Array.from(dotsEl.children).forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+            counterLabel.textContent = `${currentSlide + 1} / ${slides.length}`;
+            animateCurrentSlide();
+        }
+
+        function toggleAutoPlay() {
+            if (isAutoPlaying) {
+                clearInterval(autoTimer);
+                isAutoPlaying = false;
+                btnPlay.textContent = 'Auto-Play';
+            } else {
+                isAutoPlaying = true;
+                btnPlay.textContent = 'Pause';
+                autoTimer = setInterval(() => {
+                    if (currentSlide < slides.length - 1) {
+                        goToSlide(currentSlide + 1);
+                    } else {
+                        toggleAutoPlay();
+                    }
+                }, 4200);
+            }
+        }
+
+        btnPrev.addEventListener('click', () => goToSlide(currentSlide - 1));
+        btnNext.addEventListener('click', () => goToSlide(currentSlide + 1));
+        btnReplay.addEventListener('click', () => animateCurrentSlide());
+        btnPlay.addEventListener('click', toggleAutoPlay);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') goToSlide(currentSlide + 1);
+            else if (e.key === 'ArrowLeft') goToSlide(currentSlide - 1);
+            else if (e.key === ' ') { e.preventDefault(); toggleAutoPlay(); }
+            else if (e.key.toLowerCase() === 'r') animateCurrentSlide();
+        });
+
+        // Start Screen 1
+        animateCurrentSlide();
+    })();
+    </script>
+</body>
+</html>
