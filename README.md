@@ -47,9 +47,10 @@ Here, we review an alternative in-situ bio-infrastructure paradigm: transforming
 │       ├── build-manuscript.yml    # CI/CD: Automated LaTeX to PDF compilation
 │       └── deploy-pages.yml        # CI/CD: Automated GitHub Pages deployment
 ├── analysis/
-│   ├── esm_model.py                # NASA BVAD Equivalent System Mass lifecycle model
+│   ├── esm_model.py                # NASA BVAD (2022) 4-architecture ESM & WLR physics model
 │   └── output/
-│       └── esm_trajectory_baseline.csv # Exported 60-month baseline simulation
+│       ├── esm_trajectory_baseline.csv # Exported 60-month baseline simulation
+│       └── esm_4arch_comparison.csv    # 4-architecture edible-yield comparison
 ├── docs/                           # GitHub Pages deployment root (Interactive Explorer)
 │   ├── index.html                  # Standalone interactive dashboard (Tailwind + Chart.js)
 │   └── manuscript.pdf              # Pre-compiled high-resolution PDF
@@ -63,7 +64,7 @@ Here, we review an alternative in-situ bio-infrastructure paradigm: transforming
 │   │   ├── fig2_sintering_radar.png
 │   │   ├── fig3_hydrodynamics_aeration.png
 │   │   ├── fig4_esm_lifecycle.png
-│   │   ├── fig5_mission_economics.png
+│   │   ├── fig5_bioweathering_chambers.png
 │   │   ├── fig6_trl_roadmap.png
 │   │   ├── fig7_trl_gantt.png
 │   │   ├── fig8_multitrophic_gantt.png
@@ -136,26 +137,21 @@ cp main.pdf ../manuscript.pdf
 
 ## 📈 Running the Systems Engineering ESM Model
 
-The parametric lifecycle model calculates cumulative Equivalent System Mass (ESM) based on NASA Johnson Space Center BVAD specifications (NASA/CR-2004-208941):
+The parametric lifecycle model calculates cumulative Equivalent System Mass (ESM) normalized to edible yield across four edaphic architectures based on NASA BVAD specifications (Hanford, 2004; Ewert et al., 2022, NASA/TP-20220002905) and reduced-gravity root-zone scaling (Jones et al., 2012):
 
 ```bash
 python3 analysis/esm_model.py
 ```
 
-### Sample Output:
+### Sample Output (6-Crew, 60-Month Nuclear Baseline):
 ```text
-================================================================================
-LUNAR BLSS EDAPHIC ARCHITECTURE: EQUIVALENT SYSTEM MASS (ESM) TRADE STUDY
-================================================================================
-Crew Size  | Horizon    | Raw ESM (kg)   | Sintered ESM (kg)  | Net Savings    | Breakeven
---------------------------------------------------------------------------------
-3          | 24 mo      | 2,587          | 1,901              | 686            | 15.4 mo
-3          | 60 mo      | 5,955          | 2,399              | 3,556          | 15.4 mo
-6          | 24 mo      | 5,175          | 2,852              | 2,322          | 9.4 mo
-6          | 60 mo      | 11,910         | 3,848              | 8,062          | 9.4 mo
-12         | 24 mo      | 10,349         | 4,754              | 5,595          | 6.5 mo
-12         | 60 mo      | 23,821         | 6,746              | 17,074         | 6.5 mo
-================================================================================
+Crew   | Architecture              | ESM (kg)   | Edible (kg)  | ESM/kg Edible  | ESM/1e6 kcal
+--------------------------------------------------------------------------------------------------
+6      | Conventional Hydroponics  | 5,810      | 3,780        | 1.54           | 404.5
+6      | Direct Regolith           | 11,910     | 2,722        | 4.38           | 1,151.6
+6      | Hydroponic-Regolith Hybrid | 4,620      | 3,629        | 1.27           | 335.1
+6      | Sintered Ceramic ISRU     | 3,848      | 3,856        | 1.00           | 262.7
+       -> Sintered Breakeven: 9.4 mo (vs Direct Regolith) | 20.5 mo (vs Conv. Hydroponics)
 ```
 
 ---
