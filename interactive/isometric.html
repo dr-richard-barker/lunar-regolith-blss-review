@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isometric Miniature World — Lunar BLSS Model & Scaling Series</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #eef2f3;
+            --ink: #2d3142;
+            --accent: #ef8354;
+            --slate: #4f5d75;
+            --silver: #bfc0c0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .shell {
+            width: 100vw;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 18px 36px 20px;
+        }
+
+        /* Header */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1.5px solid rgba(45, 49, 66, 0.14);
+            padding-bottom: 10px;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge {
+            background: var(--accent);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .brand-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .nav-links a {
+            color: var(--slate);
+            text-decoration: none;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Episode Header */
+        .ep-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 14px 0 6px;
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .ep-kicker {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .ep-title {
+            font-size: clamp(24px, 2.8vw, 36px);
+            font-weight: 800;
+            line-height: 1.12;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+
+        .ep-sub {
+            font-size: 15px;
+            color: var(--slate);
+            margin-top: 6px;
+            max-width: 760px;
+            line-height: 1.45;
+        }
+
+        .ep-formula {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            background: #ffffff;
+            border: 1.5px solid var(--silver);
+            border-left: 4px solid var(--accent);
+            padding: 10px 14px;
+            border-radius: 6px;
+            color: var(--ink);
+            white-space: nowrap;
+        }
+
+        /* Isometric Diorama Stage */
+        .stage-wrap {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        svg#iso-stage {
+            width: 100%;
+            height: 100%;
+            display: block;
+            overflow: visible;
+        }
+
+        #camera-rig {
+            transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .leader-line {
+            stroke: var(--ink);
+            stroke-width: 1.25;
+            fill: none;
+        }
+
+        .leader-dot {
+            fill: var(--accent);
+            stroke: var(--ink);
+            stroke-width: 1.25;
+        }
+
+        .leader-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            fill: var(--ink);
+        }
+
+        .leader-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            font-weight: 500;
+            fill: var(--slate);
+        }
+
+        /* Bottom Series Controls */
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border-top: 1.5px solid rgba(45, 49, 66, 0.14);
+            padding-top: 12px;
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .ep-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .pill {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1.5px solid var(--silver);
+            background: #ffffff;
+            color: var(--slate);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .pill.active {
+            border-color: var(--ink);
+            background: var(--ink);
+            color: #ffffff;
+        }
+
+        .pill:hover:not(.active) {
+            border-color: var(--slate);
+            color: var(--ink);
+        }
+
+        .btn-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 7px 15px;
+            border-radius: 6px;
+            border: 1.5px solid var(--ink);
+            background: transparent;
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--ink);
+            color: #ffffff;
+        }
+
+        .btn.accent {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+
+        .btn.accent:hover {
+            opacity: 0.92;
+        }
+
+        @media (max-width: 900px) {
+            .shell { padding: 12px 16px; }
+            .ep-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .controls { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <header class="topbar">
+            <div class="brand">
+                <span class="badge">Isometric Series</span>
+                <span class="brand-title">Lunar BLSS Model &amp; Habitat Scaling Factors</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html">Interactive Explorer</a>
+                <a href="story.html">Visual Story</a>
+                <a href="manuscript.pdf" target="_blank">Manuscript PDF</a>
+            </nav>
+        </header>
+
+        <section class="ep-header">
+            <div>
+                <div class="ep-kicker" id="ep-kicker">Episode 1 of 5</div>
+                <h1 class="ep-title" id="ep-title">Anatomy of the ESM Equation</h1>
+                <p class="ep-sub" id="ep-sub">Every lunar crop architecture is priced in Equivalent System Mass (kg): initial hardware M plus volume, power, cooling, and crew-time penalties.</p>
+            </div>
+            <div class="ep-formula" id="ep-formula">ESM = M + V·Cv + P·Cp + C·Cc + T·Ct</div>
+        </section>
+
+        <main class="stage-wrap">
+            <svg id="iso-stage" viewBox="-600 -310 1200 620" preserveAspectRatio="xMidYMid meet">
+                <g id="camera-rig">
+                    <g id="world-layer"></g>
+                    <g id="roof-layer"></g>
+                    <g id="interior-layer"></g>
+                    <g id="label-layer"></g>
+                </g>
+            </svg>
+        </main>
+
+        <footer class="controls">
+            <div class="ep-pills" id="ep-pills"></div>
+            <div class="btn-row">
+                <button class="btn" id="btn-prev">&larr; Prev</button>
+                <button class="btn" id="btn-replay">Replay</button>
+                <button class="btn accent" id="btn-series">Play Series</button>
+                <button class="btn" id="btn-next">Next &rarr;</button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+    (function () {
+        const COS30 = Math.cos(Math.PI / 6); // 0.8660254
+        const SIN30 = 0.5;
+        const INK = '#2d3142';
+
+        // Strict 3-flat-tone palettes (light top, mid left, dark right)
+        const PALETTES = {
+            silver: { top: '#e2e4e6', left: '#bfc0c0', right: '#95989b' },
+            slate:  { top: '#6d7d99', left: '#4f5d75', right: '#384357' },
+            accent: { top: '#f7a683', left: '#ef8354', right: '#c96236' },
+            ink:    { top: '#434961', left: '#2d3142', right: '#1d202c' },
+            ground: { top: '#ffffff', left: '#dde3e6', right: '#bfc6ca' }
+        };
+
+        const worldLayer = document.getElementById('world-layer');
+        const roofLayer = document.getElementById('roof-layer');
+        const interiorLayer = document.getElementById('interior-layer');
+        const labelLayer = document.getElementById('label-layer');
+        const cameraRig = document.getElementById('camera-rig');
+
+        const epKicker = document.getElementById('ep-kicker');
+        const epTitle = document.getElementById('ep-title');
+        const epSub = document.getElementById('ep-sub');
+        const epFormula = document.getElementById('ep-formula');
+        const epPills = document.getElementById('ep-pills');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnReplay = document.getElementById('btn-replay');
+        const btnSeries = document.getElementById('btn-series');
+
+        let currentEp = 0;
+        let isSeriesPlaying = false;
+        let seriesTimer = null;
+        let animRaf = null;
+
+        // True orthographic isometric projection
+        function iso(x, y, z) {
+            return [
+                (x - y) * COS30,
+                (x + y) * SIN30 - z
+            ];
+        }
+
+        function ptsStr(arr) {
+            return arr.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+        }
+
+        function svgEl(tag, attrs = {}) {
+            const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+            for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+            return el;
+        }
+
+        // 3-tone flat-shaded isometric prism
+        function createIsoBox(x, y, z, dx, dy, dz, paletteName = 'silver', strokeW = 1.2) {
+            const pal = PALETTES[paletteName] || PALETTES.silver;
+            const g = svgEl('g');
+
+            // 8 corners
+            const p001 = iso(x,      y,      z + dz);
+            const p101 = iso(x + dx, y,      z + dz);
+            const p111 = iso(x + dx, y + dy, z + dz);
+            const p011 = iso(x,      y + dy, z + dz);
+
+            const p100 = iso(x + dx, y,      z);
+            const p110 = iso(x + dx, y + dy, z);
+            const p010 = iso(x,      y + dy, z);
+
+            // Top face (light)
+            g.appendChild(svgEl('polygon', {
+                points: ptsStr([p001, p101, p111, p011]),
+                fill: pal.top, stroke: INK, 'stroke-width': strokeW, 'stroke-linejoin': 'round'
+            }));
+            // Left face (mid: x fixed? Wait: y+dy faces bottom-left in standard iso)
+            g.appendChild(svgEl('polygon', {
+                points: ptsStr([p011, p111, p110, p010]),
+                fill: pal.left, stroke: INK, 'stroke-width': strokeW, 'stroke-linejoin': 'round'
+            }));
+            // Right face (dark: x+dx faces bottom-right)
+            g.appendChild(svgEl('polygon', {
+                points: ptsStr([p101, p111, p110, p100]),
+                fill: pal.right, stroke: INK, 'stroke-width': strokeW, 'stroke-linejoin': 'round'
+            }));
+
+            return g;
+        }
+
+        // Thin leader-line annotation
+        function createLeader(wx, wy, wz, lx, ly, title, sub, align = 'start') {
+            const g = svgEl('g', { opacity: 0 });
+            const [sx, sy] = iso(wx, wy, wz);
+            const midX = align === 'start' ? lx - 14 : lx + 14;
+
+            g.appendChild(svgEl('polyline', {
+                points: `${sx.toFixed(1)},${sy.toFixed(1)} ${midX.toFixed(1)},${ly.toFixed(1)} ${lx.toFixed(1)},${ly.toFixed(1)}`,
+                class: 'leader-line'
+            }));
+            g.appendChild(svgEl('circle', {
+                cx: sx.toFixed(1), cy: sy.toFixed(1), r: 3.5, class: 'leader-dot'
+            }));
+
+            const tx = align === 'start' ? lx + 6 : lx - 6;
+            const t1 = svgEl('text', { x: tx, y: ly - 4, 'text-anchor': align, class: 'leader-title' });
+            t1.textContent = title;
+            g.appendChild(t1);
+
+            if (sub) {
+                const t2 = svgEl('text', { x: tx, y: ly + 13, 'text-anchor': align, class: 'leader-sub' });
+                t2.textContent = sub;
+                g.appendChild(t2);
+            }
+            return g;
+        }
+
+        // Damped bounce easing for 40px drop-in
+        function easeOutBounce(t) {
+            const n1 = 7.5625, d1 = 2.75;
+            if (t < 1 / d1) return n1 * t * t;
+            if (t < 2 / d1) return n1 * (t -= 1.5 / d1) * t + 0.75;
+            if (t < 2.5 / d1) return n1 * (t -= 2.25 / d1) * t + 0.9375;
+            return n1 * (t -= 2.625 / d1) * t + 0.984375;
+        }
+
+        // Episode Definitions (100% grounded in analysis/esm_model.py)
+        const EPISODES = [
+            {
+                pill: '1. ESM Equation',
+                kicker: 'Episode 1 of 5 · NASA BVAD Cost Blocks',
+                title: 'Anatomy of the ESM Equation',
+                sub: 'Direct regolith starts lighter (420 kg) but pays massive monthly water & volume penalties. Sintered ceramic ISRU starts at 1,850 kg and flattens consumables.',
+                formula: 'ESM = M + V·Cv + P·Cp + C·Cc + T·Ct',
+                cam: { x: 0, y: 18 },
+                build() {
+                    const blocks = [];
+                    const labels = [];
+
+                    // Base pads
+                    blocks.push({ el: createIsoBox(-240, -110, -14, 180, 220, 14, 'ground') });
+                    blocks.push({ el: createIsoBox(60, -110, -14, 180, 220, 14, 'ground') });
+
+                    // Left: Direct Regolith (420 kg init, 12.5 m3 vol, 120 kg/mo H2O)
+                    blocks.push({ el: createIsoBox(-210, -80, 0, 120, 160, 22, 'slate') }); // M = 420 kg
+                    blocks.push({ el: createIsoBox(-200, -70, 22, 100, 140, 48, 'silver') }); // V = 12.5 m3
+                    blocks.push({ el: createIsoBox(-185, -55, 70, 70, 110, 68, 'accent') }); // 120 kg/mo H2O + 40 hr/mo crew
+
+                    // Right: Sintered Ceramic ISRU (1850 kg init, 4.2 m3 vol, 18 kg/mo H2O)
+                    blocks.push({ el: createIsoBox(90, -80, 0, 120, 160, 62, 'slate') }); // M = 1850 kg
+                    blocks.push({ el: createIsoBox(105, -65, 62, 90, 130, 18, 'silver') }); // V = 4.2 m3
+                    blocks.push({ el: createIsoBox(120, -50, 80, 60, 100, 14, 'accent') }); // 18 kg/mo H2O + 6 hr/mo crew
+
+                    labels.push(createLeader(-150, 0, 138, -280, -140, 'Direct Regolith: 11,910 kg @ 60 mo', 'M=420 kg · V=12.5 m³ · 120 kg/mo H₂O', 'end'));
+                    labels.push(createLeader(-150, 0, 45, -280, -35, 'Unpressurized/Loose Dust Penalty', '40 crew-hr/mo · 145 kg/yr buffers', 'end'));
+                    labels.push(createLeader(150, 0, 94, 240, -110, 'Sintered Ceramic ISRU: 3,848 kg @ 60 mo', 'M=1,850 kg · V=4.2 m³ · 18 kg/mo H₂O', 'start'));
+                    labels.push(createLeader(150, 0, 30, 240, -5, 'Breakeven: 9.4 Months (Nuclear)', 'Net Savings: 8,062 kg by Month 60', 'start'));
+
+                    return { blocks, roofs: [], interiors: [], labels };
+                }
+            },
+            {
+                pill: '2. 1/6 g Root Physics',
+                kicker: 'Episode 2 of 5 · Lift-the-Roof Pore Reveal',
+                title: '1/6 g Root-Zone Physics & Pore Scaling',
+                sub: 'Lifting the BLSS dome roof reveals why raw dust suffocates roots at 1/6 g (400 cm capillary rise) while 0.5–2.0 mm sintered macropores keep Dp/Do > 0.02.',
+                formula: 'αg = α1g·(g/gE)  |  Dp/Do = (φ - θ)^2.5 / φ ≥ 0.02',
+                cam: { x: 0, y: 24 },
+                build() {
+                    const blocks = [];
+                    const roofs = [];
+                    const interiors = [];
+                    const labels = [];
+
+                    // Platform
+                    blocks.push({ el: createIsoBox(-170, -140, -14, 340, 280, 14, 'ground') });
+                    // Dome walls (split front/back frame)
+                    blocks.push({ el: createIsoBox(-130, -110, 0, 260, 20, 78, 'silver') });
+                    blocks.push({ el: createIsoBox(-130, -110, 0, 20, 220, 78, 'silver') });
+                    blocks.push({ el: createIsoBox(-130, 90, 0, 260, 20, 24, 'slate') });
+                    blocks.push({ el: createIsoBox(110, -110, 0, 20, 220, 24, 'slate') });
+
+                    // Interior: Left Raw Regolith Tray vs Right Sintered Ceramic Rack
+                    interiors.push(createIsoBox(-95, -60, 0, 75, 120, 32, 'ink')); // waterlogged raw dust
+                    interiors.push(createIsoBox(15, -60, 0, 80, 120, 16, 'silver')); // sintered base
+                    interiors.push(createIsoBox(22, -48, 16, 22, 96, 36, 'accent')); // 30-60 um wick pin
+                    interiors.push(createIsoBox(56, -48, 16, 22, 96, 36, 'accent')); // 30-60 um wick pin
+
+                    // Roof that lifts off!
+                    roofs.push(createIsoBox(-136, -116, 78, 272, 232, 22, 'slate'));
+                    roofs.push(createIsoBox(-96, -76, 100, 192, 152, 16, 'accent'));
+
+                    labels.push(createLeader(-58, 0, 32, -255, -70, 'Raw Dust @ 1/6 g: Dp/Do = 0.0007', '400 cm capillary rise → Root Hypoxia', 'end'));
+                    labels.push(createLeader(55, 0, 52, 235, -80, 'Sintered Ceramic: Dp/Do = 0.0862', '30–60 µm wicks + 0.5–2.0 mm air pores', 'start'));
+                    labels.push(createLeader(0, -110, 138, 235, -165, 'Roof Lifts: Arya–Paris Dual Porosity', '123× higher O₂ diffusion than raw dust', 'start'));
+
+                    return { blocks, roofs, interiors, labels };
+                }
+            },
+            {
+                pill: '3. Crew & Power Scaling',
+                kicker: 'Episode 3 of 5 · Sublinear ISRU Scaling',
+                title: 'Crew-Size (3 → 6 → 12) & Power Scaling',
+                sub: 'Conventional systems scale linearly with crew size. Sintered ISRU plant mass scales sublinearly (1850 + 150·(crew-6) kg), halving breakeven time at 12 crew.',
+                formula: 'M_ISRU = 1850 + 150·(Crew - 6) kg  |  Cp: 54 vs 237 kg/kWe',
+                cam: { x: -10, y: 20 },
+                build() {
+                    const blocks = [];
+                    const roofs = [];
+                    const interiors = [];
+                    const labels = [];
+
+                    // Ground pads
+                    blocks.push({ el: createIsoBox(-250, -110, -14, 150, 220, 14, 'ground') });
+                    blocks.push({ el: createIsoBox(-60, -110, -14, 310, 220, 14, 'ground') });
+
+                    // Power Yard: Nuclear (Cp=54) vs Solar/RFC (Cp=237)
+                    blocks.push({ el: createIsoBox(-215, -75, 0, 75, 75, 42, 'accent') }); // Kilopower 54 kg/kWe
+                    blocks.push({ el: createIsoBox(-225, 25, 0, 95, 65, 85, 'slate') }); // Solar/RFC 14-day night 237 kg/kWe
+
+                    // Crew scaling modules: 3, 6, 12 crew
+                    blocks.push({ el: createIsoBox(-25, -75, 0, 65, 150, 38, 'silver') }); // 3 crew
+                    blocks.push({ el: createIsoBox(60, -75, 0, 75, 150, 56, 'slate') }); // 6 crew
+                    blocks.push({ el: createIsoBox(155, -75, 0, 85, 150, 78, 'accent') }); // 12 crew
+
+                    // Roofs on 12-crew module lifting to show 10.9 mo breakeven
+                    roofs.push(createIsoBox(152, -78, 78, 91, 156, 14, 'ink'));
+                    interiors.push(createIsoBox(168, -55, 78, 56, 110, 12, 'silver'));
+
+                    labels.push(createLeader(-178, -38, 42, -265, -115, 'Nuclear Fission (Cp = 54 kg/kWe)', 'Breakeven: 9.4 mo vs raw · 20.5 mo vs hydro', 'end'));
+                    labels.push(createLeader(-178, 58, 85, -265, 15, 'Solar + RFC (Cp = 237 kg/kWe)', '14-day lunar night shifts breakeven to 18–22 mo', 'end'));
+                    labels.push(createLeader(8, 0, 38, 120, -170, '3 Crew: 33.7 mo vs Hydro', 'Linear scaling penalized at small scale', 'start'));
+                    labels.push(createLeader(98, 0, 56, 235, -95, '6 Crew: 20.5 mo vs Hydro', '1.00 kg ESM / kg edible @ 60 mo', 'start'));
+                    labels.push(createLeader(198, 0, 78, 235, -15, '12 Crew: 10.9 mo vs Hydro', 'Sublinear +150 kg/crew plant scaling', 'start'));
+
+                    return { blocks, roofs, interiors, labels };
+                }
+            },
+            {
+                pill: '4. Moon vs Mars',
+                kicker: 'Episode 4 of 5 · Gravity & Transit Gear',
+                title: 'Moon (0.16 g) vs. Mars (0.38 g) Scaling',
+                sub: 'Mars gravity (0.38 g) slightly improves raw soil drainage (0.92× water entrapment), but the 1.15× transit gear penalty makes ISRU ceramics even more valuable.',
+                formula: 'Mars: Transit = 1.15×  |  Raw Entrapment = 0.92×',
+                cam: { x: 0, y: 20 },
+                build() {
+                    const blocks = [];
+                    const labels = [];
+
+                    // Moon Base Diorama (Left)
+                    blocks.push({ el: createIsoBox(-235, -110, -14, 180, 220, 14, 'silver') });
+                    blocks.push({ el: createIsoBox(-200, -70, 0, 110, 140, 48, 'slate') });
+                    blocks.push({ el: createIsoBox(-175, -45, 48, 60, 90, 22, 'accent') });
+
+                    // Mars Base Diorama (Right)
+                    blocks.push({ el: createIsoBox(55, -110, -14, 180, 220, 14, 'accent') });
+                    blocks.push({ el: createIsoBox(90, -70, 0, 110, 140, 62, 'slate') });
+                    blocks.push({ el: createIsoBox(115, -45, 62, 60, 90, 28, 'silver') });
+
+                    labels.push(createLeader(-145, 0, 70, -255, -115, 'Moon (0.16 g): 1.00× Transit Gear', 'Sintered ESM = 3,848 kg @ 60 mo', 'end'));
+                    labels.push(createLeader(-145, 0, 20, -255, -20, 'Severe Capillary Retention (1.00×)', 'High water-trapping in raw regolith', 'end'));
+                    labels.push(createLeader(145, 0, 90, 240, -115, 'Mars (0.38 g): 1.15× Transit Mass', 'Imported hydroponic gear penalized +15%', 'start'));
+                    labels.push(createLeader(145, 0, 32, 240, -20, '0.92× Raw Entrapment, Higher ISRU Payoff', 'In-situ ceramics bypass long-haul mass', 'start'));
+
+                    return { blocks, roofs: [], interiors: [], labels };
+                }
+            },
+            {
+                pill: '5. Closed-Loop Reset',
+                kicker: 'Episode 5 of 5 · Roof-Off Multitrophic Loop',
+                title: '500°C Pyrolytic Reset & SynCom Loop',
+                sub: 'Lifting the roofs off the Pyrolytic Chamber, Mycoponics Bay, and Winogradsky/Lunar LECA Reactor shows infinite ceramic reuse with >98.5% water recovery.',
+                formula: 'Biomass + O2 → 500°C → CO2 + H2O + Ash  |  >98.5% H2O',
+                cam: { x: 0, y: 24 },
+                build() {
+                    const blocks = [];
+                    const roofs = [];
+                    const interiors = [];
+                    const labels = [];
+
+                    // Shared Outpost Base
+                    blocks.push({ el: createIsoBox(-260, -120, -14, 520, 240, 14, 'ground') });
+
+                    // Building 1 (Left): 500°C Pyrolytic Chamber
+                    blocks.push({ el: createIsoBox(-230, -80, 0, 120, 160, 54, 'slate') });
+                    interiors.push(createIsoBox(-205, -55, 8, 70, 110, 28, 'accent')); // glowing thermal core
+                    roofs.push(createIsoBox(-234, -84, 54, 128, 168, 16, 'ink'));
+
+                    // Building 2 (Center): Pleurotus Mycoponics Bay
+                    blocks.push({ el: createIsoBox(-60, -80, 0, 120, 160, 54, 'silver') });
+                    interiors.push(createIsoBox(-35, -55, 8, 70, 110, 30, 'accent')); // fungal trays + polyols
+                    roofs.push(createIsoBox(-64, -84, 54, 128, 168, 16, 'slate'));
+
+                    // Building 3 (Right): Winogradsky & Lunar LECA Bioleaching Reactor
+                    blocks.push({ el: createIsoBox(110, -80, 0, 120, 160, 54, 'slate') });
+                    interiors.push(createIsoBox(135, -55, 8, 70, 110, 38, 'silver')); // LECA + SynComs
+                    roofs.push(createIsoBox(106, -84, 54, 128, 168, 16, 'accent'));
+
+                    labels.push(createLeader(-170, 0, 36, -260, -125, '500°C Pyrolytic Bake-Out', 'Sterilizes biofilms; recovers CO₂ & H₂O', 'end'));
+                    labels.push(createLeader(0, 0, 38, 0, -170, 'Mycoponics + SynCom Inoculation', 'Straw → Protein + Polyol Wetting (Sikes 2026)', 'start'));
+                    labels.push(createLeader(170, 0, 46, 250, -95, 'Winogradsky & Lunar LECA Loop', '>98.5% H₂O · <8 kg/yr buffer vs 145 kg/yr', 'start'));
+
+                    return { blocks, roofs, interiors, labels };
+                }
+            }
+        ];
+
+        // Build Episode Pills
+        EPISODES.forEach((ep, idx) => {
+            const b = document.createElement('button');
+            b.className = 'pill' + (idx === 0 ? ' active' : '');
+            b.textContent = ep.pill;
+            b.addEventListener('click', () => {
+                stopSeries();
+                playEpisode(idx);
+            });
+            epPills.appendChild(b);
+        });
+
+        function playEpisode(idx) {
+            if (animRaf) cancelAnimationFrame(animRaf);
+            currentEp = (idx + EPISODES.length) % EPISODES.length;
+            const ep = EPISODES[currentEp];
+
+            // Update header & pills
+            epKicker.textContent = ep.kicker;
+            epTitle.textContent = ep.title;
+            epSub.textContent = ep.sub;
+            epFormula.textContent = ep.formula;
+            Array.from(epPills.children).forEach((p, i) => p.classList.toggle('active', i === currentEp));
+
+            // Clear stage layers
+            worldLayer.innerHTML = '';
+            roofLayer.innerHTML = '';
+            interiorLayer.innerHTML = '';
+            labelLayer.innerHTML = '';
+
+            // Orthographic camera slide (never rotates into perspective)
+            cameraRig.setAttribute('transform', `translate(${ep.cam.x}, ${ep.cam.y})`);
+
+            const scene = ep.build();
+            scene.blocks.forEach(b => {
+                b.el.setAttribute('transform', 'translate(0, -40)');
+                b.el.setAttribute('opacity', '0');
+                worldLayer.appendChild(b.el);
+            });
+            scene.interiors.forEach(el => {
+                el.setAttribute('opacity', '0');
+                interiorLayer.appendChild(el);
+            });
+            scene.roofs.forEach(el => {
+                el.setAttribute('transform', 'translate(0, -40)');
+                el.setAttribute('opacity', '0');
+                roofLayer.appendChild(el);
+            });
+            scene.labels.forEach(el => labelLayer.appendChild(el));
+
+            // Frame-accurate choreography: 3 frames (~50ms) stagger, 40px drop with bounce, then roof lift
+            const startTime = performance.now();
+            const STAGGER_MS = 50; // 3 frames @ 60fps
+            const DROP_MS = 380;
+            const totalBuildMs = scene.blocks.length * STAGGER_MS + DROP_MS;
+            const ROOF_LIFT_START = totalBuildMs + 120;
+            const ROOF_LIFT_MS = 450;
+
+            function tick(now) {
+                const elapsed = now - startTime;
+
+                // Drop-in blocks from 40px above with bounce
+                scene.blocks.forEach((b, i) => {
+                    const localT = (elapsed - i * STAGGER_MS) / DROP_MS;
+                    if (localT <= 0) {
+                        b.el.setAttribute('opacity', '0');
+                        b.el.setAttribute('transform', 'translate(0, -40)');
+                    } else if (localT < 1) {
+                        const yOff = -40 * (1 - easeOutBounce(localT));
+                        b.el.setAttribute('opacity', '1');
+                        b.el.setAttribute('transform', `translate(0, ${yOff.toFixed(2)})`);
+                    } else {
+                        b.el.setAttribute('opacity', '1');
+                        b.el.setAttribute('transform', 'translate(0, 0)');
+                    }
+                });
+
+                // Roof drop-in + roof-lift reveal
+                scene.roofs.forEach((r, i) => {
+                    const dropT = (elapsed - (scene.blocks.length + i) * STAGGER_MS) / DROP_MS;
+                    if (dropT <= 0) {
+                        r.setAttribute('opacity', '0');
+                    } else if (elapsed < ROOF_LIFT_START) {
+                        const t = Math.min(1, dropT);
+                        const yOff = -40 * (1 - easeOutBounce(t));
+                        r.setAttribute('opacity', '1');
+                        r.setAttribute('transform', `translate(0, ${yOff.toFixed(2)})`);
+                    } else {
+                        const liftT = Math.min(1, (elapsed - ROOF_LIFT_START) / ROOF_LIFT_MS);
+                        const ease = 1 - Math.pow(1 - liftT, 3);
+                        const yLift = -58 * ease;
+                        const op = 1 - 0.82 * ease;
+                        r.setAttribute('opacity', op.toFixed(2));
+                        r.setAttribute('transform', `translate(0, ${yLift.toFixed(2)})`);
+                    }
+                });
+
+                // Reveal interiors when roof lifts
+                if (scene.interiors.length > 0) {
+                    const intT = Math.max(0, Math.min(1, (elapsed - ROOF_LIFT_START + 80) / 300));
+                    scene.interiors.forEach(el => el.setAttribute('opacity', intT.toFixed(2)));
+                }
+
+                // Reveal thin leader-line labels
+                const lblStart = scene.roofs.length > 0 ? ROOF_LIFT_START + 180 : totalBuildMs - 80;
+                const lblT = Math.max(0, Math.min(1, (elapsed - lblStart) / 320));
+                scene.labels.forEach(el => el.setAttribute('opacity', lblT.toFixed(2)));
+
+                if (elapsed < lblStart + 400) {
+                    animRaf = requestAnimationFrame(tick);
+                } else {
+                    animRaf = null;
+                }
+            }
+
+            animRaf = requestAnimationFrame(tick);
+        }
+
+        function stopSeries() {
+            if (seriesTimer) {
+                clearInterval(seriesTimer);
+                seriesTimer = null;
+            }
+            isSeriesPlaying = false;
+            btnSeries.textContent = 'Play Series';
+        }
+
+        function toggleSeries() {
+            if (isSeriesPlaying) {
+                stopSeries();
+                return;
+            }
+            isSeriesPlaying = true;
+            btnSeries.textContent = 'Pause Series';
+            playEpisode(currentEp);
+            seriesTimer = setInterval(() => {
+                if (currentEp < EPISODES.length - 1) {
+                    playEpisode(currentEp + 1);
+                } else {
+                    stopSeries();
+                }
+            }, 5200);
+        }
+
+        btnPrev.addEventListener('click', () => { stopSeries(); playEpisode(currentEp - 1); });
+        btnNext.addEventListener('click', () => { stopSeries(); playEpisode(currentEp + 1); });
+        btnReplay.addEventListener('click', () => playEpisode(currentEp));
+        btnSeries.addEventListener('click', toggleSeries);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') { stopSeries(); playEpisode(currentEp + 1); }
+            else if (e.key === 'ArrowLeft') { stopSeries(); playEpisode(currentEp - 1); }
+            else if (e.key === ' ') { e.preventDefault(); toggleSeries(); }
+            else if (e.key.toLowerCase() === 'r') playEpisode(currentEp);
+        });
+
+        // Start Episode 1 immediately
+        playEpisode(0);
+    })();
+    </script>
+</body>
+</html>
