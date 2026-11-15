@@ -373,11 +373,10 @@
         }
 
         // 3-tone flat-shaded isometric prism
-        function createIsoBox(x, y, z, dx, dy, dz, paletteName = 'silver', strokeW = 1.2) {
+        function createIsoBox(x, y, z, dx, dy, dz, paletteName = 'silver', strokeW = 1.0) {
             const pal = PALETTES[paletteName] || PALETTES.silver;
             const g = svgEl('g');
 
-            // 8 corners
             const p001 = iso(x,      y,      z + dz);
             const p101 = iso(x + dx, y,      z + dz);
             const p111 = iso(x + dx, y + dy, z + dz);
@@ -392,18 +391,112 @@
                 points: ptsStr([p001, p101, p111, p011]),
                 fill: pal.top, stroke: INK, 'stroke-width': strokeW, 'stroke-linejoin': 'round'
             }));
-            // Left face (mid: x fixed? Wait: y+dy faces bottom-left in standard iso)
+            // Left face (mid)
             g.appendChild(svgEl('polygon', {
                 points: ptsStr([p011, p111, p110, p010]),
                 fill: pal.left, stroke: INK, 'stroke-width': strokeW, 'stroke-linejoin': 'round'
             }));
-            // Right face (dark: x+dx faces bottom-right)
+            // Right face (dark)
             g.appendChild(svgEl('polygon', {
                 points: ptsStr([p101, p111, p110, p100]),
                 fill: pal.right, stroke: INK, 'stroke-width': strokeW, 'stroke-linejoin': 'round'
             }));
 
             return g;
+        }
+
+        // Voxel / little-block scene builder with painter's-algorithm depth sorting
+        function createSceneBuilder() {
+            const blocks = [];
+            const roofs = [];
+            const interiors = [];
+
+            function pushItem(target, x, y, z, dx, dy, dz, palette, wave = 0, strokeW = 0.95) {
+                target.push({
+                    x, y, z, dx, dy, dz,
+                    cx: x + dx * 0.5,
+                    cy: y + dy * 0.5,
+                    cz: z + dz * 0.5,
+                    wave,
+                    el: createIsoBox(x, y, z, dx, dy, dz, palette, strokeW)
+                });
+            }
+
+            function sortDepth(arr) {
+                return arr.sort((a, b) => {
+                    const da = a.cx + a.cy;
+                    const db = b.cx + b.cy;
+                    if (Math.abs(da - db) > 0.01) return da - db;
+                    if (Math.abs(a.cz - b.cz) > 0.01) return a.cz - b.cz;
+                    return a.cx - b.cx;
+                });
+            }
+
+            // Miniature astronaut / crew figure (3 little blocks)
+            function addCrew(target, x, y, z, wave) {
+                pushItem(target, x,     y,     z,      7, 7, 9,  'slate',  wave, 0.8); // suit torso
+                pushItem(target, x - 1, y - 1, z + 9,  9, 9, 8,  'ground', wave, 0.8); // helmet
+                pushItem(target, x + 2, y + 5, z + 11, 5, 4, 4,  'accent', wave, 0.7); // gold visor
+            }
+
+            // Miniature branching voxel plant
+            function addPlant(target, x, y, z, height, wave) {
+                for (let i = 0; i < height; i++) {
+                    pushItem(target, x, y, z + i * 7, 6, 6, 7, 'slate', wave + i * 0.3, 0.75);
+                }
+                const topZ = z + height * 7;
+                pushItem(target, x - 8, y,     topZ - 4, 8, 6, 5, 'accent', wave + 1, 0.75);
+                pushItem(target, x + 6, y,     topZ - 2, 8, 6, 5, 'accent', wave + 1, 0.75);
+                pushItem(target, x,     y - 8, topZ,     6, 8, 5, 'accent', wave + 1.5, 0.75);
+                pushItem(target, x,     y + 6, topZ,     6, 8, 5, 'accent', wave + 1.5, 0.75);
+                pushItem(target, x - 1, y - 1, topZ + 4, 8, 8, 5, 'accent', wave + 2, 0.75);
+            }
+
+            // Miniature mushroom (stem + stepped cap)
+            function addMushroom(target, x, y, z, wave) {
+                pushItem(target, x + 2, y + 2, z,      5, 5, 8, 'ground', wave, 0.75);
+                pushItem(target, x - 2, y - 2, z + 8, 13, 13, 5, 'accent', wave + 0.5, 0.8);
+                pushItem(target, x + 1, y + 1, z + 13, 7, 7, 3, 'accent', wave + 1, 0.75);
+            }
+
+            // Tiled voxel roof grid (lifts off cleanly)
+            function addTiledRoof(x, y, z, nx, ny, tileSize, gap, palMain, palTrim) {
+                for (let ix = 0; ix < nx; ix++) {
+                    for (let iy = 0; iy < ny; iy++) {
+                        const isEdge = ix === 0 || iy === 0 || ix === nx - 1 || iy === ny - 1;
+                        pushItem(
+                            roofs,
+                            x + ix * tileSize,
+                            y + iy * tileSize,
+                            z + (isEdge ? 0 : 4),
+                            tileSize - gap,
+                            tileSize - gap,
+                            isEdge ? 8 : 6,
+                            isEdge ? palTrim : palMain,
+                            0,
+                            0.85
+                        );
+                    }
+                }
+            }
+
+            return {
+                box: (x, y, z, dx, dy, dz, pal, wave = 0, sw = 0.95) => pushItem(blocks, x, y, z, dx, dy, dz, pal, wave, sw),
+                interior: (x, y, z, dx, dy, dz, pal, sw = 0.85) => pushItem(interiors, x, y, z, dx, dy, dz, pal, 0, sw),
+                roof: (x, y, z, dx, dy, dz, pal, sw = 0.9) => pushItem(roofs, x, y, z, dx, dy, dz, pal, 0, sw),
+                addCrew: (x, y, z, wave) => addCrew(blocks, x, y, z, wave),
+                addPlant: (x, y, z, h, wave) => addPlant(blocks, x, y, z, h, wave),
+                addInteriorPlant: (x, y, z, h) => addPlant(interiors, x, y, z, h, 0),
+                addInteriorMushroom: (x, y, z) => addMushroom(interiors, x, y, z, 0),
+                addTiledRoof,
+                finalize() {
+                    return {
+                        blocks: sortDepth(blocks),
+                        interiors: sortDepth(interiors).map(i => i.el),
+                        roofs: sortDepth(roofs).map(r => r.el)
+                    };
+                }
+            };
         }
 
         // Thin leader-line annotation
@@ -442,116 +535,279 @@
             return n1 * (t -= 2.625 / d1) * t + 0.984375;
         }
 
-        // Episode Definitions (100% grounded in analysis/esm_model.py)
+        // Episode Definitions (100% grounded in analysis/esm_model.py & manuscript)
         const EPISODES = [
             {
                 pill: '1. ESM Equation',
                 kicker: 'Episode 1 of 5 · NASA BVAD Cost Blocks',
                 title: 'Anatomy of the ESM Equation',
-                sub: 'Direct regolith starts lighter (420 kg) but pays massive monthly water & volume penalties. Sintered ceramic ISRU starts at 1,850 kg and flattens consumables.',
+                sub: 'Direct regolith starts light (420 kg) but pays massive monthly water & crew-time penalties. Sintered ceramic ISRU starts at 1,850 kg and flattens consumables.',
                 formula: 'ESM = M + V·Cv + P·Cp + C·Cc + T·Ct',
-                cam: { x: 0, y: 18 },
+                cam: { x: 0, y: 20 },
                 build() {
-                    const blocks = [];
+                    const sb = createSceneBuilder();
                     const labels = [];
 
-                    // Base pads
-                    blocks.push({ el: createIsoBox(-240, -110, -14, 180, 220, 14, 'ground') });
-                    blocks.push({ el: createIsoBox(60, -110, -14, 180, 220, 14, 'ground') });
+                    // Base terrain pads (tiled little ground blocks)
+                    for (let x = -236; x <= -68; x += 28) {
+                        for (let y = -104; y <= 76; y += 28) {
+                            sb.box(x, y, -10, 26, 26, 10, 'ground', 0);
+                        }
+                    }
+                    for (let x = 56; x <= 224; x += 28) {
+                        for (let y = -104; y <= 76; y += 28) {
+                            sb.box(x, y, -10, 26, 26, 10, 'ground', 0);
+                        }
+                    }
 
-                    // Left: Direct Regolith (420 kg init, 12.5 m3 vol, 120 kg/mo H2O)
-                    blocks.push({ el: createIsoBox(-210, -80, 0, 120, 160, 22, 'slate') }); // M = 420 kg
-                    blocks.push({ el: createIsoBox(-200, -70, 22, 100, 140, 48, 'silver') }); // V = 12.5 m3
-                    blocks.push({ el: createIsoBox(-185, -55, 70, 70, 110, 68, 'accent') }); // 120 kg/mo H2O + 40 hr/mo crew
+                    // LEFT DIORAMA: Direct Regolith (M=420 kg, V=12.5 m3, 120 kg/mo H2O, 40 hr/mo crew)
+                    // 1) Voxel Lunar Scoop Rover
+                    sb.box(-220, 32, 0, 8, 8, 8, 'ink', 2);
+                    sb.box(-192, 32, 0, 8, 8, 8, 'ink', 2);
+                    sb.box(-220, 56, 0, 8, 8, 8, 'ink', 2);
+                    sb.box(-192, 56, 0, 8, 8, 8, 'ink', 2);
+                    sb.box(-222, 34, 8, 38, 28, 10, 'silver', 3); // chassis
+                    sb.box(-214, 38, 18, 18, 18, 10, 'slate', 4);  // mast
+                    sb.box(-184, 42, 12, 14, 12, 6, 'accent', 5);  // scoop arm
+                    sb.box(-172, 38, 4,  10, 20, 10, 'accent', 6); // scoop bucket
 
-                    // Right: Sintered Ceramic ISRU (1850 kg init, 4.2 m3 vol, 18 kg/mo H2O)
-                    blocks.push({ el: createIsoBox(90, -80, 0, 120, 160, 62, 'slate') }); // M = 1850 kg
-                    blocks.push({ el: createIsoBox(105, -65, 62, 90, 130, 18, 'silver') }); // V = 4.2 m3
-                    blocks.push({ el: createIsoBox(120, -50, 80, 60, 100, 14, 'accent') }); // 18 kg/mo H2O + 6 hr/mo crew
+                    // 2) Jagged Loose Regolith Dust Heap (many little dark/slate cubes)
+                    const dustCoords = [
+                        [-158, 26, 0], [-144, 26, 0], [-130, 26, 0], [-158, 40, 0], [-144, 40, 0], [-130, 40, 0],
+                        [-158, 54, 0], [-144, 54, 0], [-130, 54, 0],
+                        [-152, 32, 12], [-138, 32, 12], [-152, 46, 12], [-138, 46, 12],
+                        [-146, 38, 24]
+                    ];
+                    dustCoords.forEach(([x, y, z], i) => {
+                        sb.box(x, y, z, 12, 12, 12, i % 3 === 0 ? 'ink' : 'slate', 4 + Math.floor(z / 6));
+                    });
 
-                    labels.push(createLeader(-150, 0, 138, -280, -140, 'Direct Regolith: 11,910 kg @ 60 mo', 'M=420 kg · V=12.5 m³ · 120 kg/mo H₂O', 'end'));
-                    labels.push(createLeader(-150, 0, 45, -280, -35, 'Unpressurized/Loose Dust Penalty', '40 crew-hr/mo · 145 kg/yr buffers', 'end'));
-                    labels.push(createLeader(150, 0, 94, 240, -110, 'Sintered Ceramic ISRU: 3,848 kg @ 60 mo', 'M=1,850 kg · V=4.2 m³ · 18 kg/mo H₂O', 'start'));
-                    labels.push(createLeader(150, 0, 30, 240, -5, 'Breakeven: 9.4 Months (Nuclear)', 'Net Savings: 8,062 kg by Month 60', 'start'));
+                    // 3) Tall 12-Block Water Drum Stack (120 kg/mo H2O penalty)
+                    for (let iz = 0; iz < 4; iz++) {
+                        for (let ix = 0; ix < 2; ix++) {
+                            for (let iy = 0; iy < 2; iy++) {
+                                const bx = -205 + ix * 18;
+                                const by = -78 + iy * 18;
+                                const bz = iz * 16;
+                                sb.box(bx, by, bz, 15, 15, 13, 'silver', 7 + iz * 2);
+                                sb.box(bx + 2, by + 2, bz + 13, 11, 11, 2, 'accent', 7 + iz * 2);
+                            }
+                        }
+                    }
 
-                    return { blocks, roofs: [], interiors: [], labels };
+                    // 4) 4 Tiny Crew-Time Figures (40 hr/mo maintenance)
+                    sb.addCrew(-145, -72, 0, 10);
+                    sb.addCrew(-125, -72, 0, 11);
+                    sb.addCrew(-145, -50, 0, 12);
+                    sb.addCrew(-125, -50, 0, 13);
+
+                    // RIGHT DIORAMA: Sintered Ceramic ISRU (M=1850 kg, V=4.2 m3, 18 kg/mo H2O, 6 hr/mo crew)
+                    // 1) Voxel Sintering Kiln with glowing #ef8354 hearth
+                    for (let ix = 0; ix < 3; ix++) {
+                        for (let iy = 0; iy < 3; iy++) {
+                            sb.box(74 + ix * 16, -78 + iy * 16, 0, 15, 15, 14, 'slate', 2);
+                        }
+                    }
+                    // Kiln chamber walls & glowing core
+                    sb.box(74, -78, 14, 15, 47, 22, 'slate', 4);
+                    sb.box(74, -78, 14, 47, 15, 22, 'slate', 4);
+                    sb.box(90, -62, 14, 24, 24, 16, 'accent', 5); // glowing 1100°C microwave hearth
+                    sb.box(80, -72, 36, 36, 36, 8,  'ink', 6);    // kiln hood
+                    sb.box(92, -60, 44, 12, 12, 14, 'silver', 7); // exhaust stack
+
+                    // 2) Neat Pallet of Sintered LECA Ceramic Bricks
+                    for (let iz = 0; iz < 2; iz++) {
+                        for (let ix = 0; ix < 3; ix++) {
+                            for (let iy = 0; iy < 2; iy++) {
+                                sb.box(144 + ix * 14, -74 + iy * 16, iz * 11, 12, 14, 9, 'silver', 8 + iz);
+                            }
+                        }
+                    }
+
+                    // 3) Compact Closed-Loop Hydro/Ceramic Rack with Growing Voxel Crops
+                    sb.box(82, 24, 0, 68, 44, 12, 'slate', 9);
+                    sb.addPlant(92,  36, 12, 2, 11);
+                    sb.addPlant(114, 36, 12, 2, 12);
+                    sb.addPlant(134, 36, 12, 2, 13);
+
+                    // 4) Only 2 Water Drums (18 kg/mo H2O) + 1 Crew Figure (6 hr/mo)
+                    sb.box(176, 34, 0, 15, 15, 13, 'silver', 10);
+                    sb.box(178, 36, 13, 11, 11, 2, 'accent', 10);
+                    sb.box(176, 54, 0, 15, 15, 13, 'silver', 11);
+                    sb.box(178, 56, 13, 11, 11, 2, 'accent', 11);
+                    sb.addCrew(204, 44, 0, 12);
+
+                    labels.push(createLeader(-188, -60, 64, -270, -145, 'Direct Regolith: 11,910 kg @ 60 mo', '120 kg/mo H₂O drums + 40 hr/mo crew', 'end'));
+                    labels.push(createLeader(-145, 40, 28, -270, -35, 'Loose Dust + Scooped Regolith', 'M=420 kg · V=12.5 m³ · 145 kg/yr buffer', 'end'));
+                    labels.push(createLeader(98, -54, 52, 240, -135, 'Sintered Ceramic ISRU: 3,848 kg @ 60 mo', '1,850 kg kiln + neat LECA brick pallet', 'start'));
+                    labels.push(createLeader(184, 44, 16, 240, -25, 'Breakeven: 9.4 Months (Nuclear)', '18 kg/mo H₂O · 6 hr/mo · Saves 8,062 kg', 'start'));
+
+                    return { ...sb.finalize(), labels };
                 }
             },
             {
                 pill: '2. 1/6 g Root Physics',
                 kicker: 'Episode 2 of 5 · Lift-the-Roof Pore Reveal',
                 title: '1/6 g Root-Zone Physics & Pore Scaling',
-                sub: 'Lifting the BLSS dome roof reveals why raw dust suffocates roots at 1/6 g (400 cm capillary rise) while 0.5–2.0 mm sintered macropores keep Dp/Do > 0.02.',
+                sub: 'Lifting the tiled BLSS roof reveals tightly packed raw dust suffocating roots (Dp/Do = 0.0007) vs. open sintered LECA macropores & capillary wicks (0.0862).',
                 formula: 'αg = α1g·(g/gE)  |  Dp/Do = (φ - θ)^2.5 / φ ≥ 0.02',
-                cam: { x: 0, y: 24 },
+                cam: { x: 0, y: 26 },
                 build() {
-                    const blocks = [];
-                    const roofs = [];
-                    const interiors = [];
+                    const sb = createSceneBuilder();
                     const labels = [];
 
-                    // Platform
-                    blocks.push({ el: createIsoBox(-170, -140, -14, 340, 280, 14, 'ground') });
-                    // Dome walls (split front/back frame)
-                    blocks.push({ el: createIsoBox(-130, -110, 0, 260, 20, 78, 'silver') });
-                    blocks.push({ el: createIsoBox(-130, -110, 0, 20, 220, 78, 'silver') });
-                    blocks.push({ el: createIsoBox(-130, 90, 0, 260, 20, 24, 'slate') });
-                    blocks.push({ el: createIsoBox(110, -110, 0, 20, 220, 24, 'slate') });
+                    // Ground tiles
+                    for (let x = -168; x <= 140; x += 28) {
+                        for (let y = -126; y <= 98; y += 28) {
+                            sb.box(x, y, -10, 26, 26, 10, 'ground', 0);
+                        }
+                    }
 
-                    // Interior: Left Raw Regolith Tray vs Right Sintered Ceramic Rack
-                    interiors.push(createIsoBox(-95, -60, 0, 75, 120, 32, 'ink')); // waterlogged raw dust
-                    interiors.push(createIsoBox(15, -60, 0, 80, 120, 16, 'silver')); // sintered base
-                    interiors.push(createIsoBox(22, -48, 16, 22, 96, 36, 'accent')); // 30-60 um wick pin
-                    interiors.push(createIsoBox(56, -48, 16, 22, 96, 36, 'accent')); // 30-60 um wick pin
+                    // Cutaway Dome Frame (voxel wall blocks)
+                    for (let x = -132; x <= 108; x += 24) {
+                        sb.box(x, -108, 0, 22, 16, 76, 'silver', 2); // back-left wall
+                        sb.box(x, 88,   0, 22, 16, 18, 'slate',  2); // front-right low curb
+                    }
+                    for (let y = -84; y <= 60; y += 24) {
+                        sb.box(-132, y, 0, 16, 22, 76, 'silver', 2); // back-right wall
+                        sb.box(116,  y, 0, 16, 22, 18, 'slate',  2); // front-left low curb
+                    }
 
-                    // Roof that lifts off!
-                    roofs.push(createIsoBox(-136, -116, 78, 272, 232, 22, 'slate'));
-                    roofs.push(createIsoBox(-96, -76, 100, 192, 152, 16, 'accent'));
+                    // Tiled Voxel Roof (7x6 tiles that lift off as a unit)
+                    sb.addTiledRoof(-136, -112, 76, 11, 9, 24, 2, 'slate', 'accent');
 
-                    labels.push(createLeader(-58, 0, 32, -255, -70, 'Raw Dust @ 1/6 g: Dp/Do = 0.0007', '400 cm capillary rise → Root Hypoxia', 'end'));
-                    labels.push(createLeader(55, 0, 52, 235, -80, 'Sintered Ceramic: Dp/Do = 0.0862', '30–60 µm wicks + 0.5–2.0 mm air pores', 'start'));
-                    labels.push(createLeader(0, -110, 138, 235, -165, 'Roof Lifts: Arya–Paris Dual Porosity', '123× higher O₂ diffusion than raw dust', 'start'));
+                    // INTERIOR LEFT: Packed Raw Dust (4x4x3 tightly packed cubes = 48 little blocks, zero pores)
+                    for (let ix = 0; ix < 4; ix++) {
+                        for (let iy = 0; iy < 4; iy++) {
+                            for (let iz = 0; iz < 3; iz++) {
+                                const isWaterPocket = (ix + iy + iz) % 5 === 0;
+                                sb.interior(
+                                    -102 + ix * 18,
+                                    -54 + iy * 18,
+                                    iz * 13,
+                                    17, 17, 12,
+                                    isWaterPocket ? 'slate' : 'ink'
+                                );
+                            }
+                        }
+                    }
+                    // Stunted wilted 2-block seedling
+                    sb.interior(-70, -24, 39, 5, 5, 8, 'slate');
+                    sb.interior(-65, -24, 44, 6, 5, 4, 'accent');
 
-                    return { blocks, roofs, interiors, labels };
+                    // INTERIOR RIGHT: Porous Sintered LECA Beads (checkerboard open macropores!) + Capillary Wicks + Thriving Crops
+                    for (let ix = 0; ix < 4; ix++) {
+                        for (let iy = 0; iy < 4; iy++) {
+                            for (let iz = 0; iz < 3; iz++) {
+                                // Leave open pore channels between LECA beads!
+                                if ((ix + iy + iz) % 2 === 0) {
+                                    sb.interior(
+                                        22 + ix * 20,
+                                        -54 + iy * 20,
+                                        iz * 13,
+                                        15, 15, 11,
+                                        'silver'
+                                    );
+                                }
+                            }
+                        }
+                    }
+                    // 30-60 um capillary wick pins rising through LECA bed
+                    sb.interior(42, -34, 0, 8, 8, 42, 'accent');
+                    sb.interior(82, -14, 0, 8, 8, 42, 'accent');
+                    // Thriving branching voxel plants
+                    sb.addInteriorPlant(38, -34, 40, 3);
+                    sb.addInteriorPlant(78, -14, 40, 3);
+
+                    labels.push(createLeader(-70, -20, 46, -255, -80, 'Raw Dust @ 1/6 g: Dp/Do = 0.0007', '48 packed dust blocks · 400 cm capillary rise', 'end'));
+                    labels.push(createLeader(62, -18, 56, 235, -85, 'Sintered LECA: Dp/Do = 0.0862', 'Open 0.5–2 mm pores + 30–60 µm wick pins', 'start'));
+                    labels.push(createLeader(0, -108, 125, 235, -165, 'Roof Lifts: Arya–Paris Dual Porosity', '123× higher O₂ diffusion · Healthy crops', 'start'));
+
+                    return { ...sb.finalize(), labels };
                 }
             },
             {
                 pill: '3. Crew & Power Scaling',
                 kicker: 'Episode 3 of 5 · Sublinear ISRU Scaling',
                 title: 'Crew-Size (3 → 6 → 12) & Power Scaling',
-                sub: 'Conventional systems scale linearly with crew size. Sintered ISRU plant mass scales sublinearly (1850 + 150·(crew-6) kg), halving breakeven time at 12 crew.',
+                sub: 'Solar + RFC arrays sprawl for the 14-day lunar night (237 kg/kWe), while compact Kilopower fission (54 kg/kWe) + sublinear ISRU halves breakeven at 12 crew.',
                 formula: 'M_ISRU = 1850 + 150·(Crew - 6) kg  |  Cp: 54 vs 237 kg/kWe',
-                cam: { x: -10, y: 20 },
+                cam: { x: -8, y: 22 },
                 build() {
-                    const blocks = [];
-                    const roofs = [];
-                    const interiors = [];
+                    const sb = createSceneBuilder();
                     const labels = [];
 
                     // Ground pads
-                    blocks.push({ el: createIsoBox(-250, -110, -14, 150, 220, 14, 'ground') });
-                    blocks.push({ el: createIsoBox(-60, -110, -14, 310, 220, 14, 'ground') });
+                    for (let x = -252; x <= -112; x += 28) {
+                        for (let y = -108; y <= 88; y += 28) sb.box(x, y, -10, 26, 26, 10, 'ground', 0);
+                    }
+                    for (let x = -60; x <= 220; x += 28) {
+                        for (let y = -108; y <= 88; y += 28) sb.box(x, y, -10, 26, 26, 10, 'ground', 0);
+                    }
 
-                    // Power Yard: Nuclear (Cp=54) vs Solar/RFC (Cp=237)
-                    blocks.push({ el: createIsoBox(-215, -75, 0, 75, 75, 42, 'accent') }); // Kilopower 54 kg/kWe
-                    blocks.push({ el: createIsoBox(-225, 25, 0, 95, 65, 85, 'slate') }); // Solar/RFC 14-day night 237 kg/kWe
+                    // POWER YARD (Left)
+                    // 1) Compact Kilopower Nuclear Reactor (Cp = 54 kg/kWe)
+                    sb.box(-202, -68, 0,  26, 26, 28, 'ink', 2);    // reactor core
+                    sb.box(-197, -63, 28, 16, 16, 18, 'accent', 3); // Stirling converter
+                    // 4 radiator fin wings
+                    sb.box(-226, -60, 32, 24, 6, 16, 'silver', 4);
+                    sb.box(-178, -60, 32, 24, 6, 16, 'silver', 4);
+                    sb.box(-194, -92, 32, 6, 24, 16, 'silver', 4);
+                    sb.box(-194, -44, 32, 6, 24, 16, 'silver', 4);
 
-                    // Crew scaling modules: 3, 6, 12 crew
-                    blocks.push({ el: createIsoBox(-25, -75, 0, 65, 150, 38, 'silver') }); // 3 crew
-                    blocks.push({ el: createIsoBox(60, -75, 0, 75, 150, 56, 'slate') }); // 6 crew
-                    blocks.push({ el: createIsoBox(155, -75, 0, 85, 150, 78, 'accent') }); // 12 crew
+                    // 2) Sprawling Solar + RFC 14-Day Night Array (Cp = 237 kg/kWe)
+                    for (let ix = 0; ix < 4; ix++) {
+                        for (let iy = 0; iy < 3; iy++) {
+                            sb.box(-236 + ix * 28, 10 + iy * 24, 0, 24, 20, 4, 'slate', 5 + ix);
+                            sb.box(-234 + ix * 28, 12 + iy * 24, 4, 20, 16, 3, 'ink',   5 + ix);
+                        }
+                    }
+                    // Heavy RFC energy-storage tanks
+                    for (let i = 0; i < 3; i++) {
+                        sb.box(-232 + i * 24, 82, 0, 18, 18, 28, 'silver', 9);
+                        sb.box(-230 + i * 24, 84, 28, 14, 14, 4, 'accent', 9);
+                    }
 
-                    // Roofs on 12-crew module lifting to show 10.9 mo breakeven
-                    roofs.push(createIsoBox(152, -78, 78, 91, 156, 14, 'ink'));
-                    interiors.push(createIsoBox(168, -55, 78, 56, 110, 12, 'silver'));
+                    // CREW SCALING BAYS (Right): 3 -> 6 -> 12 Crew
+                    // 3-Crew Bay (1 module + 3 crew figures)
+                    for (let iy = 0; iy < 3; iy++) sb.box(-40, -68 + iy * 26, 0, 46, 24, 28, 'silver', 4 + iy);
+                    sb.addPlant(-24, -56, 28, 1, 7);
+                    for (let c = 0; c < 3; c++) sb.addCrew(-38 + c * 14, 22, 0, 8 + c);
 
-                    labels.push(createLeader(-178, -38, 42, -265, -115, 'Nuclear Fission (Cp = 54 kg/kWe)', 'Breakeven: 9.4 mo vs raw · 20.5 mo vs hydro', 'end'));
-                    labels.push(createLeader(-178, 58, 85, -265, 15, 'Solar + RFC (Cp = 237 kg/kWe)', '14-day lunar night shifts breakeven to 18–22 mo', 'end'));
-                    labels.push(createLeader(8, 0, 38, 120, -170, '3 Crew: 33.7 mo vs Hydro', 'Linear scaling penalized at small scale', 'start'));
-                    labels.push(createLeader(98, 0, 56, 235, -95, '6 Crew: 20.5 mo vs Hydro', '1.00 kg ESM / kg edible @ 60 mo', 'start'));
-                    labels.push(createLeader(198, 0, 78, 235, -15, '12 Crew: 10.9 mo vs Hydro', 'Sublinear +150 kg/crew plant scaling', 'start'));
+                    // 6-Crew Bay (2-story module + 6 crew figures)
+                    for (let iz = 0; iz < 2; iz++) {
+                        for (let iy = 0; iy < 3; iy++) {
+                            sb.box(34, -68 + iy * 26, iz * 24, 52, 24, 22, iz === 0 ? 'slate' : 'silver', 6 + iy + iz * 2);
+                        }
+                    }
+                    sb.addPlant(52, -52, 46, 2, 10);
+                    for (let c = 0; c < 6; c++) sb.addCrew(28 + (c % 3) * 15, 20 + Math.floor(c / 3) * 18, 0, 10 + c * 0.5);
 
-                    return { blocks, roofs, interiors, labels };
+                    // 12-Crew Bay (4-module cluster + roof-lift grow racks + 12 crew figures)
+                    for (let ix = 0; ix < 2; ix++) {
+                        for (let iy = 0; iy < 3; iy++) {
+                            sb.box(116 + ix * 44, -68 + iy * 26, 0, 42, 24, 46, 'slate', 8 + ix + iy);
+                        }
+                    }
+                    // Multi-tier interior grow racks revealed on roof lift
+                    for (let ix = 0; ix < 2; ix++) {
+                        for (let iy = 0; iy < 2; iy++) {
+                            sb.interior(124 + ix * 40, -56 + iy * 32, 46, 28, 22, 8, 'silver');
+                            sb.addInteriorPlant(132 + ix * 40, -48 + iy * 32, 54, 2);
+                        }
+                    }
+                    sb.addTiledRoof(114, -70, 52, 4, 4, 23, 2, 'accent', 'ink');
+                    for (let c = 0; c < 12; c++) {
+                        sb.addCrew(112 + (c % 4) * 16, 18 + Math.floor(c / 4) * 18, 0, 12 + c * 0.3);
+                    }
+
+                    labels.push(createLeader(-189, -55, 46, -268, -125, 'Nuclear Fission (Cp = 54 kg/kWe)', 'Compact 4-fin core · 9.4 mo breakeven', 'end'));
+                    labels.push(createLeader(-190, 52, 28, -268, 25, 'Solar + RFC (Cp = 237 kg/kWe)', '14-day night array · 18–22 mo breakeven', 'end'));
+                    labels.push(createLeader(-17, -40, 32, 80, -172, '3 Crew: 33.7 mo vs Hydro', '3 crew · Linear baseline penalty', 'start'));
+                    labels.push(createLeader(60, -40, 52, 235, -105, '6 Crew: 20.5 mo vs Hydro', '6 crew · 1.00 kg ESM / kg edible', 'start'));
+                    labels.push(createLeader(158, -32, 74, 235, -15, '12 Crew: 10.9 mo vs Hydro', '12 crew · Sublinear +150 kg/crew plant', 'start'));
+
+                    return { ...sb.finalize(), labels };
                 }
             },
             {
@@ -562,63 +818,156 @@
                 formula: 'Mars: Transit = 1.15×  |  Raw Entrapment = 0.92×',
                 cam: { x: 0, y: 20 },
                 build() {
-                    const blocks = [];
+                    const sb = createSceneBuilder();
                     const labels = [];
 
-                    // Moon Base Diorama (Left)
-                    blocks.push({ el: createIsoBox(-235, -110, -14, 180, 220, 14, 'silver') });
-                    blocks.push({ el: createIsoBox(-200, -70, 0, 110, 140, 48, 'slate') });
-                    blocks.push({ el: createIsoBox(-175, -45, 48, 60, 90, 22, 'accent') });
+                    // MOON BASE (Left, 0.16 g)
+                    for (let x = -236; x <= -68; x += 28) {
+                        for (let y = -104; y <= 76; y += 28) sb.box(x, y, -10, 26, 26, 10, 'silver', 0);
+                    }
+                    // Crater rim stepped blocks around perimeter
+                    const moonRim = [[-236,-104],[-208,-104],[-180,-104],[-236,-76],[-236,-48],[-68,-104],[-68,-76]];
+                    moonRim.forEach(([x, y], i) => sb.box(x, y, 0, 24, 24, 12 + (i % 2) * 8, 'slate', 2));
 
-                    // Mars Base Diorama (Right)
-                    blocks.push({ el: createIsoBox(55, -110, -14, 180, 220, 14, 'accent') });
-                    blocks.push({ el: createIsoBox(90, -70, 0, 110, 140, 62, 'slate') });
-                    blocks.push({ el: createIsoBox(115, -45, 62, 60, 90, 28, 'silver') });
+                    // 4-Legged Voxel Lunar Lander
+                    sb.box(-204, -52, 0, 8, 8, 16, 'slate', 3);
+                    sb.box(-164, -52, 0, 8, 8, 16, 'slate', 3);
+                    sb.box(-204, -12, 0, 8, 8, 16, 'slate', 3);
+                    sb.box(-164, -12, 0, 8, 8, 16, 'slate', 3);
+                    sb.box(-200, -48, 16, 40, 40, 18, 'accent', 5); // descent stage
+                    sb.box(-192, -40, 34, 24, 24, 20, 'ground', 6); // ascent cabin
 
-                    labels.push(createLeader(-145, 0, 70, -255, -115, 'Moon (0.16 g): 1.00× Transit Gear', 'Sintered ESM = 3,848 kg @ 60 mo', 'end'));
-                    labels.push(createLeader(-145, 0, 20, -255, -20, 'Severe Capillary Retention (1.00×)', 'High water-trapping in raw regolith', 'end'));
-                    labels.push(createLeader(145, 0, 90, 240, -115, 'Mars (0.38 g): 1.15× Transit Mass', 'Imported hydroponic gear penalized +15%', 'start'));
-                    labels.push(createLeader(145, 0, 32, 240, -20, '0.92× Raw Entrapment, Higher ISRU Payoff', 'In-situ ceramics bypass long-haul mass', 'start'));
+                    // 1.00x Cargo Pallet + Compact ISRU Kiln
+                    sb.box(-128, -42, 0, 18, 18, 16, 'silver', 7);
+                    sb.box(-106, -42, 0, 18, 18, 16, 'silver', 7);
+                    sb.box(-128, -18, 0, 40, 40, 20, 'slate', 8);
+                    sb.box(-118, -8,  20, 20, 20, 12, 'accent', 9);
 
-                    return { blocks, roofs: [], interiors: [], labels };
+                    // MARS BASE (Right, 0.38 g)
+                    for (let x = 56; x <= 224; x += 28) {
+                        for (let y = -104; y <= 76; y += 28) sb.box(x, y, -10, 26, 26, 10, 'accent', 0);
+                    }
+                    // Martian ridge voxels
+                    [[56,-104],[84,-104],[56,-76],[224,-104],[224,-76]].forEach(([x, y], i) => {
+                        sb.box(x, y, 0, 24, 24, 14 + (i % 2) * 10, 'accent', 2);
+                    });
+
+                    // Tall 1.15x Mars Transit Rocket (fins + multi-stage stack)
+                    sb.box(74, -36, 0, 10, 10, 18, 'ink', 3);
+                    sb.box(106, -36, 0, 10, 10, 18, 'ink', 3);
+                    sb.box(74, -4, 0, 10, 10, 18, 'ink', 3);
+                    sb.box(106, -4, 0, 10, 10, 18, 'ink', 3);
+                    sb.box(80, -30, 10, 30, 30, 32, 'ground', 5); // core stage
+                    sb.box(82, -28, 42, 26, 26, 24, 'silver', 6); // upper stage
+                    sb.box(86, -24, 66, 18, 18, 16, 'accent', 7); // fairing
+
+                    // +15% Cargo Stack & Perchlorate Wash Tanks + Sintered Greenhouse
+                    for (let iz = 0; iz < 3; iz++) {
+                        sb.box(138, -46, iz * 14, 16, 16, 12, 'silver', 8 + iz);
+                        sb.box(158, -46, iz * 14, 16, 16, 12, 'slate',  8 + iz);
+                    }
+                    sb.box(138, 10, 0, 62, 46, 18, 'silver', 10);
+                    sb.addPlant(148, 22, 18, 2, 12);
+                    sb.addPlant(174, 22, 18, 2, 12);
+
+                    labels.push(createLeader(-180, -28, 54, -255, -135, 'Moon (0.16 g): 1.00× Transit Gear', '4-leg lander · 3,848 kg Sintered ESM', 'end'));
+                    labels.push(createLeader(-110, 2, 32, -255, -25, 'Severe Capillary Retention (1.00×)', 'High water-trapping in raw lunar dust', 'end'));
+                    labels.push(createLeader(95, -15, 82, 240, -135, 'Mars (0.38 g): 1.15× Transit Mass', 'Tall transit rocket · +15% imported penalty', 'start'));
+                    labels.push(createLeader(168, 32, 30, 240, -25, '0.92× Entrapment, Higher ISRU Payoff', 'Sintered greenhouse + perchlorate wash', 'start'));
+
+                    return { ...sb.finalize(), labels };
                 }
             },
             {
                 pill: '5. Closed-Loop Reset',
                 kicker: 'Episode 5 of 5 · Roof-Off Multitrophic Loop',
                 title: '500°C Pyrolytic Reset & SynCom Loop',
-                sub: 'Lifting the roofs off the Pyrolytic Chamber, Mycoponics Bay, and Winogradsky/Lunar LECA Reactor shows infinite ceramic reuse with >98.5% water recovery.',
+                sub: 'Lifting the tiled roofs off the Pyrolytic Chamber, Mycoponics Bay, and Winogradsky/LECA Reactor reveals infinite ceramic reuse with >98.5% H₂O recovery.',
                 formula: 'Biomass + O2 → 500°C → CO2 + H2O + Ash  |  >98.5% H2O',
                 cam: { x: 0, y: 24 },
                 build() {
-                    const blocks = [];
-                    const roofs = [];
-                    const interiors = [];
+                    const sb = createSceneBuilder();
                     const labels = [];
 
-                    // Shared Outpost Base
-                    blocks.push({ el: createIsoBox(-260, -120, -14, 520, 240, 14, 'ground') });
+                    // Shared Outpost Base Tiles
+                    for (let x = -252; x <= 224; x += 28) {
+                        for (let y = -112; y <= 84; y += 28) {
+                            sb.box(x, y, -10, 26, 26, 10, 'ground', 0);
+                        }
+                    }
 
-                    // Building 1 (Left): 500°C Pyrolytic Chamber
-                    blocks.push({ el: createIsoBox(-230, -80, 0, 120, 160, 54, 'slate') });
-                    interiors.push(createIsoBox(-205, -55, 8, 70, 110, 28, 'accent')); // glowing thermal core
-                    roofs.push(createIsoBox(-234, -84, 54, 128, 168, 16, 'ink'));
+                    // Voxel Transfer Pipe Conduit connecting the 3 chambers
+                    for (let x = -110; x <= -66; x += 14) sb.box(x, -8, 12, 12, 16, 12, 'accent', 4);
+                    for (let x = 62; x <= 106; x += 14)   sb.box(x, -8, 12, 12, 16, 12, 'accent', 6);
 
-                    // Building 2 (Center): Pleurotus Mycoponics Bay
-                    blocks.push({ el: createIsoBox(-60, -80, 0, 120, 160, 54, 'silver') });
-                    interiors.push(createIsoBox(-35, -55, 8, 70, 110, 30, 'accent')); // fungal trays + polyols
-                    roofs.push(createIsoBox(-64, -84, 54, 128, 168, 16, 'slate'));
+                    // CHAMBER 1 (Left): 500°C Pyrolytic Bake-Out
+                    for (let x = -230; x <= -134; x += 24) {
+                        sb.box(x, -76, 0, 22, 16, 52, 'slate', 2);
+                        sb.box(x, 60,  0, 22, 16, 18, 'slate', 2);
+                    }
+                    for (let y = -52; y <= 36; y += 22) {
+                        sb.box(-230, y, 0, 16, 20, 52, 'slate', 2);
+                        sb.box(-126, y, 0, 16, 20, 18, 'slate', 2);
+                    }
+                    // Glowing 500°C ember voxels + rising condensate droplets (>98.5% H2O)
+                    for (let ix = 0; ix < 3; ix++) {
+                        for (let iy = 0; iy < 3; iy++) {
+                            sb.interior(-202 + ix * 22, -40 + iy * 24, 0, 16, 16, 14 + ((ix + iy) % 2) * 8, 'accent');
+                        }
+                    }
+                    sb.interior(-188, -22, 28, 10, 10, 10, 'ground');
+                    sb.interior(-168, -6,  38, 10, 10, 10, 'silver');
+                    sb.addTiledRoof(-234, -80, 52, 5, 6, 25, 2, 'ink', 'accent');
 
-                    // Building 3 (Right): Winogradsky & Lunar LECA Bioleaching Reactor
-                    blocks.push({ el: createIsoBox(110, -80, 0, 120, 160, 54, 'slate') });
-                    interiors.push(createIsoBox(135, -55, 8, 70, 110, 38, 'silver')); // LECA + SynComs
-                    roofs.push(createIsoBox(106, -84, 54, 128, 168, 16, 'accent'));
+                    // CHAMBER 2 (Center): Pleurotus Mycoponics + SynCom Bay
+                    for (let x = -60; x <= 36; x += 24) {
+                        sb.box(x, -76, 0, 22, 16, 52, 'silver', 3);
+                        sb.box(x, 60,  0, 22, 16, 18, 'slate',  3);
+                    }
+                    for (let y = -52; y <= 36; y += 22) {
+                        sb.box(-60, y, 0, 16, 20, 52, 'silver', 3);
+                        sb.box(44,  y, 0, 16, 20, 18, 'slate',  3);
+                    }
+                    // Straw substrate voxels + 4 miniature voxel mushrooms
+                    for (let ix = 0; ix < 3; ix++) {
+                        for (let iy = 0; iy < 3; iy++) {
+                            sb.interior(-34 + ix * 22, -40 + iy * 24, 0, 18, 20, 10, 'ink');
+                        }
+                    }
+                    sb.addInteriorMushroom(-30, -34, 10);
+                    sb.addInteriorMushroom(4,   -34, 10);
+                    sb.addInteriorMushroom(-30, 4,   10);
+                    sb.addInteriorMushroom(4,   4,   10);
+                    sb.addTiledRoof(-64, -80, 52, 5, 6, 25, 2, 'slate', 'silver');
 
-                    labels.push(createLeader(-170, 0, 36, -260, -125, '500°C Pyrolytic Bake-Out', 'Sterilizes biofilms; recovers CO₂ & H₂O', 'end'));
-                    labels.push(createLeader(0, 0, 38, 0, -170, 'Mycoponics + SynCom Inoculation', 'Straw → Protein + Polyol Wetting (Sikes 2026)', 'start'));
-                    labels.push(createLeader(170, 0, 46, 250, -95, 'Winogradsky & Lunar LECA Loop', '>98.5% H₂O · <8 kg/yr buffer vs 145 kg/yr', 'start'));
+                    // CHAMBER 3 (Right): Winogradsky Column & Lunar LECA Loop
+                    for (let x = 110; x <= 206; x += 24) {
+                        sb.box(x, -76, 0, 22, 16, 52, 'slate', 4);
+                        sb.box(x, 60,  0, 22, 16, 18, 'slate', 4);
+                    }
+                    for (let y = -52; y <= 36; y += 22) {
+                        sb.box(110, y, 0, 16, 20, 52, 'slate', 4);
+                        sb.box(214, y, 0, 16, 20, 18, 'slate', 4);
+                    }
+                    // Stratified 4-layer Winogradsky voxel column
+                    sb.interior(136, -34, 0,  22, 22, 12, 'ink');
+                    sb.interior(136, -34, 12, 22, 22, 12, 'slate');
+                    sb.interior(136, -34, 24, 22, 22, 12, 'silver');
+                    sb.interior(136, -34, 36, 22, 22, 10, 'accent');
+                    // Clean porous LECA bead pile ready for reuse
+                    for (let ix = 0; ix < 2; ix++) {
+                        for (let iy = 0; iy < 2; iy++) {
+                            sb.interior(174 + ix * 16, -24 + iy * 20, 0, 12, 12, 10, 'silver');
+                            sb.interior(178 + ix * 16, -18 + iy * 20, 10, 12, 12, 10, 'ground');
+                        }
+                    }
+                    sb.addTiledRoof(106, -80, 52, 5, 6, 25, 2, 'accent', 'ink');
 
-                    return { blocks, roofs, interiors, labels };
+                    labels.push(createLeader(-170, -10, 38, -262, -135, '500°C Pyrolytic Bake-Out', 'Glowing embers + >98.5% H₂O condensate', 'end'));
+                    labels.push(createLeader(-8, -12, 32, 0, -172, 'Mycoponics + SynCom Inoculation', 'Straw → Protein + Polyol Wetting (Sikes 2026)', 'start'));
+                    labels.push(createLeader(166, -12, 46, 248, -100, 'Winogradsky & Lunar LECA Loop', '4-zone column + <8 kg/yr buffer vs 145 kg/yr', 'start'));
+
+                    return { ...sb.finalize(), labels };
                 }
             }
         ];
@@ -673,20 +1022,23 @@
             });
             scene.labels.forEach(el => labelLayer.appendChild(el));
 
-            // Frame-accurate choreography: 3 frames (~50ms) stagger, 40px drop with bounce, then roof lift
+            // Frame-accurate choreography: 3 frames (~50ms) wave stagger, 40px drop with bounce, then roof lift
             const startTime = performance.now();
             const STAGGER_MS = 50; // 3 frames @ 60fps
             const DROP_MS = 380;
-            const totalBuildMs = scene.blocks.length * STAGGER_MS + DROP_MS;
-            const ROOF_LIFT_START = totalBuildMs + 120;
-            const ROOF_LIFT_MS = 450;
+            const maxWave = scene.blocks.reduce((m, b) => Math.max(m, b.wave || 0), 0);
+            const roofWaves = scene.roofs.length > 0 ? 3 : 0;
+            const totalBuildMs = (maxWave + roofWaves) * STAGGER_MS + DROP_MS;
+            const ROOF_LIFT_START = totalBuildMs + 140;
+            const ROOF_LIFT_MS = 480;
 
             function tick(now) {
                 const elapsed = now - startTime;
 
-                // Drop-in blocks from 40px above with bounce
+                // Drop-in blocks from 40px above with bounce, staggered by 3 frames per wave
                 scene.blocks.forEach((b, i) => {
-                    const localT = (elapsed - i * STAGGER_MS) / DROP_MS;
+                    const delay = (b.wave || 0) * STAGGER_MS + (i % 3) * 14;
+                    const localT = (elapsed - delay) / DROP_MS;
                     if (localT <= 0) {
                         b.el.setAttribute('opacity', '0');
                         b.el.setAttribute('transform', 'translate(0, -40)');
@@ -702,7 +1054,8 @@
 
                 // Roof drop-in + roof-lift reveal
                 scene.roofs.forEach((r, i) => {
-                    const dropT = (elapsed - (scene.blocks.length + i) * STAGGER_MS) / DROP_MS;
+                    const roofDelay = (maxWave + 1 + (i % 4) * 0.5) * STAGGER_MS;
+                    const dropT = (elapsed - roofDelay) / DROP_MS;
                     if (dropT <= 0) {
                         r.setAttribute('opacity', '0');
                     } else if (elapsed < ROOF_LIFT_START) {
